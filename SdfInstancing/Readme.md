@@ -12,8 +12,8 @@ this shader demonstrate the different features :
  
 Some pictures of what i rely :
 
-![Pic0](pic0.png)
-![Pic1](pic1.png)
-![Pic2](pic2.png)
-![Pic3](pic3.png)
+![Pict0](pict0.png)
+![Pict1](pict1.png)
+![Pict2](pict2.png)
+![Pict3](pict3.png)
 
