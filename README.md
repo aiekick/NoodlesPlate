@@ -4,7 +4,7 @@ This repo wil contain Samples, Doc, Tutos, and Releases of NoodlesPlate
 
 # ChangeLog :
 
-[Version 0.1.955](releases)
+[Version 0.1.955](https://github.com/aiekick/NoodlesPlate/releases)
 
 ## [ADD] Settings dialog :
   * proxy settings move from import bar to here
