@@ -38,6 +38,7 @@ you can check the wiki if you want more infos
 * inspect gpu metrics (temperature / load / memory / etc.. only support nvidia for the moment)
 
 <ins>Features planned :</ins>
+* user templates
 * Node Graph (wip, not stable)
 * video / audio (playback / recording)
 * timeline for uniforms tuning over time
