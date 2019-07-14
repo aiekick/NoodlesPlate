@@ -45,3 +45,5 @@ you can check the wiki if you want more infos
 
 <ins>Some screenshots :</ins>
 
+![1](NoodlesPlate_MSVC_x64_Release_2019-07-14_05-54-36.png)
+![2](NoodlesPlate_MSVC_x64_Release_2019-07-14_05-55-13.png)
