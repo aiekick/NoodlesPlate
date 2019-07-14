@@ -1,6 +1,13 @@
-0.1.955
+0.1.974
 https://github.com/aiekick/NoodlesPlate/Releases
-
+---
+0.1.974
+[FIX] changelog was not displayed
+[FIX] when rendering was paused, any tuning did not refresh the view
+[FIX] crash at app close
+[FIX] in some case, the config change crashed the app
+---
+0.1.955
 [ADD] Settings dialog :
   * proxy settings move from import bar to here
   * same for ShaderToy api key
