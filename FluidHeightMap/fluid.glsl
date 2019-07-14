@@ -1,4 +1,4 @@
-@FRAMEBUFFER SIZE(1000,1000) /*RATIO(picture:laby2.jpg)*/ /*RATIO(1.25)*/ /*SIZE(picture:laby2.jpg)*/
+@FRAMEBUFFER SIZE(1000) COUNT(3) /*RATIO(picture:laby2.jpg)*/ /*RATIO(1.25)*/ /*SIZE(picture:laby2.jpg)*/
 
 @UNIFORMS
 
