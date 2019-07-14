@@ -1,4 +1,4 @@
-@FRAMEBUFFER /*SIZE(800,600)*/ //RATIO(picture:file.jpeg)
+@FRAMEBUFFER COUNT(2) /*SIZE(800,600)*/ //RATIO(picture:file.jpeg)
 
 @UNIFORMS
 
