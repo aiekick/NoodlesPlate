@@ -20,6 +20,7 @@ you can check the wiki if you want more infos
   * gamepad
   * mouse
 * Vertex / Fragment / Geometry shader ibn one file
+* primitive instancing
 * in code config (selectable in ui)
 * include files
 * multipass
