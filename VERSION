@@ -1,5 +1,10 @@
-0.1.974
+0.1.1076
 https://github.com/aiekick/NoodlesPlate/Releases
+---
+0.1.1076
+[FIX] version check
+[FIX] recent files was not in good order
+[ADD] template creation (directory templates)
 ---
 0.1.974
 [FIX] changelog was not displayed
