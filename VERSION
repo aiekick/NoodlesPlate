@@ -1,7 +1,7 @@
-0.1.1081
+0.1.1417
 https://github.com/aiekick/NoodlesPlate/releases
 ---
-0.1.1417 (pre change lop)
+0.1.1417
 [FIX] version check, 4s of timeout, not block anymore the ui if github not respond
 [ADD] Support of tesselation control and tesselation evaluation shader
 [FIX] mesh loader can open mixed mesh ,traingles, and quads, but only ascii obj and without textures for the moment
