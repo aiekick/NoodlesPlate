@@ -32,7 +32,7 @@ you can check the wiki if you want more infos
 * uniforms config switcher
 * Primitve Culling System via Gizmo
 * sdf merge with mesh
-* wold camera in your shaders
+* wold camera (perspective / orthographic) in your shaders
 * fullscreen windowed or full
 * trasnparant window (contorle with the alpha value of your shader)
 * save picture for each code modification (let you create video of your shader design)
