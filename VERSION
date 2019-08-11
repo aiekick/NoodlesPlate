@@ -10,6 +10,7 @@ https://github.com/aiekick/NoodlesPlate/releases
 [ADD] MSAA x2 for mesh visu ( or debug wireframe), btw it do, pixel debugging features, and fbo textures display, stop working
 [ADD] A compil button, for force recompilation, when in some weird cases, the files changes are not triggered in NoodlesPlate
 [ADD] a natural sorting for Uniforms Config Switcher
+[ADD] cammera orthographic for mesh ( not work correctly with sdf, need glsl code modification of space3d.glsl). with sdf use perspective
 ---
 0.1.1081
 [FIX] version check
