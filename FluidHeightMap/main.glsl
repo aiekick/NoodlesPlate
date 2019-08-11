@@ -3,22 +3,26 @@
 @UNIFORMS
 
 uniform 		float		(time) time; // time
-uniform 		mat4		(camera:mvp) cam; // camera mvp (proj * view * model)
-uniform 		float		(maxpoints) maxpoints; // give the max point count abailable
+uniform 		float		(0.0:100.0:1.0) freq; // frequence
+uniform 		mat4		(camera:mvp) cam;
+uniform 		float		(maxpoints) maxpoints;
 uniform 		float		(0.0:100.0:5.0) altitude;
 
 uniform(hidden) sampler2D	(buffer:target=0) uBuffer;
-uniform(hidden) sampler2D	(buffer:target=2:file=fluid.glsl) uFluid;		// clid buffer
-uniform(hidden) vec2		(buffer:target=2:file=fluid.glsl) uFluidSize;	// clid buffer size
+uniform(hidden) sampler2D	(buffer:target=2:file=fluid) uFluid;		// clid buffer
+uniform(hidden) vec2		(buffer:target=2:file=fluid) uFluidSize;	// clid buffer size
 
-uniform(picture:0) 						float		(checkbox) uUsePicture;
-uniform(picture:1:uUsePicture==true) 	sampler2D	(picture:choice) uPicture; 
-uniform(picture:2:uUsePicture==true) 	vec2		(picture:target=uPicture) uPictureSize;
+uniform 		float		(checkbox) uUsePicture;
+uniform(hidden) sampler2D	(picture:file=monalisa.jpg) uPicture;
+uniform(hidden) vec2		(picture:file=monalisa.jpg) uPictureSize;
 
-uniform 		float		(usegeometry) uUseGeometry; // say if geometry shader is used or not
+uniform 		float		(usegeometry) uUseGeometry;
 
-uniform(sdf) 		float		(0.0:100.0:0.0) uDfPos;
-uniform(sdf) 		float		(0.0:200.0:0.0) uRadius;
+uniform 		float		(0.0:100.0:0.0) uDfPos;
+uniform 		float		(0.0:200.0:0.0) uRadius;
+
+uniform 		int			(1:16:16) uMaxIter;
+uniform 		int			(1:10:5) uMengerIter;
 
 @VERTEX POINTS(100:10000000:900000) // point slider
 
@@ -40,7 +44,7 @@ float getDf(vec3 p)
 {
 	float plane = p.y;
 	float sp = length((p+vec3(0,uDfPos,0)).yz) - uRadius;
-	return min(plane, sp);
+	return min(plane, sp) ;
 }
 
 vec3 getNor(vec3 p)

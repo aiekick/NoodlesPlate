@@ -1,4 +1,4 @@
-@FRAMEBUFFER SIZE(1000) COUNT(3) /*RATIO(picture:laby2.jpg)*/ /*RATIO(1.25)*/ /*SIZE(picture:laby2.jpg)*/
+@FRAMEBUFFER SIZE(1000,1000) FILTER(linear) COUNT(3) /*RATIO(picture:laby2.jpg)*/ /*RATIO(1.25)*/ /*SIZE(picture:laby2.jpg)*/
 
 @UNIFORMS
 
@@ -7,7 +7,7 @@ uniform(hidden) float(deltatime) uDeltaTime;
 
 ////////////////////////////////////////////
 
-uniform(buffer) sampler2D(buffer:target=0:filter=nearest) navierScottBuffer; // buffer 0
+uniform(buffer) sampler2D(buffer:target=0) navierScottBuffer; // buffer 0
 uniform(buffer) sampler2D(buffer:target=1) grayScottBuffer; // buffer 1
 uniform(buffer) sampler2D(buffer:target=2) colorBuffer; // buffer 2
 uniform(hidden) vec2(buffer:target=0) size;
