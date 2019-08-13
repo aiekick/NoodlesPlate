@@ -124,8 +124,8 @@ vec2 map(vec3 p)
 
 uniform(Volume Marcher) int(0:200:130) marchIters; // count iteration in volume marcher
 uniform(Volume Marcher) float(0:1:0.99) breakCondition; // breakc alpha accum condition
-uniform(Clouds Density) vec2(0:5:2,3) density2; // second density used by ray step size
-uniform(Clouds Density) vec2(0,0.5:1,1.5:0.3,1.12) density;
+uniform(Volume Marcher) vec2(0:5:2,3) density2; // second density used by ray step size
+uniform(Volume Marcher) vec2(0,0.5:1,1.5:0.3,1.12) density;
 uniform(Volume Marcher) vec2(0:0.5:0.09,0.3) clampedDistance; // clamp ray distance for control ray step size
 
 uniform(Fog:0) float(checkbox:true) useFog; // use fog 
@@ -239,7 +239,7 @@ vec3 iLerp(in vec3 a, in vec3 b, in float x)
 
 @UNIFORMS
 
-uniform(Cloud Colors) float(-1:1:0.4) mixerOverTime; // shapoe in map fucntion, and color after render
+uniform(sdf) float(-1:1:0.4) mixerOverTime; // shapoe in map fucntion, and color after render
  
 uniform(PostProcessing:-1) text( R   G   B) swizzle;
 uniform(PostProcessing:0) vec3(radio:0) yellowColorR;
