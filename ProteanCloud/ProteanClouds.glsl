@@ -144,7 +144,7 @@ uniform(Clouds Color:40) float(checkbox:true) useSecondDiffusion; // 5th step, d
 uniform(Clouds Color:50) float(checkbox:true) useColorShadow; // 6th step, diffusion mix for cloud shadow
 uniform(Clouds Color:51:useColorShadow==true) vec3(color:0.005,.045,.075) densityColor2; // color over tunnel axis
 
-uniform(Camera:50) float(checkbox:true) useCamera; // use camera of noodlesplate (see top button for activate camera) :\n - left mouse => rotate\n - right mouse => zzom
+uniform(Camera:50) float(checkbox:false) useCamera; // use camera of noodlesplate (see top button for activate camera) :\n - left mouse => rotate\n - right mouse => zzom
 
 @FRAGMENT
 
