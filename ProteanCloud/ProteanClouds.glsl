@@ -144,7 +144,11 @@ uniform(Clouds Color:40) float(checkbox:true) useSecondDiffusion; // 5th step, d
 uniform(Clouds Color:50) float(checkbox:true) useColorShadow; // 6th step, diffusion mix for cloud shadow
 uniform(Clouds Color:51:useColorShadow==true) vec3(color:0.005,.045,.075) densityColor2; // color over tunnel axis
 
+uniform(Camera:50) float(checkbox:true) useCamera; // use camera of noodlesplate (see top button for activate camera) :\n - left mouse => rotate\n - right mouse => zzom
+
 @FRAGMENT
+
+vec3 _globalP; // AIekick code used for calcDepth
 
 vec4 render( in vec3 ro, in vec3 rd, float time )
 {
@@ -214,6 +218,7 @@ vec4 render( in vec3 ro, in vec3 rd, float time )
         // used for fog and color diffusion for breack condition, but affect color accumulation
 		t += clamp(0.5 - dn*dn*.05, clampedDistance.x, clampedDistance.y);
 	}
+	_globalP = ro + t * rd;
     // color result clamped
 	return clamp(rez, 0.0, 1.0);
 }
@@ -254,8 +259,12 @@ uniform(PostProcessing:10) float(checkbox:true) useVignette;
 
 @FRAGMENT
 
+#include "space3d.glsl"
+
 void mainImage( out vec4 fragColor, in vec2 fragCoord )
 {	
+	_globalP = vec3(0.0); // add by aiekick for calcdepth
+	
     // standard uv 0->1 (used for vignette)
 	vec2 q = fragCoord.xy/iResolution.xy;
     // central uv -1->1
@@ -275,7 +284,7 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
     ro.xy += disp(ro.z)*dspAmp; 
     float tgtDst = 3.5;
     
-    // camera setup
+	// camera setup
     vec3 target = normalize(ro - vec3(disp(time + tgtDst)*dspAmp, time + tgtDst));
     // affect eye x moving acording to mouse
     ro.x -= bsMo.x*2.;
@@ -285,13 +294,20 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
 	vec3 rd=normalize((p.x*rightdir + p.y*updir)*1. - target);
     // apply some rotation of the ray direction affecte by mouse also
     rd.xy *= rot(-disp(time + 3.5).x*0.2 + bsMo.x);
+	
+	if (useCamera > 0.5)
+	{
+		ro = getRayOrigin();
+		rd = getRayDirection();
+	}
+	
     // prm1 is initilaized here and used in mpa for mis shape and color over time
     // blue and yellow based style
     prm1 = smoothstep(-mixerOverTime, mixerOverTime,sin(iTime*0.3));
     // render scene color
 	vec4 scn = render(ro, rd, time);
-		
-    // blue and yellow color sheme is defined here
+	
+	// blue and yellow color sheme is defined here
     // the shape was mixed in map function
     // here we just do color
     // the blue sheme is just obtained by swizzle normal color
