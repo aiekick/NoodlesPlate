@@ -20,6 +20,8 @@ you can check the wiki if you want more infos
   * gamepad (go in settings dialog for tune and affect your gampead butotn / sticks)
   * mouse
   * color picker
+* Time Line for easy animation crration (based on the behavior of blender3D)
+  * export all frames in pictures
 * uniforms collapsable / expandable by section or hidden (defined in code)
 * Vertex / Fragment / Geometry / tesselation control / tesselation eval shader ibn one file
 * primitive instancing
