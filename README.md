@@ -4,11 +4,11 @@ NoodlesPlate is a offline Shader Editor.
 
 His particularity is to offer to the user many type of widgets, let you easilty tune in real time your shader.
 
-all the system is designed for let the user choose his text editor. NoodlespLate update all ui after each code chnage (file save)
+all the system is designed for let the user choose his text editor. NoodlespLate update all ui after each code change (file save)
 
 you can check the wiki if you want more infos
 
-<ins>Smoe features availables :</ins>
+<ins>Some features availables :</ins>
 * many uniforms widgets :
   * sliders
   * checkbox
@@ -16,7 +16,7 @@ you can check the wiki if you want more infos
   * radio buttons
   * time / date / deltatime
   * frame
-  * gizmo (tranlate / rotate / scale) via [ImGuizmo](https://github.com/CedricGuillemet/ImGuizmo)
+  * gizmo (translate / rotate / scale) via [ImGuizmo](https://github.com/CedricGuillemet/ImGuizmo)
   * gamepad (go in settings dialog for tune and affect your gampead butotn / sticks)
   * mouse
   * color picker
