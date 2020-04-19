@@ -47,6 +47,8 @@ you can check the wiki if you want more infos
 * bvh player for uniforms
 * vr support ( let you define the buffer on eye / and use sticks)
 
+Binaries => https://github.com/aiekick/NoodlesPlate/releases
+
 <ins>Some screenshots :</ins>
 
 ![1](NoodlesPlate_MSVC_x64_Release_2019-07-14_05-54-36.png)
