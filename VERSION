@@ -1,3 +1,26 @@
+0.5.897
+https://github.com/aiekick/NoodlesPlate/releases
+---
+0.5.897
+big update, and stable enough for be shared. but WIP on some features
+
+New Features :
+[ADD] : new ui system (each pane can be extracted as a new windows)
+[ADD] : vertical toolbar on the left side for the main features
+[ADD] : add a live opengl profiler
+[ADD] : add a live gpu metric small pane (for nvidia on windows only)
+[ADD] : add a console pane
+[ADD] : add a unified uniforms switcher pane
+[ADD] : add a new one file system when each buffer pass will be in the same file
+  * shadertoy import can be now improted in only one file
+[ADD] : add a new uniform of type button
+[ADD] : add a samples for features (new > Feature)
+[ADD] : add a new theming system for change the colors of the ui as you want
+[ADD] : the asset file dialog can now show pictures
+[ADD] : transform feedback system for extract mesh from the vertex/geometry/tesselation shader stage
+[IMP] : improvment of the timeline, easier for create loops now
+[OPT][FIX] : Many Optimization and Bug Fixs (about the rendering system and ui)
+
 0.1.3075
 https://github.com/aiekick/NoodlesPlate/releases
 ---

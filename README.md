@@ -11,6 +11,7 @@ you can check the wiki if you want more infos
 <ins>Some features availables :</ins>
 * many uniforms widgets :
   * sliders
+  * buttons
   * checkbox
   * combobox
   * radio buttons
@@ -27,9 +28,12 @@ you can check the wiki if you want more infos
 * primitive instancing
 * in code config (selectable in ui)
 * include files
-* multipass
-* compute shader => not finalized, supprort only 2d/3d texture. no mesh generation
-* immport of ShaderToy / GlslSandbox / VertexShaderArt
+* multipass :
+  * in many files
+  * or in one file
+* compute shader => not finalized, support only 2d/3d texture. no mesh generation
+* import of ShaderToy / GlslSandbox / VertexShaderArt
+  * import fo shadertoy now possible in one file only
 * multi attachments buffers
 * uniforms config switcher => lets you save/load uniforms conf file
 * Primitve Culling System via Gizmo
@@ -40,6 +44,10 @@ you can check the wiki if you want more infos
 * save picture for each code modification (let you create video of your shader design)
 * pixel debugging, offer rgba value inspection (with mouse, under line on screen)
 * inspect gpu metrics (temperature / load / memory / etc.. only support nvidia for the moment)
+* gpu live profiler (flamegraph type)
+* support of transform feedback for extrac mesh from vertex/geometry/tesselation stage
+* Advanced UI system for extract panes to windows (thanks to Dear Imgui Docking/Viewport system)
+* Advanced theming system (thanks to Dear Imgui)
 
 <ins>Features planned :</ins>
 * Node Graph (wip, not stable)
@@ -51,5 +59,14 @@ Binaries => https://github.com/aiekick/NoodlesPlate/releases
 
 <ins>Some screenshots :</ins>
 
-![1](NoodlesPlate_MSVC_x64_Release_2019-07-14_05-54-36.png)
-![2](NoodlesPlate_MSVC_x64_Release_2019-07-14_05-55-13.png)
+NoodlesPlate v0.5.897
+
+![0.5.897.1](NoodlesPlate_Msvc_x64_N69aImL27C.png)
+![0.5.897.2](NoodlesPlate_Msvc_x64_UXpK9TMq4S.png)
+![0.5.897.3](NoodlesPlate_Msvc_x64_wPe36WwlZX.png)
+![0.5.897.4](NoodlesPlate_Msvc_x64_ldzPsKLqlK.png)
+
+NoodlesPlate v0.1.3075
+
+![0.1.3075.1](NoodlesPlate_MSVC_x64_Release_2019-07-14_05-54-36.png)
+![0.1.3075.2](NoodlesPlate_MSVC_x64_Release_2019-07-14_05-55-13.png)
