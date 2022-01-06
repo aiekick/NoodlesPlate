@@ -1,3 +1,28 @@
+0.6.254
+https://github.com/aiekick/NoodlesPlate/releases
+---
+0.6.254
+
+[ADD] : add the support of the vr (only pos and view dir of the vr device)
+[ADD] : add help section for the vr mode
+[ADD] : add a button for enable/disable the vr
+[ADD] : add a uniform for check in the shader when the vr is enabled/disable
+[ADD] : add uniforms for pos and view dir
+[ADD] : when the vr is enabled, the view and proj matrix from the camera 
+        are repleced by proj an view of each eyes of the vr device
+[ADD] : when the vr images are rendered in the vr device, the rendering in noodlesplate is stopped
+[ADD] : add a the support of the vr for the import from shadertoy
+
+0.6.148
+https://github.com/aiekick/NoodlesPlate/releases
+---
+0.6.148
+
+little update
+
+[ADD] : add a uniform for midi devices
+[ADD] : add a pane in settings dialog for detect midi devices and copy unfiorms syntax to use
+
 0.6.77
 https://github.com/aiekick/NoodlesPlate/releases
 ---
