@@ -21,6 +21,7 @@ you can check the wiki if you want more infos
   * gamepad (go in settings dialog for tune and affect your gamepad buttons / sticks)
   * mouse
   * color picker
+  * midi devices
 * Time Line for easy animation crration (based on the behavior of blender3D)
   * export all frames in pictures
 * uniforms collapsable / expandable by section or hidden (defined in code)
@@ -48,12 +49,11 @@ you can check the wiki if you want more infos
 * support of transform feedback for extrac mesh from vertex/geometry/tesselation stage
 * Advanced UI system for extract panes to windows (thanks to Dear Imgui Docking/Viewport system)
 * Advanced theming system (thanks to Dear Imgui)
-
+* support vr (not pads for the moment, but pose and view dir is working perfectly)
 <ins>Features planned :</ins>
 * Node Graph (wip, not stable)
 * video / audio (playback / recording)
 * bvh player for uniforms
-* vr support ( let you define the buffer on eye / and use sticks)
 
 Binaries => https://github.com/aiekick/NoodlesPlate/releases
 
