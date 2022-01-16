@@ -59,6 +59,11 @@ Binaries => https://github.com/aiekick/NoodlesPlate/releases
 
 <ins>Some screenshots :</ins>
 
+NoodlesPlate v0.6.660
+
+VR Mode (show left eye in screen) with the shader [Dual 3D Truchet Tiles](https://www.shadertoy.com/view/4l2cD3) of [Shane](https://www.shadertoy.com/user/Shane)
+![0.6.660.1](vlc_SNqaS5IBxD.jpg)
+
 NoodlesPlate v0.5.897
 
 ![0.5.897.1](NoodlesPlate_Msvc_x64_N69aImL27C.png)
