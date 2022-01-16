@@ -49,7 +49,22 @@ you can check the wiki if you want more infos
 * support of transform feedback for extrac mesh from vertex/geometry/tesselation stage
 * Advanced UI system for extract panes to windows (thanks to Dear Imgui Docking/Viewport system)
 * Advanced theming system (thanks to Dear Imgui)
-* support vr (not pads for the moment, but pose and view dir is working perfectly)
+* support of the VR (via OpenXR) :
+  * a button in the left toolbar is available for enable/disable the vr 
+  * display the left eye on the screen
+  * support of controllers : 
+    * Generic pads (tested => OK)
+    * Occulus touch (tested => OK)
+    * Valve index (not tested => but will work as expcted i guess)
+  * camera can be controlled via VR controllers, if the camera vr control is checked and only when swizzle (side trigger) is pressed :
+    * left controller thumbstick x can be used for roll (axis z) the camera
+    * left controller trigger can be used for move the camera backward
+    * right controller trigger can be used for move the camera forward
+    * right controller thumbstick up/down can be used for pitch (axis x) the camera
+    * right controller thumbstick left/right can be used for yaw (axis y) the camera
+  * the triggers, thumbsticks, and swizzle are available as uniforms. 
+    swizzle can be used if the camera vr control is unchecked
+    check the help avaialble in elft toolabr for have the unifomrs syntax
 <ins>Features planned :</ins>
 * Node Graph (wip, not stable)
 * video / audio (playback / recording)
