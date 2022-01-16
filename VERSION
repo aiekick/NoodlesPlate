@@ -1,3 +1,22 @@
+0.6.660
+https://github.com/aiekick/NoodlesPlate/releases
+---
+0.6.660
+
+[VR] : draw the VR FBO on screen
+[VR] : add support of controller : kronos generic, oculus touch and valve index (no mesh, just control)
+[VR] : add camera control view left and right thumbstick XY (can be enabled or disabled)
+[VR] : add uniforms for trigger, squeese, thumbs 
+       thumbs are not filled when the camera is used and 
+	   when the camera via vr is enabled
+[VR] : add camera factor for rotation and zoom when using vr controllers
+[VR] : add factor for uniforms vr::thumb:accum
+[ADD] : add rotation around Z for camera
+[ADD] : add a lock for translation and rotation. by default translation XYZ and rotation Z are locked
+[ADD] : add a Free Camera Mode
+[FIX] : fix time widget speed between modes
+[FIX] : fix and refactor of recent files system
+
 0.6.254
 https://github.com/aiekick/NoodlesPlate/releases
 ---
