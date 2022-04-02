@@ -65,6 +65,7 @@ you can check the wiki if you want more infos
   * the triggers, thumbsticks, and swizzle are available as uniforms. 
     swizzle can be used if the camera vr control is unchecked
     check the help avaialble in elft toolabr for have the unifomrs syntax
+    
 <ins>Features planned :</ins>
 * Node Graph (wip, not stable)
 * video / audio (playback / recording)
