@@ -1,8 +1,5 @@
----
-sidebar_position: -6
----
-
-# NoodlesPlate 0.6.0148
+NoodlesPlate 0.6.0148
+=============
 
 [NoodlesPlate 0.6.0148](https://github.com/aiekick/NoodlesPlate/releases/tag/v0.6.148)
 
