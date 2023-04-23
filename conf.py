@@ -108,14 +108,14 @@ pygments_dark_style = "monokai"
 
 ogp_site_url = "https://aiekick.github.io/NoodlesPlate"
 ogp_site_name = "Learn NoodlesPlate"
-ogp_image = "images/appicon.png"
+ogp_image = "images/appicon-180x180.png"
 
 # -- Options for sphinx-favicon -----------------------------------------
 
 favicons = [
     {
         "rel": "icon",
-        "static-file": "favicon/appicon.png",
+        "static-file": "favicon/appicon-180x180.png",
         "type": "image/svg+xml",
     },
     {

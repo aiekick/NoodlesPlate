@@ -8,7 +8,6 @@ Contents
 :titlesonly:
 
 Introduction/index
-General/index
 Features/index
 SoGlsl/index
 Samples/index

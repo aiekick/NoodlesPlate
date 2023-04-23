@@ -1,7 +1,3 @@
----
-sidebar_position: 2
----
-
 # Sdf Instancing
 
 Test Case : Sdf Instancing
@@ -21,7 +17,7 @@ this shader demonstrate the different features :
  
 Some pictures of what i rely :
 
-![Pict0](/img/SdfInstancing/pict0.png)
-![Pict1](/img/SdfInstancing/pict1.png)
-![Pict2](/img/SdfInstancing/pict2.png)
-![Pict3](/img/SdfInstancing/pict3.png)
+![Pict0](/data/Samples/SdfInstancing/pict0.png)
+![Pict1](/data/Samples/SdfInstancing/pict1.png)
+![Pict2](/data/Samples/SdfInstancing/pict2.png)
+![Pict3](/data/Samples/SdfInstancing/pict3.png)

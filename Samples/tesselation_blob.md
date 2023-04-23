@@ -1,7 +1,3 @@
----
-sidebar_position: 2
----
-
 # Tesselated Blob
 
 Test Case : Tesselation Shader (Control / Evaluation)
@@ -25,7 +21,7 @@ if you want to choose another mesh by default see the @VERTEX seciton in code. y
 Some pictures of what i rely :
 
 Tesselation enable / disable + uniforms tuning
-![tesselation_enable_uniform_tuning](/img/TesselationBlob/tesselation_enable_uniform_tuning.gif)
+![tesselation_enable_uniform_tuning](/data/Samples/TesselationBlob/tesselation_enable_uniform_tuning.gif)
 
 Msaa X2 for inspect wireframe ( see the breaked texture on left pane )
-![msaa_x2_enabled](/img/TesselationBlob/msaa_x2_enabled.gif)
+![msaa_x2_enabled](/data/Samples/TesselationBlob/msaa_x2_enabled.gif)
