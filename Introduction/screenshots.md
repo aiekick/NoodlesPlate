@@ -1,8 +1,5 @@
----
-sidebar_position: 5
----
-
-# Screenshots
+Screenshots
+=============
 
 NoodlesPlate v0.6.660
 
