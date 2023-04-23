@@ -1,4 +1,5 @@
-# Requirements
+Requirements
+=============
 
 the minimum requirement i thinck is :
 * window operating system 32 or 64 bits dependant of the version :)
