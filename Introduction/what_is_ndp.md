@@ -17,8 +17,7 @@ NoodlesPlate is a GLSL Shader Editor :
     * Compute Shader Support, let you fill texture 2d on texture 3d by example (not very stable for the moment)
     * Support of mesh instancing
     
-Why ?
-=============
+## Why ?
 
 I Discovered Shaders in 2014 for a game, and im in love with all the procedural stuff we can create with that since this moment.
 
