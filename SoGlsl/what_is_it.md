@@ -1,6 +1,3 @@
----
-sidebar_position: 0
----
-
-# What is it ?
+What is it ?
+=============
 
