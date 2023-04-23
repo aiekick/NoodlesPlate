@@ -30,13 +30,13 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v2
       - name: Setup Python
-        run: pip install -r requirements.txt
+        run: cd docs && pip install -r requirements.txt
       - name: Build with Sphinx
-        run: make html
+        run: cd docs && make html
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
         with:
-          path: _build/html
+          path: docs/_build/html
 
   # Deployment job
   deploy:
