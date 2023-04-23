@@ -17,9 +17,9 @@ sys.path.append(abspath(join(dirname(__file__), '_extensions')))
 
 # -- Project information -----------------------------------------------------
 
-project = 'Learn WebGPU for C++'
-copyright = '2022-2023, Élie Michel and contributors'
-author = 'Élie Michel'
+project = 'Learn NoodlesPlate'
+copyright = '2018-2023, Stephane Cuillerdier (aka AieKick)'
+author = 'Stephane Cuillerdier'
 
 
 # -- General configuration ---------------------------------------------------
@@ -60,8 +60,8 @@ myst_enable_extensions = [
 html_theme = 'furo'
 
 html_theme_options = {
-    "light_logo": "webgpu-light.svg",
-    "dark_logo": "webgpu-dark.svg",
+    "light_logo": "images/appicon-180x180.png",
+    "dark_logo": "images/appicon-180x180.png",
     "sidebar_hide_name": True,
     "navigation_with_keys": True,
     "light_css_variables": {
@@ -85,7 +85,7 @@ html_theme_options = {
         },
     ],
     "source_repository": "https://github.com/aiekick/NoodlesPlate/",
-    "source_branch": "main",
+    "source_branch": "docs",
     "source_directory": ".",
 }
 
