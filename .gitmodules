@@ -1,0 +1,4 @@
+[submodule "3rdparty/SoGLSL"]
+	path = 3rdparty/SoGLSL
+	url = https://github.com/aiekick/SoGLSL.git
+	branch = master
