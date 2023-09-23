@@ -60,9 +60,9 @@ inline void SetCurrentContext(GPU_CONTEXT vContext) {
 #define ICON_NDP_PAUSE u8"\uffd2"
 inline bool PlayPauseButton(bool& vIsPaused) {
     bool res = false;
-    const char* play_pause_label = ICON_NDP_PLAY;
+    const char* play_pause_label = ICON_NDP_PAUSE;
     if (vIsPaused) {
-        play_pause_label = ICON_NDP_PAUSE;
+        play_pause_label = ICON_NDP_PLAY;
     }
     if (ImGui::ContrastedButton(play_pause_label)) {
         vIsPaused = !vIsPaused;

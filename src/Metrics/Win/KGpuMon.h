@@ -1,4 +1,5 @@
 #pragma once
+#pragma warning(disable : 4702)
  
 /* 
    Not found the orioginla code

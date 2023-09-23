@@ -481,8 +481,6 @@ bool MainFrame::DoAbout() {
             ImGui::ClickableTextUrl("FileWatcher (MIT)", "https://github.com/apetrone/simplefilewatcher");
             // shadertoy api
             ImGui::ClickableTextUrl("Shadertoy.com API", "https://www.shadertoy.com/api");
-            // glslang
-            ImGui::ClickableTextUrl("Glslang (Various)", "https://github.com/KhronosGroup/glslang");
             // ImGuizmo
             ImGui::ClickableTextUrl("ImGuizmo (MIT)", "https://github.com/CedricGuillemet/ImGuizmo");
             ImGui::SameLine();
