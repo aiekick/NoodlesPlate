@@ -3,7 +3,7 @@ name: Linux
 on:
   push:
     branches:
-    - DemoApp
+    - master
 
 jobs:
   build_Linux_Ubuntu:
@@ -11,7 +11,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
       with:
-        ref: DemoApp
+        ref: master
     - name: checkout submodules
       run : git submodule update --init --recursive 
     - name: Install OpenGL lib  / Requirement for Glfw3
@@ -23,5 +23,5 @@ jobs:
     - name: upload artifact
       uses: actions/upload-artifact@v3
       with:
-        name: DemoApp_Linux
-        path: bin/DemoApp_Linux
+        name: NoodlesPlate_Linux_x64
+        path: bin/NoodlesPlate_Linux_x64
