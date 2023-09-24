@@ -194,7 +194,7 @@ message("${PROJECT} Version to install : ${${PROJECT}_Version}")
 #############################################################
 
 if (APPLE)
-	set(${PROJECT}_Output_Name "${PROJECT}_${ARCH}")
+	set(${PROJECT}_Output_Name "${PROJECT}_Osx_${ARCH}")
 	set_target_properties(${PROJECT} PROPERTIES
 		OUTPUT_NAME "${PROJECT}_${ARCH}"
 		MACOSX_BUNDLE_EXECUTABLE_NAME "${PROJECT}_${ARCH}"
