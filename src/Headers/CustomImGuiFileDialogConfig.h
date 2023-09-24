@@ -42,7 +42,7 @@
 //#define MAX_PATH_BUFFER_SIZE 1024
 
 // options of use std::filesystem isntead of dirent.h but need c++17
-#define USE_STD_FILESYSTEM
+//#define USE_STD_FILESYSTEM
 
 #define USE_THUMBNAILS
 //the thumbnail generation use the stb_image and stb_resize lib who need to define the implementation
