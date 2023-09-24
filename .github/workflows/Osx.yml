@@ -3,7 +3,7 @@ name: Osx
 on:
   push:
     branches:
-    - DemoApp
+    - master
 
 jobs:
   build_Osx:
@@ -11,7 +11,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
       with:
-        ref: DemoApp
+        ref: master
     - name: checkout submodules
       run : git submodule update --init --recursive 
     - name: Install OpenGL lib  / Requirement for Glfw3
@@ -24,4 +24,4 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: DemoApp_Osx
-        path: bin/DemoApp_Osx
+        path: bin/NoodlesPlate_Osx_x64
