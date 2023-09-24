@@ -60,7 +60,7 @@ you can check the wiki if you want more infos
   * support of controllers : 
     * Generic pads (tested => OK)
     * Occulus touch (tested => OK)
-    * Valve index (not tested => but will work as expcted i guess)
+    * Valve index (not tested => but will work as expected i guess)
   * camera can be controlled via VR controllers, if the camera vr control is checked and only when swizzle (side trigger) is pressed :
     * left controller thumbstick x can be used for roll (axis z) the camera
     * left controller trigger can be used for move the camera backward
@@ -78,12 +78,18 @@ you can check the wiki if you want more infos
 
 Binaries => https://github.com/aiekick/NoodlesPlate/releases
 
+Build tested and succeded on :
+* On Win 7 x64 (in version x32/x64)
+* On Win 10 x64 (in version x64)
+* On Linux Debian/Ubuntu (in version x32/x64)
+* On Linux Debian/RaspberryOs (in version x86/x64)
+* MacOs Mojave (in version x86)
+
 # requirements
 
 * Cmake
 * OpenSSH
 * C++17
-
 
 # how to build
 
@@ -101,6 +107,10 @@ cmake --build my_build_directory --config BuildMode
 Some cMake version need Build mode define via the directive CMAKE_BUILD_TYPE or via --Config when we launch the build. 
 This is why i put the boths possibilities
 
+## On Windows :
+
+You need to have the opengl library installed
+
 ## On Linux :
 
 You need many lib : (X11, xrandr, xinerama, xcursor, mesa)
@@ -110,9 +120,30 @@ If you are on debian you can run :
 ```cpp
 sudo apt-get update 
 sudo apt-get install libgl1-mesa-dev libx11-dev libxi-dev libxrandr-dev libxinerama-dev libxcursor-dev
-sudo apt-get install libasound2-dev libxxf86vm-dev libxrandr-dev libssl-dev libxcb-glx0-dev
 ```
 
+## On MacOs :
+
+you need many lib : opengl and cocoa framework
+
+# License :
+
+NoodlesPlate is an open source software under [GPL-3.0](LICENSE)
+
+# Library used :
+
+* [Glfw - ZLIB](http://www.glfw.org/)
+* [Dear ImGui - Docking branch - MIT](https://github.com/ocornut/imgui)
+* [Glad - MIT](https://github.com/Dav1dde/glad)
+* [Stb - MIT](https://github.com/nothings/stb)
+* [tinyxml2 - ZLIB]( https://github.com/leethomason/tinyxml2)
+* [cTools - MIT](https://github.com/aiekick/cTools)
+* [ImGuiFileDialog - MIT](https://github.com/aiekick/ImGuiFileDialog)
+* [Curl - MIT](https://curl.haxx.se/")
+* [ImGuizmo MIT](https://github.com/CedricGuillemet/ImGuizmo)
+* [imgui_markdown MIT](https://github.com/juliettef/imgui_markdown)
+* [AlphaNum MIT](http://www.davekoelle.com/alphanum.html)
+			
 # Some screenshots :
 
 NoodlesPlate v0.6.660
