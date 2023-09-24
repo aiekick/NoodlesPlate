@@ -23,5 +23,5 @@ jobs:
     - name: upload artifact
       uses: actions/upload-artifact@v3
       with:
-        name: NoodlesPlate_Linux_x32
-        path: build/Release/NoodlesPlate_Linux_x32
+        name: NoodlesPlate_Linux_x64
+        path: bin/NoodlesPlate_Linux_x64

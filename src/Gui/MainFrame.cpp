@@ -83,28 +83,6 @@
 
 #include <Res/CustomFont.h>
 
-extern template IMGUI_API float ImGui::ScaleRatioFromValueT<ImS32, ImS32, float>(ImGuiDataType, ImS32, ImS32, ImS32, bool, float, float);
-extern template IMGUI_API float ImGui::ScaleRatioFromValueT<ImS32, ImU32, float>(ImGuiDataType, ImS32, ImS32, ImS32, bool, float, float);
-extern template IMGUI_API float ImGui::ScaleRatioFromValueT<ImU32, ImS32, float>(ImGuiDataType, ImU32, ImU32, ImU32, bool, float, float);
-extern template IMGUI_API float ImGui::ScaleRatioFromValueT<ImS64, ImS64, double>(ImGuiDataType, ImS64, ImS64, ImS64, bool, float, float);
-extern template IMGUI_API float ImGui::ScaleRatioFromValueT<ImU64, ImS64, double>(ImGuiDataType, ImU64, ImU64, ImU64, bool, float, float);
-extern template IMGUI_API float ImGui::ScaleRatioFromValueT<float, float, float>(ImGuiDataType, float, float, float, bool, float, float);
-extern template IMGUI_API float ImGui::ScaleRatioFromValueT<double, double, double>(ImGuiDataType, double, double, double, bool, float, float);
-
-extern template IMGUI_API ImS32 ImGui::ScaleValueFromRatioT<ImS32, ImS32, float>(ImGuiDataType, float, ImS32, ImS32, bool, float, float);
-extern template IMGUI_API ImU32 ImGui::ScaleValueFromRatioT<ImU32, ImS32, float>(ImGuiDataType, float, ImU32, ImU32, bool, float, float);
-extern template IMGUI_API ImS64 ImGui::ScaleValueFromRatioT<ImS64, ImS64, double>(ImGuiDataType, float, ImS64, ImS64, bool, float, float);
-extern template IMGUI_API ImU64 ImGui::ScaleValueFromRatioT<ImU64, ImS64, double>(ImGuiDataType, float, ImU64, ImU64, bool, float, float);
-extern template IMGUI_API float ImGui::ScaleValueFromRatioT<float, float, float>(ImGuiDataType, float, float, float, bool, float, float);
-extern template IMGUI_API double ImGui::ScaleValueFromRatioT<double, double, double>(ImGuiDataType, float, double, double, bool, float, float);
-
-extern template IMGUI_API float ImGui::RoundScalarWithFormatT<float>(const char*, ImGuiDataType, float);
-extern template IMGUI_API double ImGui::RoundScalarWithFormatT<double>(const char*, ImGuiDataType, double);
-extern template IMGUI_API ImS32 ImGui::RoundScalarWithFormatT<ImS32>(const char*, ImGuiDataType, ImS32);
-extern template IMGUI_API ImU32 ImGui::RoundScalarWithFormatT<ImU32>(const char*, ImGuiDataType, ImU32);
-extern template IMGUI_API ImS64 ImGui::RoundScalarWithFormatT<ImS64>(const char*, ImGuiDataType, ImS64);
-extern template IMGUI_API ImU64 ImGui::RoundScalarWithFormatT<ImU64>(const char*, ImGuiDataType, ImU64);
-
 ///////////////////////////////////////////////////////
 //// STATIC ///////////////////////////////////////////
 ///////////////////////////////////////////////////////

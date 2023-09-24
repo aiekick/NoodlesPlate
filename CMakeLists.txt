@@ -10,12 +10,11 @@ project(${PROJECT} CXX)
 
 option(USE_SDL "Enale SDL instead of GLFW" OFF)
 option(USE_PROFILER_TRACY "Enale Tracy Profiler" OFF)
-option(USE_GPU_METRIC "Enable Gpu Metrics if available (NVIDIA and WINDOWS only)" ON)
-option(USE_TEST "Enable Tests" OFF)
-option(USE_NETWORK "Enable NETWORK (Shader Inport, Versions, Changelog)" ON)
+option(USE_GPU_METRIC "Enable Gpu Metrics if available (NVIDIA and WINDOWS only)" OFF)
+option(USE_NETWORK "Enable NETWORK (Shader Inport, Versions, Changelog)" OFF)
 option(USE_STD_FILESYSTEM "Enable std::filesystem use for path and ImGuiFileDialog" ON)
 option(USE_PACKAGE_TO_NSIS "Enable packaging to nsis isntaller or zip if false" ON)
-option(USE_VR "Enable VR Backend via Openxr" ON)
+option(USE_VR "Enable VR Backend via Openxr" OFF)
 
 if (USE_NETWORK)
 	add_definitions(-DUSE_NETWORK)
@@ -37,8 +36,8 @@ endif()
 
 ## some defines for debug mode (before 3rdparty.cmake)
 if(MSVC)
-	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_DEBUG /Zi /MTd /NODEFAULTLIB:library")
-	set(CMAKE_CXX_FLAGS_RELEASE "/MT /NODEFAULTLIB:library")
+	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_DEBUG /Zi /MTd")
+	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_DEBUG} /MT")
 else()
 	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_DEBUG -g")
 endif()
@@ -47,7 +46,7 @@ set(LLVM_USE_CRT_DEBUG MTd CACHE STRING "" FORCE)
 set(LLVM_USE_CRT_MINSIZEREL MT CACHE STRING "" FORCE)
 set(LLVM_USE_CRT_RELEASE MT CACHE STRING "" FORCE)
 set(LLVM_USE_CRT_RELWITHDEBINFO MT CACHE STRING "" FORCE)
-set(USE_MSVC_RUNTIME_LIBRARY_DLL OFF CACHE BOOL "")
+set(USE_MSVC_RUNTIME_LIBRARY_DLL OFF CACHE BOOL "" FORCE)
 
 ## for group smake targets in the dir cmakeTargets
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
@@ -72,8 +71,8 @@ add_definitions(-DIMGUI_DEFINE_MATH_OPERATORS)
 add_definitions(-DIMGUI_IMPL_OPENGL_LOADER_GLAD)
 add_definitions(-DCUSTOM_SOGLSL_CONFIG="${CMAKE_SOURCE_DIR}/src/Headers/CustomSoGLSLConfig.h")
 add_definitions(-DCUSTOM_IMWIDGETS_CONFIG="${CMAKE_SOURCE_DIR}/src/Headers/CustomImWidgetsConfig.h")
+#add_definitions(-DCUSTOM_IN_APP_GPU_PROFILER_CONFIG="${CMAKE_SOURCE_DIR}/src/Headers/CustomInAppGpuProfiler.h")
 add_definitions(-DCUSTOM_IMGUIFILEDIALOG_CONFIG="${CMAKE_SOURCE_DIR}/src/Headers/CustomImGuiFileDialogConfig.h")
-add_definitions(-DCUSTOM_IN_APP_GPU_PROFILER_CONFIG="${CMAKE_SOURCE_DIR}/src/Headers/CustomInAppGpuProfiler.h")
 add_definitions(-DUSE_IMGUI="${CMAKE_SOURCE_DIR}/3rdparty/SoGLSL/3rdparty/ImGuiPack/3rdparty/imgui/imgui.h")
 
 include(cmake/3rdparty.cmake)
@@ -113,7 +112,7 @@ if(MSVC)
     add_definitions(-DMSVC)
 	add_definitions(-DNOMINMAX) ## for avoid issue regarding std::max and std::min
 else ()
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic -Wdeprecated-declarations -Wno-unknown-pragmas -Wno-unused-variable -Wno-unused-parameter")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m64 -Wall -Wextra -Wpedantic -Wdeprecated-declarations -Wno-unknown-pragmas -Wno-unused-variable -Wno-unused-parameter")
 endif()
 
 if (TARGET uninstall)
@@ -145,16 +144,12 @@ source_group(src/Impl FILES ${IMGUI_IMPL_SRC})
 file(GLOB_RECURSE CMAKE_RECURSE ${CMAKE_CURRENT_SOURCE_DIR}/cmake/*.cmake)
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/cmake PREFIX cmake FILES ${CMAKE_RECURSE})
 
-### TESTS ###
-file(GLOB PROJECT_CODETREE_TESTS ${CMAKE_SOURCE_DIR}/mainlibs/CodeTree/Tests/*.*)
-source_group(tests FILES ${PROJECT_CODETREE_TESTS})
-#############
-
 if (MSVC)
 	set(APP_ICON_RESOURCE_WINDOWS "${CMAKE_SOURCE_DIR}/res/appicon.rc")
 endif()
 
-add_executable(${PROJECT}
+add_executable(
+	${PROJECT}
 	${PROJECT_MAIN}
 	${CMAKE_RECURSE}
 	${IMGUI_IMPL_SRC}
@@ -171,9 +166,11 @@ add_executable(${PROJECT}
 if ("${CMAKE_EXE_LINKER_FLAGS}" STREQUAL "/machine:x64")
 	set(ARCH x64)
 	add_definitions(-DVERSION_X64)
+	message("${PROJECT} Build X64")
 else()
 	set(ARCH x32)
 	add_definitions(-DVERSION_X32)
+	message("${PROJECT} Build X32")
 endif()
 
 #############################################################
@@ -226,21 +223,20 @@ endif()
 #endforeach()
 
 include_directories(
-	include
 	src
+	include
 	3rdparty
 	3rdparty/SoGLSL
+	${NVAPI_INCLUDE_DIR}
 	${SOGSL_INCLUDE_DIRS}
 	${FREETYPE_INCLUDE_DIR}
-	${NVAPI_INCLUDE_DIR}
 )
 
 target_link_libraries(${PROJECT} PRIVATE 
-	${SOGLSL_LIBRARIES}
-	${CTOOLS_LIBRARIES}
-	${FREETYPE_LIBRARIES}
-	${NVAPI_LIBRARIES}
 	${ZLIB_LIBRARIES}
+	${NVAPI_LIBRARIES}
+	${SOGLSL_LIBRARIES}
+	${FREETYPE_LIBRARIES}
 )
 
 #############################################################

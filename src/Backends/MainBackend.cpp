@@ -54,6 +54,8 @@
 #include <SoGLSL/src/Buffer/FrameBuffersPipeLine.h>
 #include <SoGLSL/src/Systems/RenderDocController.h>
 #include <SoGLSL/src/CodeTree/ShaderKeyConfigSwitcherUnified.h>
+#include <SoGLSL/src/Res/CustomFont.h>
+#include <SoGLSL/src/Res/CustomFont2.h>
 
 // This Project
 #include <Generator/CodeGenerator.h>
