@@ -73,21 +73,56 @@ you can check the wiki if you want more infos
 
 Binaries => https://github.com/aiekick/NoodlesPlate/releases
 
-<ins>Some screenshots :</ins>
+# requirements
+
+* Cmake
+* OpenSSH
+* C++17
+
+
+# how to build
+
+You need to use cMake.
+For the 3 Os (Win, Linux, MacOs), the cMake usage is exactly the same, 
+
+1) Choose a build directory. (called here my_build_directory for instance) and
+2) Choose a Build Mode : "Release" / "MinSizeRel" / "RelWithDebInfo" / "Debug" (called here BuildMode for instance)
+3) Run cMake in console : (the first for generate cmake build files, the second for build the binary)
+```cpp
+cmake -B my_build_directory -DCMAKE_BUILD_TYPE=BuildMode
+cmake --build my_build_directory --config BuildMode
+```
+
+Some cMake version need Build mode define via the directive CMAKE_BUILD_TYPE or via --Config when we launch the build. 
+This is why i put the boths possibilities
+
+## On Linux :
+
+You need many lib : (X11, xrandr, xinerama, xcursor, mesa)
+
+If you are on debian you can run :  
+
+```cpp
+sudo apt-get update 
+sudo apt-get install libgl1-mesa-dev libx11-dev libxi-dev libxrandr-dev libxinerama-dev libxcursor-dev
+sudo apt-get install libasound2-dev libxxf86vm-dev libxrandr-dev libssl-dev libxcb-glx0-dev
+```
+
+# Some screenshots :
 
 NoodlesPlate v0.6.660
 
 VR Mode (show left eye in screen) with the shader [Dual 3D Truchet Tiles](https://www.shadertoy.com/view/4l2cD3) of [Shane](https://www.shadertoy.com/user/Shane)
-![0.6.660.1](doc/images/vlc_SNqaS5IBxD.jpg)
+![0.6.660.1](images/vlc_SNqaS5IBxD.jpg)
 
 NoodlesPlate v0.5.897
 
-![0.5.897.1](doc/images/NoodlesPlate_Msvc_x64_N69aImL27C.png)
-![0.5.897.2](doc/images/NoodlesPlate_Msvc_x64_UXpK9TMq4S.png)
-![0.5.897.3](doc/images/NoodlesPlate_Msvc_x64_wPe36WwlZX.png)
-![0.5.897.4](doc/images/NoodlesPlate_Msvc_x64_ldzPsKLqlK.png)
+![0.5.897.1](images/NoodlesPlate_Msvc_x64_N69aImL27C.png)
+![0.5.897.2](images/NoodlesPlate_Msvc_x64_UXpK9TMq4S.png)
+![0.5.897.3](images/NoodlesPlate_Msvc_x64_wPe36WwlZX.png)
+![0.5.897.4](images/NoodlesPlate_Msvc_x64_ldzPsKLqlK.png)
 
 NoodlesPlate v0.1.3075
 
-![0.1.3075.1](doc/images/NoodlesPlate_MSVC_x64_Release_2019-07-14_05-54-36.png)
-![0.1.3075.2](doc/images/NoodlesPlate_MSVC_x64_Release_2019-07-14_05-55-13.png)
+![0.1.3075.1](images/NoodlesPlate_MSVC_x64_Release_2019-07-14_05-54-36.png)
+![0.1.3075.2](images/NoodlesPlate_MSVC_x64_Release_2019-07-14_05-55-13.png)
