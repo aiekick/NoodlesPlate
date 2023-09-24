@@ -22,4 +22,4 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: NoodlesPlate_Msvc_x64.exe
-        path: build\Release\NoodlesPlate_Msvc_x64.exe
+        path: build/Release/NoodlesPlate_Msvc_x64.exe
