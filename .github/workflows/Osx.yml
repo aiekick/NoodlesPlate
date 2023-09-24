@@ -15,7 +15,7 @@ jobs:
     - name: checkout submodules
       run : git submodule update --init --recursive 
     - name: Install OpenGL lib  / Requirement for Glfw3
-      run : brew update
+      run : brew update && brew install libomp
     - name: configure
       run: mkdir build && cd build && cmake .. -DCMAKE_BUILD_TYPE=Release -DUSE_VR=OFF -DUSE_GPU_METRIC=OFF
     - name: build
