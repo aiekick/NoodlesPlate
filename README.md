@@ -1,3 +1,8 @@
+[![Win](https://github.com/aiekick/NoodlesPlate/actions/workflows/Win.yml/badge.svg)](https://github.com/aiekick/NoodlesPlate/actions/workflows/Win.yml)
+[![Osx](https://github.com/aiekick/NoodlesPlate/actions/workflows/Osx.yml/badge.svg)](https://github.com/aiekick/NoodlesPlate/actions/workflows/Osx.yml)
+[![Linux](https://github.com/aiekick/NoodlesPlate/actions/workflows/Linux.yml/badge.svg)](https://github.com/aiekick/NoodlesPlate/actions/workflows/Linux.yml)
+[![Sphinx](https://github.com/aiekick/NoodlesPlate/actions/workflows/gh-pages.yml/badge.svg)](https://github.com/aiekick/NoodlesPlate/actions/workflows/gh-pages.yml)
+
 # NoodlesPlate
 
 NoodlesPlate is a offline Shader Editor. 
