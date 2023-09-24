@@ -1047,15 +1047,15 @@ void MainFrame::DrawMainMenuBar() {
     if (displayShaderPtr) {
         MainBackend::Instance()->puPreviewBufferId = ct::mini<int>(MainBackend::Instance()->puPreviewBufferId, displayShaderPtr->puZeroBasedMaxSliceBufferId);
 
-        char bufferRecord[10];
-        char bufferRecordHelp[30];
+        char bufferRecord[80];
+        char bufferRecordHelp[80];
         const auto& arr = displayShaderPtr->puFragColorNames;
         for (auto i = 0; i <= displayShaderPtr->puZeroBasedMaxSliceBufferId; i++) {
-            snprintf(bufferRecord, 10, "%i##record", i);
+            snprintf(bufferRecord, 80, "%i##record", i);
             if (!arr.empty() && !arr[i].empty()) {
-                snprintf(bufferRecordHelp, 30, "Show Buffer %i (%s)", i, arr[i].c_str());
+                snprintf(bufferRecordHelp, 80, "Show Buffer %i (%s)", i, arr[i].c_str());
             } else {
-                snprintf(bufferRecordHelp, 30, "Show Buffer %i", i);
+                snprintf(bufferRecordHelp, 80, "Show Buffer %i", i);
             }
             if (ImGui::RadioButtonLabeled(ImVec2(0.0f, 0.0f), bufferRecord, bufferRecordHelp, MainBackend::Instance()->puPreviewBufferId == i)) {
                 MainBackend::Instance()->puPreviewBufferId = i;
