@@ -39,9 +39,9 @@ ProfilerPane::~ProfilerPane() = default;
 
 bool ProfilerPane::Init()
 {
-    iagp::InAppGpuProfiler::Instance()->SetImGuiBeginFunctor([this](const char* vLabel, bool* pOpen, ImGuiWindowFlags vFlags) -> bool {
+    /*iagp::InAppGpuProfiler::Instance()->SetImGuiBeginFunctor([this](const char* vLabel, bool* pOpen, ImGuiWindowFlags vFlags) -> bool {
         static ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_MenuBar;
-        if (ImGui::Begin<PaneFlags>(paneName.c_str(), &m_InOutPaneShown, paneFlag, flags)) {
+        if (ImGui::Begin<PaneFlags>(paneName.c_str(), &m_InOutPaneShown, paneFlag, flags, pOpen)) {
 #ifdef USE_DECORATIONS_FOR_RESIZE_CHILD_WINDOWS
             auto win = ImGui::GetCurrentWindowRead();
             if (win->Viewport->Idx != 0)
@@ -52,7 +52,7 @@ bool ProfilerPane::Init()
             return true;
         }
         return false;
-    });
+    });*/
 	return true;
 }
 
@@ -94,6 +94,8 @@ bool ProfilerPane::DrawPanes(const uint32_t& vCurrentFrame, PaneFlags& vInOutPan
 		ImGui::End();
 
         iagp::InAppGpuProfiler::Instance()->DrawFlamGraphChilds();
+
+        iagp::InAppGpuProfiler::Instance()->DrawDetails();
 
         vInOutPaneShown = m_InOutPaneShown;
 

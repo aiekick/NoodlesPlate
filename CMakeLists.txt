@@ -1,4 +1,5 @@
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.5)
+cmake_policy(SET CMP0091 NEW) ## for CMAKE_MSVC_RUNTIME_LIBRARY
 
 set(PROJECT NoodlesPlate)
 
@@ -29,24 +30,20 @@ endif()
 if (USE_VR)
 	add_definitions(-DUSE_VR)
 	add_definitions(-DXR_USE_GRAPHICS_API_OPENGL)
-	if(WIN32)
+	if(UNIX AND NOT APPLE)
+		add_definitions(-DXR_USE_PLATFORM_LINUX)
+	elseif(WIN32)
 		add_definitions(-DXR_USE_PLATFORM_WIN32)
 	endif()
 endif()
 
 ## some defines for debug mode (before 3rdparty.cmake)
 if(MSVC)
-	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_DEBUG /Zi /MTd")
-	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_DEBUG} /MT")
+	set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>") ## MT in release or MTd in debug
+	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_DEBUG /Zi")
 else()
 	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_DEBUG -g")
 endif()
-
-set(LLVM_USE_CRT_DEBUG MTd CACHE STRING "" FORCE)
-set(LLVM_USE_CRT_MINSIZEREL MT CACHE STRING "" FORCE)
-set(LLVM_USE_CRT_RELEASE MT CACHE STRING "" FORCE)
-set(LLVM_USE_CRT_RELWITHDEBINFO MT CACHE STRING "" FORCE)
-set(USE_MSVC_RUNTIME_LIBRARY_DLL OFF CACHE BOOL "" FORCE)
 
 ## for group smake targets in the dir cmakeTargets
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
@@ -62,26 +59,33 @@ endif()
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-add_definitions(-DGLAD)
 add_definitions(-DGLM)
+add_definitions(-DGLAD)
 add_definitions(-DUSE_OPENGL)
 add_definitions(-DUSE_XML_CONFIG)
 add_definitions(-DIMGUI_ENABLE_FREETYPE)
 add_definitions(-DIMGUI_DEFINE_MATH_OPERATORS)
 add_definitions(-DIMGUI_IMPL_OPENGL_LOADER_GLAD)
+#add_definitions(-DIMGUI_DISABLE_OBSOLETE_FUNCTIONS)
 add_definitions(-DCUSTOM_SOGLSL_CONFIG="${CMAKE_SOURCE_DIR}/src/Headers/CustomSoGLSLConfig.h")
 add_definitions(-DCUSTOM_IMWIDGETS_CONFIG="${CMAKE_SOURCE_DIR}/src/Headers/CustomImWidgetsConfig.h")
-#add_definitions(-DCUSTOM_IN_APP_GPU_PROFILER_CONFIG="${CMAKE_SOURCE_DIR}/src/Headers/CustomInAppGpuProfiler.h")
+add_definitions(-DCUSTOM_IN_APP_GPU_PROFILER_CONFIG="${CMAKE_SOURCE_DIR}/src/Headers/CustomInAppGpuProfiler.h")
 add_definitions(-DCUSTOM_IMGUIFILEDIALOG_CONFIG="${CMAKE_SOURCE_DIR}/src/Headers/CustomImGuiFileDialogConfig.h")
 add_definitions(-DUSE_IMGUI="${CMAKE_SOURCE_DIR}/3rdparty/SoGLSL/3rdparty/ImGuiPack/3rdparty/imgui/imgui.h")
+
+set(LLVM_USE_CRT_DEBUG MTd CACHE STRING "" FORCE)
+set(LLVM_USE_CRT_MINSIZEREL MT CACHE STRING "" FORCE)
+set(LLVM_USE_CRT_RELEASE MT CACHE STRING "" FORCE)
+set(LLVM_USE_CRT_RELWITHDEBINFO MT CACHE STRING "" FORCE)
+set(USE_MSVC_RUNTIME_LIBRARY_DLL OFF CACHE BOOL "" FORCE)
 
 include(cmake/3rdparty.cmake)
 
 if (USE_PROFILER_TRACY)
 	option(USE_CALIBRATED_CONTEXT "Enable Calibrated Context in Tracy for sync cpu/gpu timestamps" OFF)
-if (USE_CALIBRATED_CONTEXT)
-	add_definitions(-DENABLE_CALIBRATED_CONTEXT)
-endif()
+	if (USE_CALIBRATED_CONTEXT)
+		add_definitions(-DENABLE_CALIBRATED_CONTEXT)
+	endif()
 	add_definitions(-DTRACY_ENABLE)
 	add_definitions(-DTRACY_ON_DEMAND)
 	add_definitions(-DTRACY_NO_BROADCAST)
@@ -116,7 +120,7 @@ else ()
 endif()
 
 if (TARGET uninstall)
-set_target_properties(uninstall PROPERTIES FOLDER "cmakeTargets")
+	set_target_properties(uninstall PROPERTIES FOLDER "cmakeTargets")
 endif()
 
 add_definitions(${GLFW_DEFINITIONS})
@@ -127,17 +131,17 @@ file(GLOB_RECURSE PROJECT_SRC_RECURSE ${CMAKE_CURRENT_SOURCE_DIR}/src/*.*)
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/src PREFIX src FILES ${PROJECT_SRC_RECURSE})
 
 if (USE_SDL)
-file(GLOB IMGUI_IMPL_SRC 
-	${CMAKE_SOURCE_DIR}/3rdparty/SoGLSL/3rdparty/ImGuiPack/3rdparty/imgui/backends/imgui_impl_opengl3.cpp
-	${CMAKE_SOURCE_DIR}/3rdparty/SoGLSL/3rdparty/ImGuiPack/3rdparty/imgui/backends/imgui_impl_opengl3.h
-	${CMAKE_SOURCE_DIR}/3rdparty/SoGLSL/3rdparty/ImGuiPack/3rdparty/imgui/backends/imgui_impl_sdl.cpp
-	${CMAKE_SOURCE_DIR}/3rdparty/SoGLSL/3rdparty/ImGuiPack/3rdparty/imgui/backends/imgui_impl_sdl.h)
+	file(GLOB IMGUI_IMPL_SRC 
+		${CMAKE_SOURCE_DIR}/3rdparty/SoGLSL/3rdparty/ImGuiPack/3rdparty/imgui/backends/imgui_impl_opengl3.cpp
+		${CMAKE_SOURCE_DIR}/3rdparty/SoGLSL/3rdparty/ImGuiPack/3rdparty/imgui/backends/imgui_impl_opengl3.h
+		${CMAKE_SOURCE_DIR}/3rdparty/SoGLSL/3rdparty/ImGuiPack/3rdparty/imgui/backends/imgui_impl_sdl.cpp
+		${CMAKE_SOURCE_DIR}/3rdparty/SoGLSL/3rdparty/ImGuiPack/3rdparty/imgui/backends/imgui_impl_sdl.h)
 else()
-file(GLOB IMGUI_IMPL_SRC 
-	${CMAKE_SOURCE_DIR}/3rdparty/SoGLSL/3rdparty/ImGuiPack/3rdparty/imgui/backends/imgui_impl_opengl3.cpp
-	${CMAKE_SOURCE_DIR}/3rdparty/SoGLSL/3rdparty/ImGuiPack/3rdparty/imgui/backends/imgui_impl_opengl3.h
-	${CMAKE_SOURCE_DIR}/3rdparty/SoGLSL/3rdparty/ImGuiPack/3rdparty/imgui/backends/imgui_impl_glfw.cpp
-	${CMAKE_SOURCE_DIR}/3rdparty/SoGLSL/3rdparty/ImGuiPack/3rdparty/imgui/backends/imgui_impl_glfw.h)
+	file(GLOB IMGUI_IMPL_SRC 
+		${CMAKE_SOURCE_DIR}/3rdparty/SoGLSL/3rdparty/ImGuiPack/3rdparty/imgui/backends/imgui_impl_opengl3.cpp
+		${CMAKE_SOURCE_DIR}/3rdparty/SoGLSL/3rdparty/ImGuiPack/3rdparty/imgui/backends/imgui_impl_opengl3.h
+		${CMAKE_SOURCE_DIR}/3rdparty/SoGLSL/3rdparty/ImGuiPack/3rdparty/imgui/backends/imgui_impl_glfw.cpp
+		${CMAKE_SOURCE_DIR}/3rdparty/SoGLSL/3rdparty/ImGuiPack/3rdparty/imgui/backends/imgui_impl_glfw.h)
 endif()
 source_group(src/Impl FILES ${IMGUI_IMPL_SRC})
 
@@ -148,8 +152,7 @@ if (MSVC)
 	set(APP_ICON_RESOURCE_WINDOWS "${CMAKE_SOURCE_DIR}/res/appicon.rc")
 endif()
 
-add_executable(
-	${PROJECT}
+add_executable(${PROJECT}
 	${PROJECT_MAIN}
 	${CMAKE_RECURSE}
 	${IMGUI_IMPL_SRC}
@@ -166,11 +169,9 @@ add_executable(
 if ("${CMAKE_EXE_LINKER_FLAGS}" STREQUAL "/machine:x64")
 	set(ARCH x64)
 	add_definitions(-DVERSION_X64)
-	message("${PROJECT} Build X64")
 else()
 	set(ARCH x32)
 	add_definitions(-DVERSION_X32)
-	message("${PROJECT} Build X32")
 endif()
 
 #############################################################
@@ -217,11 +218,6 @@ elseif(UNIX)
 	set_target_properties(${PROJECT} PROPERTIES	OUTPUT_NAME "${${PROJECT}_Output_Name}")
 endif()
 
-#message("SOGSL_INCLUDE_DIRS :")
-#foreach( LINE ${SOGSL_INCLUDE_DIRS})
-#	message(" - ${LINE}")
-#endforeach()
-
 include_directories(
 	src
 	include
@@ -229,14 +225,12 @@ include_directories(
 	3rdparty/SoGLSL
 	${NVAPI_INCLUDE_DIR}
 	${SOGSL_INCLUDE_DIRS}
-	${FREETYPE_INCLUDE_DIR}
 )
 
 target_link_libraries(${PROJECT} PRIVATE 
 	${ZLIB_LIBRARIES}
 	${NVAPI_LIBRARIES}
 	${SOGLSL_LIBRARIES}
-	${FREETYPE_LIBRARIES}
 )
 
 #############################################################

@@ -168,8 +168,8 @@ static void Imgui_Prepare()
 	ImGui::Render();
 }
 
-static void Imgui_Render(const ImGuiIO& io)
-{
+static void Imgui_Render(const ImGuiIO& io) {
+    AIGPScoped("ImGui", "Imgui_Render");
 	GuiBackend::MakeContextCurrent(MainBackend::sMainThread);
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 

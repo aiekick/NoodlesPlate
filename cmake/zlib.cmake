@@ -12,5 +12,3 @@ set(ZLIB_INCLUDE_DIR ${ZLIB_INCLUDE_DIRS})
 set(ZLIB_LIBRARIES zlibstatic)
 set(ZLIB::ZLIB zlibstatic)
 set(ZLIB_FOUND TRUE)
-
-include_directories(${ZLIB_INCLUDE_DIRS})

@@ -1,6 +1,6 @@
 if (USE_GPU_METRIC)
 	if(WIN32)
-		message("GPU METRIC is enabled, but only with the couple NVIDIA && Windows")
+		message("GPU METRIC id enabled, but only with the couple NVIDIA && Windows")
 		add_definitions(-DUSE_GPU_METRIC)
 		set(NVAPI_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/3rdparty/NVApi_R470)
 		if ("${CMAKE_EXE_LINKER_FLAGS}" STREQUAL "/machine:x64")

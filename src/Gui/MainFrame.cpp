@@ -105,6 +105,7 @@ void MainFrame::Unit() {
     ZoneScoped;
 
     SaveConfigFile("config.xml");
+    LayoutManager::Instance()->UnitPanes();
     puMainToolBar.Unit();
     m_ShadowTexturePtr.reset();
 }
@@ -159,8 +160,11 @@ bool MainFrame::Init() {
 #ifdef USE_VR
         VRGui::Instance()->SetCodeTree(MainBackend::Instance()->puCodeTree);
 #endif
+        LayoutManager::Instance()->InitPanes();
+
         Messaging::sMessagePaneId = ConsolePane::Instance()->paneFlag;
     
+
         if (MainBackend::Instance()->Load(puFileToLoad)) {
             SaveConfigFile("config.xml");
             res = true;
