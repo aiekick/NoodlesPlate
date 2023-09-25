@@ -1,27 +1,27 @@
 name: Win
 
 on:
-    push:
-        branches:
-            - master
-        types:
-            - requested
+  push:
+    branches:
+    - master
+    types:
+    - requested
 
 jobs:
-    build_Win_latest:
-        runs-on: windows-latest
-        steps:
-            - uses: actions/checkout@v3
-            with:
-                ref: master
-            - name: checkout submodules
-                run : git submodule update --init --recursive 
-            - name: configure
-                run: mkdir build && cd build && cmake .. -DCMAKE_BUILD_TYPE=Release
-            - name: build
-                run: cmake --build build --config Release
-            - name: upload artifact
-                uses: actions/upload-artifact@v3
-                with:
-                    name: NoodlesPlate_Msvc_x64.exe
-                    path: bin/NoodlesPlate_Msvc_x64.exe
+  build_Win_latest:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        ref: master
+    - name: checkout submodules
+      run : git submodule update --init --recursive 
+    - name: configure
+      run: mkdir build && cd build && cmake .. -DCMAKE_BUILD_TYPE=Release
+    - name: build
+      run: cmake --build build --config Release
+    - name: upload artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: NoodlesPlate_Msvc_x64.exe
+        path: bin/NoodlesPlate_Msvc_x64.exe
