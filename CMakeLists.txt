@@ -17,6 +17,10 @@ option(USE_STD_FILESYSTEM "Enable std::filesystem use for path and ImGuiFileDial
 option(USE_PACKAGE_TO_NSIS "Enable packaging to nsis isntaller or zip if false" ON)
 option(USE_VR "Enable VR Backend via Openxr" OFF)
 
+if (APPLE)
+	set(USE_VR OFF CACHE BOOL "" FORCE) ## VR not supported on MACOS
+endif()
+
 if (USE_NETWORK)
 	add_definitions(-DUSE_NETWORK)
 endif()
@@ -36,6 +40,10 @@ if (USE_VR)
 		add_definitions(-DXR_USE_PLATFORM_WIN32)
 	endif()
 endif()
+
+set(FINAL_BIN_DIR ${CMAKE_BINARY_DIR}/../bin)
+set(CMAKE_INSTALL_PREFIX "${FINAL_BIN_DIR}")
+set(CMAKE_PDB_OUTPUT_DIRECTORY "${FINAL_BIN_DIR}/debug")
 
 ## some defines for debug mode (before 3rdparty.cmake)
 if(MSVC)
@@ -166,12 +174,19 @@ add_executable(${PROJECT}
 ##  COMMAND_EXPAND_LISTS
 ##)
 
+set_target_properties(${PROJECT} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${FINAL_BIN_DIR}")
+set_target_properties(${PROJECT} PROPERTIES RUNTIME_OUTPUT_DIRECTORY_DEBUG "${FINAL_BIN_DIR}")
+set_target_properties(${PROJECT} PROPERTIES RUNTIME_OUTPUT_DIRECTORY_RELEASE "${FINAL_BIN_DIR}")
+set_target_properties(${PROJECT} PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${FINAL_BIN_DIR}")
+ 
 if ("${CMAKE_EXE_LINKER_FLAGS}" STREQUAL "/machine:x64")
 	set(ARCH x64)
 	add_definitions(-DVERSION_X64)
+	message("${PROJECT} Build X64")
 else()
 	set(ARCH x32)
 	add_definitions(-DVERSION_X32)
+	message("${PROJECT} Build X32")
 endif()
 
 #############################################################

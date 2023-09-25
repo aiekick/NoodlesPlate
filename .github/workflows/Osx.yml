@@ -1,27 +1,29 @@
 name: Osx
 
 on:
-  push:
-    branches:
-    - master
+    push:
+        branches:
+            - master
+        types:
+            - requested
 
 jobs:
-  build_Osx:
-    runs-on: macos-latest
-    steps:
-    - uses: actions/checkout@v3
-      with:
-        ref: master
-    - name: checkout submodules
-      run : git submodule update --init --recursive 
-    - name: Install OpenGL lib  / Requirement for Glfw3
-      run : brew update
-    - name: configure
-      run: mkdir build && cd build && cmake .. -DCMAKE_BUILD_TYPE=Release -DUSE_VR=OFF -DUSE_GPU_METRIC=OFF
-    - name: build
-      run: cmake --build build
-    - name: upload artifact
-      uses: actions/upload-artifact@v3
-      with:
-        name: NoodlesPlate_Osx_x64
-        path: bin/NoodlesPlate_Osx_x64
+    build_Osx:
+        runs-on: macos-latest
+        steps:
+            - uses: actions/checkout@v3
+            with:
+                ref: master
+            - name: checkout submodules
+                run : git submodule update --init --recursive 
+            - name: Install OpenGL lib  / Requirement for Glfw3
+                run : brew update
+            - name: configure
+                run: mkdir build && cd build && cmake .. -DCMAKE_BUILD_TYPE=Release -DUSE_VR=OFF -DUSE_GPU_METRIC=OFF
+            - name: build
+                run: cmake --build build
+            - name: upload artifact
+                uses: actions/upload-artifact@v3
+                with:
+                    name: NoodlesPlate_Osx_x64
+                    path: bin/NoodlesPlate_Osx_x64
