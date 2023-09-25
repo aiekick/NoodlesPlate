@@ -15,7 +15,7 @@
 // without that you will have many linker error
 // ex : #include <imgui.h>
 // ex : #include <imgui_internal.h>
-//#include <ImGuiPack.h>
+#include <ImGuiPack.h>
 
 // you need also to put your context dependencies here if requried
 // by your get/set context fucntions
