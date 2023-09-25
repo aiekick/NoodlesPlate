@@ -2,6 +2,7 @@ name: Osx
 
 on:
   push:
+  workflow_run:
     branches:
     - master
     types:
