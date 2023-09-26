@@ -238,6 +238,7 @@ include_directories(
 	include
 	3rdparty
 	3rdparty/SoGLSL
+	${ZLIB_INCLUDE_DIR}
 	${NVAPI_INCLUDE_DIR}
 	${SOGSL_INCLUDE_DIRS}
 )
