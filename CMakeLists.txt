@@ -11,11 +11,11 @@ project(${PROJECT} CXX)
 
 option(USE_SDL "Enale SDL instead of GLFW" OFF)
 option(USE_PROFILER_TRACY "Enale Tracy Profiler" OFF)
-option(USE_GPU_METRIC "Enable Gpu Metrics if available (NVIDIA and WINDOWS only)" OFF)
-option(USE_NETWORK "Enable NETWORK (Shader Inport, Versions, Changelog)" OFF)
+option(USE_GPU_METRIC "Enable Gpu Metrics if available (NVIDIA and WINDOWS only)" ON)
+option(USE_NETWORK "Enable NETWORK (Shader Inport, Versions, Changelog)" ON)
 option(USE_STD_FILESYSTEM "Enable std::filesystem use for path and ImGuiFileDialog" ON)
 option(USE_PACKAGE_TO_NSIS "Enable packaging to nsis isntaller or zip if false" ON)
-option(USE_VR "Enable VR Backend via Openxr" OFF)
+option(USE_VR "Enable VR Backend via Openxr" ON)
 
 if (APPLE)
 	set(USE_VR OFF CACHE BOOL "" FORCE) ## VR not supported on MACOS
