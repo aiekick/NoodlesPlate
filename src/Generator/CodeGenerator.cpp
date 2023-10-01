@@ -902,9 +902,9 @@ ShaderInfos CodeGenerator::Get_Helper_Space3D()
 @UNIFORMS
 
 uniform vec2(buffer:target=0) size;
-uniform mat4(camera:p) _proj;
-uniform mat4(camera:v) _view;
-uniform mat4(camera:m) _model; 
+uniform(noexport) mat4(camera:p) _proj;
+uniform(noexport) mat4(camera:v) _view;
+uniform(noexport) mat4(camera:m) _model; 
 
 @FRAGMENT
 
