@@ -168,6 +168,37 @@ add_executable(${PROJECT}
 	${PROJECT_SRC_RECURSE}
 	${APP_ICON_RESOURCE_WINDOWS})
 
+if (USE_IMPLOT)
+	target_compile_definitions(${PROJECT} PUBLIC USE_IMPLOT)
+endif()
+if (USE_IMCOOL_BAR)
+	target_compile_definitions(${PROJECT} PUBLIC USE_IMCOOL_BAR)
+endif()
+if (USE_IM_GRADIENT_HDR)
+	target_compile_definitions(${PROJECT} PUBLIC USE_IM_GRADIENT_HDR)
+endif()
+if (USE_IMGUI_FILE_DIALOG)
+	target_compile_definitions(${PROJECT} PUBLIC USE_IMGUI_FILE_DIALOG)
+endif()
+if (USE_IM_GUIZMO)
+	target_compile_definitions(${PROJECT} PUBLIC USE_IM_GUIZMO)
+endif()
+if (USE_IM_TOOLS)
+	target_compile_definitions(${PROJECT} PUBLIC USE_IM_TOOLS)
+endif()
+if (USE_IMGUI_NODE_EDITOR)
+	target_compile_definitions(${PROJECT} PUBLIC USE_IMGUI_NODE_EDITOR)
+endif()
+if (USE_IMGUI_MARKDOW)
+	target_compile_definitions(${PROJECT} PUBLIC USE_IMGUI_MARKDOW)
+endif()
+if (USE_IMGUI_COLOR_TEXT_EDIT)
+	target_compile_definitions(${PROJECT} PUBLIC USE_IMGUI_COLOR_TEXT_EDIT)
+endif()
+if (USE_IN_APP_GPU_PROFILER)
+	target_compile_definitions(${PROJECT} PUBLIC USE_IN_APP_GPU_PROFILER)
+endif()
+ 
 ## will put dependencies in output dir
 ##add_custom_command(TARGET ${PROJECT} POST_BUILD
 ##  COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:${PROJECT}> $<TARGET_FILE_DIR:${PROJECT}>
