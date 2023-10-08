@@ -519,9 +519,10 @@ void MainBackend::EndFrame() {
     MidiSystem::Instance()->updateMidiNeeded = false;
     // SoundSystem::Instance()->updateMidiNeeded = false;
     PictureExportSystem::Instance()->ScreenGrabbIfNeeded(MainBackend::sMainThread);
-    GuiBackend::Instance()->SwapBuffers(MainBackend::sMainThread);
-    iagp::InAppGpuProfiler::Instance()->Collect();
-    TracyGpuCollect;
+    {
+        AIGPScoped("Opengl", "%s", "Swap buffers");
+        GuiBackend::Instance()->SwapBuffers(MainBackend::sMainThread);
+    }
 }
 
 void MainBackend::StartOrStopVR() {
@@ -1139,7 +1140,7 @@ void MainBackend::DoRendering() {
     GuiBackend::MakeContextCurrent(MainBackend::sMainThread);
 
     TracyGpuZone("MainBackend::DoRendering");
-    AIGPScoped("MainBackend", "Rendering");
+    AIGPScoped("MainBackend", "%s", "Rendering");
 
     if (puPixelDebug.NeedRefresh()) {
         puPixelDebug.Capture(puDisplay_RenderPack, puDisplayQuality, CameraSystem::Instance());

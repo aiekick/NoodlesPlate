@@ -169,7 +169,7 @@ static void Imgui_Prepare()
 }
 
 static void Imgui_Render(const ImGuiIO& io) {
-    AIGPScoped("ImGui", "Imgui_Render");
+    AIGPScoped("ImGui", "%s", "Rendering");
 	GuiBackend::MakeContextCurrent(MainBackend::sMainThread);
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
@@ -343,9 +343,11 @@ int main(int, char** argv)
 					{
 						mainBackendPtr->Render();
 					}
-					Imgui_Render(io);
-				}
-				mainBackendPtr->EndFrame();
+                    Imgui_Render(io);
+                    mainBackendPtr->EndFrame();
+                }
+                AIGPCollect;
+                TracyGpuCollect;
 
 				RenderDocController::Instance()->EndCaptureIfResquested();
 			}
