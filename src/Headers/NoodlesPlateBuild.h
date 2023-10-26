@@ -1,7 +1,7 @@
 #pragma once
 
 #define NoodlesPlate_Prefix "NoodlesPlate"
-#define NoodlesPlate_BuildNumber 667
+#define NoodlesPlate_BuildNumber 675
 #define NoodlesPlate_MinorNumber 7
 #define NoodlesPlate_MajorNumber 0
-#define NoodlesPlate_BuildId "0.7.667"
+#define NoodlesPlate_BuildId "0.7.675"
