@@ -7,21 +7,25 @@ enable_language(C CXX)
 
 project(${PROJECT} CXX)
 
-# need openssl : https://slproweb.com/products/Win32OpenSSL.html
-
-option(USE_SDL "Enale SDL instead of GLFW" OFF)
+option(USE_SDL "Enale SDL instead of GLFW (Not fully tested btw)" OFF)
 option(USE_PROFILER_TRACY "Enale Tracy Profiler" OFF)
-option(USE_GPU_METRIC "Enable Gpu Metrics if available (NVIDIA and WINDOWS only)" ON)
 option(USE_NETWORK "Enable NETWORK (Shader Inport, Versions, Changelog)" ON)
 option(USE_STD_FILESYSTEM "Enable std::filesystem use for path and ImGuiFileDialog" ON)
 option(USE_PACKAGE_TO_NSIS "Enable packaging to nsis isntaller or zip if false" ON)
-option(USE_VR "Enable VR Backend via Openxr" ON)
 
-if (APPLE)
-	set(USE_VR OFF CACHE BOOL "" FORCE) ## VR not supported on MACOS
+if (WIN32)
+	# MACOS : VR is not supported
+	# LINUX : OpenXR have issues, so disbaled for the moment
+	option(USE_VR "Enable VR Backend via Openxr" ON)
+	# GPU Metric need the NVApi of Nvidia and as i know is not available on Linux
+	option(USE_GPU_METRIC "Enable Gpu Metrics if available (NVIDIA and WINDOWS only)" ON)
+else()
+	set(USE_VR OFF CACHE BOOL "" FORCE)
+	set(USE_GPU_METRIC OFF CACHE BOOL "" FORCE)
 endif()
 
 if (USE_NETWORK)
+	# need openssl : https://slproweb.com/products/Win32OpenSSL.html
 	add_definitions(-DUSE_NETWORK)
 endif()
 

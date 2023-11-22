@@ -2,13 +2,12 @@ name: Osx
 
 on:
   push:
-  workflow_run:
-    workflows:
-      - scheduled
     branches:
     - master
-    types:
-    - requested
+    paths-ignore:
+    - 'doc/**'
+    - 'bin/**'
+    - '.github/**'
 
 jobs:
   build_Osx:
@@ -22,7 +21,7 @@ jobs:
     - name: Install OpenGL lib  / Requirement for Glfw3
       run : brew update
     - name: configure
-      run: mkdir build && cd build && cmake .. -DCMAKE_BUILD_TYPE=Release -DUSE_VR=OFF -DUSE_GPU_METRIC=OFF
+      run: mkdir build && cd build && cmake .. -DCMAKE_BUILD_TYPE=Release
     - name: build
       run: cmake --build build
     - name: upload artifact

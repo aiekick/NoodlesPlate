@@ -2,13 +2,12 @@ name: Win
 
 on:
   push:
-  workflow_run:
-    workflows:
-      - scheduled
     branches:
     - master
-    types:
-      - requested
+    paths-ignore:
+    - 'doc/**'
+    - 'bin/**'
+    - '.github/**'
 
 jobs:
   build_Win_latest:
