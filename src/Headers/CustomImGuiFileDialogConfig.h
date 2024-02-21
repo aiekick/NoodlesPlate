@@ -59,7 +59,7 @@
 #define DisplayMode_ThumbailsGrid_ButtonString ICON_NDP_FILE_GRID_THUMBNAILS
 //#define DisplayMode_ThumbailsGrid_ButtonHelp "Thumbnails Grid"
 
-#define USE_EXPLORATION_BY_KEYS
+//#define USE_EXPLORATION_BY_KEYS
 // this mapping by default is for GLFW but you can use another
 // Up key for explore to the top
 #define IGFD_KEY_UP ImGuiKey_UpArrow//GLFW_KEY_UP
@@ -121,10 +121,20 @@
 #define tableHeaderFileSizeString " Size"
 #define tableHeaderFileDateTimeString " Date"
 
-#define USE_BOOKMARK
-//#define bookmarkPaneWith 150.0f
-//#define IMGUI_TOGGLE_BUTTON ToggleButton
-#define bookmarksButtonString ICON_NDP_BOOKMARK
-//#define bookmarksButtonHelpString "bookmark"
-#define addBookmarkButtonString ICON_NDP_ADD
-#define removeBookmarkButtonString ICON_NDP_REMOVE
+#define USE_PLACES_FEATURE
+// #define placesPaneWith 150.0f
+// #define IMGUI_TOGGLE_BUTTON ToggleButton
+#define placesButtonString ICON_NDP_BOOKMARK
+// #define placesButtonHelpString "Places"
+#define addPlaceButtonString ICON_NDP_ADD
+#define removePlaceButtonString ICON_NDP_REMOVE
+
+// a group for bookmarks will be added by default, but you can also create it yourself and many more
+#define USE_PLACES_BOOKMARKS
+// #define PLACE_BOOKMARKS_NAME "Bookmarks"
+// #define PLACE_BOOKMARKS_DISPLAY_ORDER 0  // to the first
+
+// a group for system devices (returned by IFileSystem), but you can also add yours
+// #define USE_PLACES_DEVICES
+// #define PLACE_DEVICES_NAME "Devices"
+// #define PLACE_DEVICES_DISPLAY_ORDER 10  // to the end

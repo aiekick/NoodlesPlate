@@ -55,9 +55,12 @@ std::string PathField::GetPath()
 
 void PathField::Draw(const char* vButtonLabel)
 {
-	if (ImGui::ContrastedButton(vButtonLabel, nullptr, nullptr, 250.0f))
-	{
-		ImGuiFileDialog::Instance()->OpenDialog(vButtonLabel, "Select path", nullptr, m_Original_Path, 1, nullptr, ImGuiFileDialogFlags_Modal);
+	if (ImGui::ContrastedButton(vButtonLabel, nullptr, nullptr, 250.0f)) {
+        IGFD::FileDialogConfig config;
+        config.path = m_Original_Path;
+        config.countSelectionMax = 1;
+        config.flags =  ImGuiFileDialogFlags_Modal;
+        ImGuiFileDialog::Instance()->OpenDialog(vButtonLabel, "Select path", nullptr, config);
 	}
 
 	ImGui::SameLine();

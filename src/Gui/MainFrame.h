@@ -154,6 +154,7 @@ public:
 	void OpenImportBar(std::string vUrl = "");
 
 private: // imgui
+    void m_CreateDialogPlaces();
 	void DrawSettingsMenu_Global(); // Settings menu Global
 	bool DrawImportBar();
 	bool DrawErrorDialog();

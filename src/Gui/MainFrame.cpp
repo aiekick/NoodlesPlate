@@ -83,6 +83,13 @@
 
 #include <Res/CustomFont.h>
 
+#if defined(__WIN32__) || defined(WIN32) || defined(_WIN32) || defined(__WIN64__) || defined(WIN64) || defined(_WIN64) || defined(_MSC_VER)
+#include <ShlObj.h> // for quick acces places
+#else
+#endif
+
+using namespace std::placeholders;
+
 ///////////////////////////////////////////////////////
 //// STATIC ///////////////////////////////////////////
 ///////////////////////////////////////////////////////
@@ -130,6 +137,8 @@ bool MainFrame::Init() {
     if (MainBackend::Instance()->Init(500)) {
         HelpManager::Instance()->Init("NOODLESPLATE");
         UrlLibrarySystem::Instance()->Init();
+
+        m_CreateDialogPlaces();
 
         LoadConfigFile("config.xml");
 
@@ -298,6 +307,86 @@ void MainFrame::CanMouseAffectRendering() {
 
 void MainFrame::ShowAboutDialog() {
     puShowAboutDialog = true;
+}
+
+void MainFrame::m_CreateDialogPlaces() {
+    const char* system_group_name = ICON_NDP_STAR " System";
+    ImGuiFileDialog::Instance()->AddPlacesGroup(system_group_name, 1, false);
+    auto system_places_ptr = ImGuiFileDialog::Instance()->GetPlacesGroupPtr(system_group_name);
+    if (system_places_ptr != nullptr) {
+#if defined(__WIN32__) || defined(WIN32) || defined(_WIN32) || defined(__WIN64__) || defined(WIN64) || defined(_WIN64) || defined(_MSC_VER)
+
+        //////////////////////////////////////////////////
+        //// SYSTEM QUICK ACCESS /////////////////////////
+        //////////////////////////////////////////////////
+
+#define addKnownFolderAsPlace(knownFolder, folderLabel, folderIcon)      \
+    {                                                                    \
+        PWSTR path = NULL;                                               \
+        HRESULT hr = SHGetKnownFolderPath(knownFolder, 0, NULL, &path);  \
+        if (SUCCEEDED(hr)) {                                             \
+            IGFD::FileStyle style;                                       \
+            style.icon = folderIcon;                                     \
+            auto place_path = IGFD::Utils::UTF8Encode(path);             \
+            system_places_ptr->AddPlace(folderLabel, place_path, false, style); \
+        }                                                                \
+        CoTaskMemFree(path);                                             \
+    }
+        addKnownFolderAsPlace(FOLDERID_Desktop, "Desktop", ICON_NDP2_DESKTOP_MAC);
+        addKnownFolderAsPlace(FOLDERID_Startup, "Startup", ICON_NDP2_HOME);
+        addKnownFolderAsPlace(FOLDERID_Downloads, "Downloads", ICON_NDP2_DOWNLOADS);
+        addKnownFolderAsPlace(FOLDERID_Pictures, "Pictures", ICON_NDP_PICTURE_O);
+        addKnownFolderAsPlace(FOLDERID_Music, "Music", ICON_NDP_MUSIC);
+        addKnownFolderAsPlace(FOLDERID_Videos, "Videos", ICON_NDP_VIDEO);
+#undef addKnownFolderAsPlace
+
+        //////////////////////////////////////////////////
+        //// SYSTEM DEVICES //////////////////////////////
+        //////////////////////////////////////////////////
+
+        const DWORD mydrives = 2048;
+        char lpBuffer[2048];
+#define mini(a, b) (((a) < (b)) ? (a) : (b))
+        const DWORD countChars = mini(GetLogicalDriveStringsA(mydrives, lpBuffer), 2047);
+#undef mini
+        if (countChars > 0U && countChars < 2049U) {
+            std::string var = std::string(lpBuffer, (size_t)countChars);
+            IGFD::Utils::ReplaceString(var, "\\", "");
+            auto arr = IGFD::Utils::SplitStringToVector(var, '\0', false);
+            wchar_t szVolumeName[2048];
+            std::string path;
+            std::string name;
+            for (auto& a : arr) {
+                path = a;
+                name.clear();
+                std::wstring wpath = IGFD::Utils::UTF8Decode(a);
+                if (GetVolumeInformationW(wpath.c_str(), szVolumeName, 2048, NULL, NULL, NULL, NULL, 0)) {
+                    name = IGFD::Utils::UTF8Encode(szVolumeName);
+                }
+                IGFD::FileStyle style;
+                style.icon = ICON_NDP_DRIVES;
+                system_places_ptr->AddPlace(path + " " + name, path + IGFD::Utils::GetPathSeparator(), false, style);
+            }
+        }
+#else
+#endif
+        system_places_ptr = nullptr;
+    }
+
+    const char* local_group_name = "Local";
+    ImGuiFileDialog::Instance()->AddPlacesGroup(local_group_name, 2, false);
+    auto local_places_ptr = ImGuiFileDialog::Instance()->GetPlacesGroupPtr(local_group_name);
+    if (local_places_ptr != nullptr) {
+        IGFD::FileStyle style;
+        style.icon = ICON_NDP_PICTURE_O;
+        local_places_ptr->AddPlace("Assets", "assets", false, style);
+        style.icon = ICON_NDP_FILE_TEXT_O;
+        local_places_ptr->AddPlace("Scripts", "scripts", false, style);
+        local_places_ptr = nullptr;
+    }
+
+    const char* recent_group_name = "Recent";
+    ImGuiFileDialog::Instance()->AddPlacesGroup(recent_group_name, 3, false);
 }
 
 void MainFrame::DrawSettingsMenu_Global() {
@@ -765,8 +854,12 @@ void MainFrame::DrawMainMenuBar() {
         }
 
         if (ImGui::MenuItem(ICON_NDP2_FOLDER " Open")) {
-            ImGuiFileDialog::Instance()->OpenDialog("OpenFileDialog", "Open File", ".glsl", puOpenFileDialog.filePath, puOpenFileDialog.filePathName,
-                                                    1, nullptr, ImGuiFileDialogFlags_DisableThumbnailMode | ImGuiFileDialogFlags_Modal);
+            IGFD::FileDialogConfig config;
+            config.path = puOpenFileDialog.filePath;
+            config.filePathName = puOpenFileDialog.filePathName;
+            config.countSelectionMax = 1;
+            config.flags = ImGuiFileDialogFlags_DisableThumbnailMode | ImGuiFileDialogFlags_Modal;
+            ImGuiFileDialog::Instance()->OpenDialog("OpenFileDialog", "Open File", ".glsl", config);
         }
 
         if (MainBackend::Instance()->IsLoaded()) {
@@ -796,9 +889,12 @@ void MainFrame::DrawMainMenuBar() {
         if (ImGui::BeginMenu(ICON_NDP2_IMPORT " Import")) {
             if (ImGui::BeginMenu("From File Type")) {
                 if (ImGui::MenuItem(".json (ShaderToy Backup File)")) {
-                    ImGuiFileDialog::Instance()->OpenDialog("OpenShaderToyBackupJsonFile", "Open ShaderToy Backup File", ".json",
-                                                            puOpenFileDialog.filePath, puOpenFileDialog.filePathName, 1, nullptr,
-                                                            ImGuiFileDialogFlags_DisableThumbnailMode | ImGuiFileDialogFlags_Modal);
+                    IGFD::FileDialogConfig config;
+                    config.path = puOpenFileDialog.filePath;
+                    config.filePathName = puOpenFileDialog.filePathName;
+                    config.countSelectionMax = 1;
+                    config.flags = ImGuiFileDialogFlags_DisableThumbnailMode | ImGuiFileDialogFlags_Modal;
+                    ImGuiFileDialog::Instance()->OpenDialog("OpenShaderToyBackupJsonFile", "Open ShaderToy Backup File", ".json", config);
                 }
 
                 if (ImGui::MenuItem(".xsha (wxShade)")) {
@@ -826,12 +922,14 @@ void MainFrame::DrawMainMenuBar() {
         if (ImGui::BeginMenu(ICON_NDP2_UPLOAD " Export")) {
             if (ImGui::BeginMenu("Buffer")) {
                 if (ImGui::MenuItem("To Picture File")) {
-                    ImGuiFileDialog::Instance()->OpenDialogWithPane(
-                        "SavePictureDialog", "Save Current Buffer to Picture File", ".png,.tga,.bmp,.hdr", puSavePictureDialog.filePath,
-                        puSavePictureDialog.filePathName,
-                        std::bind(&PictureExportSystem::ExportPictureDialogOptions, PictureExportSystem::Instance(), std::placeholders::_1,
-                                  std::placeholders::_2, std::placeholders::_3),
-                        ImGuiFileDialogFlags_Modal);
+                    IGFD::FileDialogConfig config;
+                    config.path = puSavePictureDialog.filePath;
+                    config.filePathName = puSavePictureDialog.filePathName;
+                    config.countSelectionMax = 1;
+                    config.sidePane = std::bind(&PictureExportSystem::ExportPictureDialogOptions, PictureExportSystem::Instance(), _1, _2, _3);
+                    config.flags = ImGuiFileDialogFlags_Modal;
+                    ImGuiFileDialog::Instance()->OpenDialog(
+                        "SavePictureDialog", "Save Current Buffer to Picture File", ".png,.tga,.bmp,.hdr", config);
                 }
 
                 if (ImGui::BeginMenu("After Each Modif of Code")) {
@@ -899,10 +997,13 @@ void MainFrame::DrawMainMenuBar() {
         auto displayShaderPtr = MainBackend::Instance()->puDisplay_RenderPack.lock();
         if (displayShaderPtr && displayShaderPtr->GetShaderKey()) {
             if (ImGui::MenuItem(ICON_NDP_FLOPPY_O " Save As Template")) {
-                ImGuiFileDialog::Instance()->OpenDialogWithPane(
-                    "NewFileDialog", "Save As Template", ".glsl", ImGuiFileDialog::Instance()->GetCurrentPath(),
-                                                        displayShaderPtr->GetShaderKey()->puKey, nullptr, 0, 1, IGFDUserDatas("saveastemplate"),
-                                                        ImGuiFileDialogFlags_DisableThumbnailMode | ImGuiFileDialogFlags_Modal);
+                IGFD::FileDialogConfig config;
+                config.path = ImGuiFileDialog::Instance()->GetCurrentPath();
+                config.filePathName = displayShaderPtr->GetShaderKey()->puKey;
+                config.countSelectionMax = 1;
+                config.userDatas = IGFDUserDatas("saveastemplate");
+                config.flags = ImGuiFileDialogFlags_DisableThumbnailMode | ImGuiFileDialogFlags_Modal;
+                ImGuiFileDialog::Instance()->OpenDialog("NewFileDialog", "Save As Template", ".glsl", config);
             }
 
             ImGui::Separator();
@@ -1059,11 +1160,14 @@ void MainFrame::DrawMainMenuBar() {
 
 void MainFrame::CreateNewShader(std::string vType, const std::string& vFilePathName) {
     const auto filePathName = FileHelper::Instance()->CorrectSlashTypeForFilePathName(vFilePathName);
-
     puNewFileDialog.tgt_ext = vType;
     puNewFileDialog.filePathName = filePathName;
-    ImGuiFileDialog::Instance()->OpenDialog("NewFileDialog", "New File", ".glsl", puNewFileDialog.filePath, puNewFileDialog.filePathName, 1, nullptr,
-                                            ImGuiFileDialogFlags_DisableThumbnailMode | ImGuiFileDialogFlags_Modal);
+    IGFD::FileDialogConfig config;
+    config.path = puNewFileDialog.filePath;
+    config.filePathName = puNewFileDialog.filePathName;
+    config.countSelectionMax = 1;
+    config.flags = ImGuiFileDialogFlags_DisableThumbnailMode | ImGuiFileDialogFlags_Modal;
+    ImGuiFileDialog::Instance()->OpenDialog("NewFileDialog", "New File", ".glsl", config);
 }
 
 ///////////////////////////////////////////////////////
@@ -1085,7 +1189,7 @@ std::string MainFrame::getXml(const std::string& vOffset, const std::string& vUs
     str += puForkFileDialog.getXml(vOffset, vUserDatas);
     str += vOffset + "<debug>" + ct::toStr(puShowDebug ? "true" : "false") + "</debug>\n";
     str += vOffset + "<consoleguivisibility>" + ct::toStr(puConsoleGuiVisiblity ? "true" : "false") + "</consoleguivisibility>\n";
-    str += vOffset + "<igfd_bookmarks>" + ImGuiFileDialog::Instance()->SerializeBookmarks() + "</igfd_bookmarks>\n";
+    str += vOffset + "<igfd_places>" + ImGuiFileDialog::Instance()->SerializePlaces() + "</igfd_places>\n";
     str += vOffset + "<consoleverbose>" + ct::toStr(Logger::Instance()->ConsoleVerbose ? "true" : "false") + "</consoleverbose>\n";
     str += vOffset + "<ShaderFile>" + MainBackend::sCurrentFileLoaded + "</ShaderFile>\n";
 
@@ -1142,8 +1246,8 @@ bool MainFrame::setFromXml(tinyxml2::XMLElement* vElem, tinyxml2::XMLElement* vP
             puFileToLoad = ct::fvariant(strValue).GetS();
         if (strName == "debug")
             puShowDebug = ct::ivariant(strValue).GetB();
-        if (strName == "igfd_bookmarks")
-            ImGuiFileDialog::Instance()->DeserializeBookmarks(strValue);
+        if (strName == "igfd_places")
+            ImGuiFileDialog::Instance()->DeserializePlaces(strValue);
     }
 
     LayoutManager::Instance()->setFromXml(vElem, vParent, vUserDatas);

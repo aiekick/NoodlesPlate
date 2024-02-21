@@ -30,6 +30,8 @@
 #include <SoGLSL/src/Renderer/RenderPack.h>
 #include <SoGLSL/src/Uniforms/UniformVariant.h>
 
+using namespace std::placeholders;
+
 ////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////
@@ -253,11 +255,16 @@ bool TemplateSystem::DrawMenu()
 
 void TemplateSystem::CopyFromTemplate(TemplateFile vTemplateFile)
 {
-	puSelectedFileToCopy = vTemplateFile;
-	ImGuiFileDialog::Instance()->OpenDialogWithPane("NewFileDialog", "New File from template", ".glsl",
-		ImGuiFileDialog::Instance()->GetCurrentPath(), puSelectedFileToCopy.main,
-		std::bind(&TemplateSystem::SetNameOfBuffers, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3), 
-		350, 1, IGFDUserDatas("createfromtemplate"), ImGuiFileDialogFlags_DisableThumbnailMode | ImGuiFileDialogFlags_Modal);
+    puSelectedFileToCopy = vTemplateFile;
+    IGFD::FileDialogConfig config;
+    config.path = ImGuiFileDialog::Instance()->GetCurrentPath();
+    config.filePathName = puSelectedFileToCopy.main;
+    config.countSelectionMax = 1;
+    config.sidePane = std::bind(&TemplateSystem::SetNameOfBuffers, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+    config.sidePaneWidth = 350.0f;
+    config.userDatas = IGFDUserDatas("createfromtemplate");
+    config.flags = ImGuiFileDialogFlags_DisableThumbnailMode | ImGuiFileDialogFlags_Modal;
+	ImGuiFileDialog::Instance()->OpenDialog("NewFileDialog", "New File from template", ".glsl", config);
 }
 
 void TemplateSystem::SetNameOfBuffers(const char * /*vFilter*/, IGFDUserDatas /*vUserDatas*/, bool *vCantContinue)
