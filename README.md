@@ -93,6 +93,16 @@ Build tested and succeded on :
 
 # how to build
 
+## first : clone the repo and initialize their submodules
+
+```cpp
+git clone https://github.com/aiekick/NoodlesPlate.git
+cd NoodlesPlate
+git submodule update --init --recursive
+```
+
+## second : build with cmake
+
 You need to use cMake.
 For the 3 Os (Win, Linux, MacOs), the cMake usage is exactly the same, 
 
@@ -101,11 +111,8 @@ For the 3 Os (Win, Linux, MacOs), the cMake usage is exactly the same,
 3) Run cMake in console : (the first for generate cmake build files, the second for build the binary)
 ```cpp
 cmake -B my_build_directory -DCMAKE_BUILD_TYPE=BuildMode
-cmake --build my_build_directory --config BuildMode
+cmake --build my_build_directory
 ```
-
-Some cMake version need Build mode define via the directive CMAKE_BUILD_TYPE or via --Config when we launch the build. 
-This is why i put the boths possibilities
 
 ## On Windows :
 
@@ -119,12 +126,12 @@ If you are on debian you can run :
 
 ```cpp
 sudo apt-get update 
-sudo apt-get install libgl1-mesa-dev libx11-dev libxi-dev libxrandr-dev libxinerama-dev libxcursor-dev
+sudo apt-get install libssl-dev libgl1-mesa-dev libx11-dev libxi-dev libxrandr-dev libxinerama-dev libxcursor-dev libasound2-dev
 ```
 
 ## On MacOs :
 
-you need many lib : opengl and cocoa framework
+you need many lib : opengl, openssl and cocoa framework
 
 # License :
 
