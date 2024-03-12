@@ -21,6 +21,7 @@
 #include <Gui/MainFrame.h>
 #include <Backends/MainBackend.h>
 #include <ImGuiPack.h>
+#include <InAppGpuProfiler/InAppGpuProfiler.h>
 #include <ctools/cTools.h>
 #include <ctools/Logger.h>
 #include <Helper/InterfacePanes.h>
@@ -61,7 +62,7 @@ void ProfilerPane::Unit()
 
 }
 
-bool ProfilerPane::DrawPanes(const uint32_t& vCurrentFrame, PaneFlags& vInOutPaneShown, ImGuiContext* vContextPtr, const std::string& vUserDatas)
+bool ProfilerPane::DrawPanes(const uint32_t& vCurrentFrame, PaneFlags& vInOutPaneShown, ImGuiContext* vContextPtr, void* vUserDatas)
 {
 	iagp::InAppGpuProfiler::Instance()->sIsActive = false;
 

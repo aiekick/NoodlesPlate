@@ -51,7 +51,7 @@ void UniformsPane::Unit()
 
 }
 
-bool UniformsPane::DrawPanes(const uint32_t& vCurrentFrame, PaneFlags& vInOutPaneShown, ImGuiContext* vContextPtr, const std::string& vUserDatas)
+bool UniformsPane::DrawPanes(const uint32_t& vCurrentFrame, PaneFlags& vInOutPaneShown, ImGuiContext* vContextPtr, void* vUserDatas)
 {
 	if (vInOutPaneShown & paneFlag)
 	{

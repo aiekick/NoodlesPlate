@@ -23,12 +23,13 @@
 #include <ctools/Logger.h>
 #include <Headers/RenderPackHeaders.h>
 #include <ImGuiPack.h>
+#include <InAppGpuProfiler/InAppGpuProfiler.h>
 #ifdef USE_SDL2
-#include <ImGuiPack/3rdparty/imgui/backends/imgui_impl_sdl.h>
+#include <ImGuiPack/3rdparty/imgui_docking/backends/imgui_impl_sdl.h>
 #else
-#include <ImGuiPack/3rdparty/imgui/backends/imgui_impl_glfw.h>
+#include <ImGuiPack/3rdparty/imgui_docking/backends/imgui_impl_glfw.h>
 #endif
-#include <ImGuiPack/3rdparty/imgui/backends/imgui_impl_opengl3.h>
+#include <ImGuiPack/3rdparty/imgui_docking/backends/imgui_impl_opengl3.h>
 
 #include <ImGuiPack.h>
 

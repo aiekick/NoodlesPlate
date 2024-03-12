@@ -46,7 +46,7 @@ void ConsolePane::Unit()
 
 }
 
-bool ConsolePane::DrawPanes(const uint32_t& vCurrentFrame, PaneFlags& vInOutPaneShown, ImGuiContext* vContextPtr, const std::string& vUserDatas)
+bool ConsolePane::DrawPanes(const uint32_t& vCurrentFrame, PaneFlags& vInOutPaneShown, ImGuiContext* vContextPtr, void* vUserDatas)
 {
 	if (vInOutPaneShown & paneFlag)
 	{

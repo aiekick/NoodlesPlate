@@ -48,7 +48,7 @@ void VRPane::Unit()
 
 }
 
-bool VRPane::DrawPanes(const uint32_t& vCurrentFrame, PaneFlags& vInOutPaneShown, ImGuiContext* vContextPtr, const std::string& vUserDatas)
+bool VRPane::DrawPanes(const uint32_t& vCurrentFrame, PaneFlags& vInOutPaneShown, ImGuiContext* vContextPtr, void* vUserDatas)
 {
 	if (vInOutPaneShown & paneFlag)
 	{

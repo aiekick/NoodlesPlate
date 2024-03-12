@@ -49,7 +49,7 @@ void MessagePane::Unit()
 
 }
 
-bool MessagePane::DrawPanes(const uint32_t& vCurrentFrame, PaneFlags& vInOutPaneShown, ImGuiContext* vContextPtr, const std::string& vUserDatas)
+bool MessagePane::DrawPanes(const uint32_t& vCurrentFrame, PaneFlags& vInOutPaneShown, ImGuiContext* vContextPtr, void* vUserDatas)
 {
 	IsThereSomeMessages(false);
 

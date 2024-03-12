@@ -47,7 +47,7 @@ void InfosPane::Unit()
 
 }
 
-bool InfosPane::DrawPanes(const uint32_t& vCurrentFrame, PaneFlags& vInOutPaneShown, ImGuiContext* vContextPtr, const std::string& vUserDatas)
+bool InfosPane::DrawPanes(const uint32_t& vCurrentFrame, PaneFlags& vInOutPaneShown, ImGuiContext* vContextPtr, void* vUserDatas)
 {
 	if (vInOutPaneShown & paneFlag)
 	{

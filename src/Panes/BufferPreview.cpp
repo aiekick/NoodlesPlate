@@ -48,7 +48,7 @@ void BufferPreview::Unit() {
 }
 
 bool BufferPreview::DrawPanes(const uint32_t& vCurrentFrame, PaneFlags& vInOutPaneShown, ImGuiContext* vContextPtr,
-                              const std::string& vUserDatas) {
+                              void* vUserDatas) {
 
     if (vInOutPaneShown & paneFlag) {
         static ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_MenuBar;

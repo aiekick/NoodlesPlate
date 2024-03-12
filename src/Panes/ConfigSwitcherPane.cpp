@@ -50,7 +50,7 @@ void ConfigSwitcherPane::Unit()
 
 }
 
-bool ConfigSwitcherPane::DrawPanes(const uint32_t& vCurrentFrame, PaneFlags& vInOutPaneShown, ImGuiContext* vContextPtr, const std::string& vUserDatas)
+bool ConfigSwitcherPane::DrawPanes(const uint32_t& vCurrentFrame, PaneFlags& vInOutPaneShown, ImGuiContext* vContextPtr, void* vUserDatas)
 {
 	if (vInOutPaneShown & paneFlag) {
         static ImGuiWindowFlags flags =               //
@@ -95,7 +95,7 @@ bool ConfigSwitcherPane::DrawPanes(const uint32_t& vCurrentFrame, PaneFlags& vIn
 	return false;
 }
 
-bool ConfigSwitcherPane::DrawDialogsAndPopups(const uint32_t& vCurrentFrame, const ImVec2& vMaxSize, ImGuiContext* vContextPtr, const std::string& vUserDatas)
+bool ConfigSwitcherPane::DrawDialogsAndPopups(const uint32_t& vCurrentFrame, const ImVec2& vMaxSize, ImGuiContext* vContextPtr, void* vUserDatas)
 {
     ShaderKeyConfigSwitcherUnified::Instance()->DrawDialog();
     return false;

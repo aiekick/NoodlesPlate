@@ -144,27 +144,27 @@ bool MainFrame::Init() {
 
         PathSystem::Instance()->Save();  // apply paths who was loaded before in LoadConfigFile
 
-        LayoutManager::Instance()->SetPaneDisposalSize(PaneDisposal::LEFT, 300.0f);
-        LayoutManager::Instance()->SetPaneDisposalSize(PaneDisposal::RIGHT, 300.0f);
-        LayoutManager::Instance()->SetPaneDisposalSize(PaneDisposal::BOTTOM, 300.0f);
+        LayoutManager::Instance()->SetPaneDisposalRatio("LEFT", 0.3f);
+        LayoutManager::Instance()->SetPaneDisposalRatio("RIGHT", 0.3f);
+        LayoutManager::Instance()->SetPaneDisposalRatio("BOTTOM", 0.3f);
 
         LayoutManager::Instance()->Init(ICON_NDP2_DESKTOP_MAC " Layouts", "Default Layout");
-        LayoutManager::Instance()->AddPane(ConfigPane::Instance(), ICON_NDP2_VIEW_LIST " Config", "", PaneDisposal::LEFT, false, true);
-        LayoutManager::Instance()->AddPane(UniformsPane::Instance(), ICON_NDP2_TUNE " Tuning", "", PaneDisposal::RIGHT, false, true);
-        LayoutManager::Instance()->AddPane(TimeLinePane::Instance(), ICON_NDP2_VECTOR_CURVE " TimeLine", "", PaneDisposal::BOTTOM, false, true);
-        LayoutManager::Instance()->AddPane(ConfigSwitcherPane::Instance(), ICON_NDP2_LAYERS_TRIPLE " Tuning Switcher", "", PaneDisposal::RIGHT, false, false);
-        LayoutManager::Instance()->AddPane(InfosPane::Instance(), ICON_NDP2_FILE_DOCUMENT_BOX " Notes", "", PaneDisposal::CENTRAL, false, false);
+        LayoutManager::Instance()->AddPane(ConfigPane::Instance(), ICON_NDP2_VIEW_LIST " Config", "", "LEFT", 0.3f, false, true);
+        LayoutManager::Instance()->AddPane(UniformsPane::Instance(), ICON_NDP2_TUNE " Tuning", "", "RIGHT", 0.3f, false, true);
+        LayoutManager::Instance()->AddPane(TimeLinePane::Instance(), ICON_NDP2_VECTOR_CURVE " TimeLine", "", "BOTTOM", 0.3f, false, true);
+        LayoutManager::Instance()->AddPane(ConfigSwitcherPane::Instance(), ICON_NDP2_LAYERS_TRIPLE " Tuning Switcher", "", "RIGHT", 0.3f, false, false);
+        LayoutManager::Instance()->AddPane(InfosPane::Instance(), ICON_NDP2_FILE_DOCUMENT_BOX " Notes", "", "CENTRAL", 0.3f, false, false);
 #ifdef USE_HELP_IN_APP
-        LayoutManager::Instance()->AddPane(HelpPane::Instance(), ICON_NDP2_COMMENT_QUESTION " Help", "", PaneDisposal::CENTRAL, false, false);
+        LayoutManager::Instance()->AddPane(HelpPane::Instance(), ICON_NDP2_COMMENT_QUESTION " Help", "", "CENTRAL", 0.3f, false, false);
 #endif
-        LayoutManager::Instance()->AddPane(ProfilerPane::Instance(), ICON_NDP2_CLIPBOARD_PULSE " Profiler", "", PaneDisposal::BOTTOM, false, false);
-        LayoutManager::Instance()->AddPane(ConsolePane::Instance(), ICON_NDP2_COMMENT_TEXT_MULTIPLE " Console", "", PaneDisposal::BOTTOM, false, false);
-        LayoutManager::Instance()->AddPane(MessagePane::Instance(), ICON_NDP2_COMMENT_TEXT " Message", "", PaneDisposal::CENTRAL, false, false);
-        LayoutManager::Instance()->AddPane(CodePane::Instance(), ICON_NDP2_FILE_DOCUMENT_EDIT " Code", "", PaneDisposal::LEFT, false, false);
+        LayoutManager::Instance()->AddPane(ProfilerPane::Instance(), ICON_NDP2_CLIPBOARD_PULSE " Profiler", "", "BOTTOM", 0.3f, false, false);
+        LayoutManager::Instance()->AddPane(ConsolePane::Instance(), ICON_NDP2_COMMENT_TEXT_MULTIPLE " Console", "", "BOTTOM", 0.3f, false, false);
+        LayoutManager::Instance()->AddPane(MessagePane::Instance(), ICON_NDP2_COMMENT_TEXT " Message", "", "CENTRAL", 0.3f, false, false);
+        LayoutManager::Instance()->AddPane(CodePane::Instance(), ICON_NDP2_FILE_DOCUMENT_EDIT " Code", "", "LEFT", 0.3f, false, false);
 #ifdef _DEBUG
-        LayoutManager::Instance()->AddPane(InspectorPane::Instance(), ICON_NDP2_ORBIT " Inspector", "", PaneDisposal::BOTTOM, false, false);
+        LayoutManager::Instance()->AddPane(InspectorPane::Instance(), ICON_NDP2_ORBIT " Inspector", "", "BOTTOM", 0.3f, false, false);
 #endif
-        LayoutManager::Instance()->AddPane(BufferPreview::Instance(), ICON_NDP2_VIEW_GRID " Buffers Preview", "", PaneDisposal::RIGHT, false, false);
+        LayoutManager::Instance()->AddPane(BufferPreview::Instance(), ICON_NDP2_VIEW_GRID " Buffers Preview", "", "RIGHT", 0.3f, false, false);
 
 #ifdef USE_VR
         VRGui::Instance()->SetCodeTree(MainBackend::Instance()->puCodeTree);

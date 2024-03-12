@@ -53,7 +53,7 @@ set(CMAKE_PDB_OUTPUT_DIRECTORY "${FINAL_BIN_DIR}/debug")
 ## some defines for debug mode (before 3rdparty.cmake)
 if(MSVC)
 	set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>") ## MT in release or MTd in debug
-	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_DEBUG /Zi")
+	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /W4 -D_DEBUG /Zi")
 else()
 	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_DEBUG -g")
 endif()
@@ -84,7 +84,7 @@ add_definitions(-DCUSTOM_SOGLSL_CONFIG="${CMAKE_SOURCE_DIR}/src/Headers/CustomSo
 add_definitions(-DCUSTOM_IMWIDGETS_CONFIG="${CMAKE_SOURCE_DIR}/src/Headers/CustomImWidgetsConfig.h")
 add_definitions(-DCUSTOM_IN_APP_GPU_PROFILER_CONFIG="${CMAKE_SOURCE_DIR}/src/Headers/CustomInAppGpuProfiler.h")
 add_definitions(-DCUSTOM_IMGUIFILEDIALOG_CONFIG="${CMAKE_SOURCE_DIR}/src/Headers/CustomImGuiFileDialogConfig.h")
-add_definitions(-DUSE_IMGUI="${CMAKE_SOURCE_DIR}/3rdparty/SoGLSL/3rdparty/ImGuiPack/3rdparty/imgui/imgui.h")
+add_definitions(-DIMGUI_INCLUDE="${CMAKE_SOURCE_DIR}/3rdparty/SoGLSL/3rdparty/ImGuiPack/3rdparty/imgui_docking/imgui.h")
 
 set(LLVM_USE_CRT_DEBUG MTd CACHE STRING "" FORCE)
 set(LLVM_USE_CRT_MINSIZEREL MT CACHE STRING "" FORCE)
@@ -155,16 +155,16 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/src PREFIX src FILES ${PROJECT_SRC
 
 if (USE_SDL)
 	file(GLOB IMGUI_IMPL_SRC 
-		${CMAKE_SOURCE_DIR}/3rdparty/SoGLSL/3rdparty/ImGuiPack/3rdparty/imgui/backends/imgui_impl_opengl3.cpp
-		${CMAKE_SOURCE_DIR}/3rdparty/SoGLSL/3rdparty/ImGuiPack/3rdparty/imgui/backends/imgui_impl_opengl3.h
-		${CMAKE_SOURCE_DIR}/3rdparty/SoGLSL/3rdparty/ImGuiPack/3rdparty/imgui/backends/imgui_impl_sdl.cpp
-		${CMAKE_SOURCE_DIR}/3rdparty/SoGLSL/3rdparty/ImGuiPack/3rdparty/imgui/backends/imgui_impl_sdl.h)
+		${CMAKE_SOURCE_DIR}/3rdparty/SoGLSL/3rdparty/ImGuiPack/3rdparty/imgui_docking/backends/imgui_impl_opengl3.cpp
+		${CMAKE_SOURCE_DIR}/3rdparty/SoGLSL/3rdparty/ImGuiPack/3rdparty/imgui_docking/backends/imgui_impl_opengl3.h
+		${CMAKE_SOURCE_DIR}/3rdparty/SoGLSL/3rdparty/ImGuiPack/3rdparty/imgui_docking/backends/imgui_impl_sdl.cpp
+		${CMAKE_SOURCE_DIR}/3rdparty/SoGLSL/3rdparty/ImGuiPack/3rdparty/imgui_docking/backends/imgui_impl_sdl.h)
 else()
 	file(GLOB IMGUI_IMPL_SRC 
-		${CMAKE_SOURCE_DIR}/3rdparty/SoGLSL/3rdparty/ImGuiPack/3rdparty/imgui/backends/imgui_impl_opengl3.cpp
-		${CMAKE_SOURCE_DIR}/3rdparty/SoGLSL/3rdparty/ImGuiPack/3rdparty/imgui/backends/imgui_impl_opengl3.h
-		${CMAKE_SOURCE_DIR}/3rdparty/SoGLSL/3rdparty/ImGuiPack/3rdparty/imgui/backends/imgui_impl_glfw.cpp
-		${CMAKE_SOURCE_DIR}/3rdparty/SoGLSL/3rdparty/ImGuiPack/3rdparty/imgui/backends/imgui_impl_glfw.h)
+		${CMAKE_SOURCE_DIR}/3rdparty/SoGLSL/3rdparty/ImGuiPack/3rdparty/imgui_docking/backends/imgui_impl_opengl3.cpp
+		${CMAKE_SOURCE_DIR}/3rdparty/SoGLSL/3rdparty/ImGuiPack/3rdparty/imgui_docking/backends/imgui_impl_opengl3.h
+		${CMAKE_SOURCE_DIR}/3rdparty/SoGLSL/3rdparty/ImGuiPack/3rdparty/imgui_docking/backends/imgui_impl_glfw.cpp
+		${CMAKE_SOURCE_DIR}/3rdparty/SoGLSL/3rdparty/ImGuiPack/3rdparty/imgui_docking/backends/imgui_impl_glfw.h)
 endif()
 source_group(src/Impl FILES ${IMGUI_IMPL_SRC})
 
@@ -186,8 +186,8 @@ add_executable(${PROJECT}
 if (USE_IMPLOT)
 	target_compile_definitions(${PROJECT} PUBLIC USE_IMPLOT)
 endif()
-if (USE_IMCOOL_BAR)
-	target_compile_definitions(${PROJECT} PUBLIC USE_IMCOOL_BAR)
+if (USE_IM_COOL_BAR)
+	target_compile_definitions(${PROJECT} PUBLIC USE_IM_COOL_BAR)
 endif()
 if (USE_IM_GRADIENT_HDR)
 	target_compile_definitions(${PROJECT} PUBLIC USE_IM_GRADIENT_HDR)
@@ -296,6 +296,8 @@ include_directories(
 	include
 	3rdparty
 	3rdparty/SoGLSL
+	3rdparty/SoGLSL/3rdparty/ImGuiPack
+	3rdparty/SoGLSL/3rdparty/ImGuiPack/3rdparty/imgui
 	${ZLIB_INCLUDE_DIR}
 	${NVAPI_INCLUDE_DIR}
 	${SOGSL_INCLUDE_DIRS}

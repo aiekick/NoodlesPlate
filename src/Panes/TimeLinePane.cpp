@@ -50,7 +50,7 @@ void TimeLinePane::Unit()
 
 }
 
-bool TimeLinePane::DrawPanes(const uint32_t& vCurrentFrame, PaneFlags& vInOutPaneShown, ImGuiContext* vContextPtr, const std::string& vUserDatas)
+bool TimeLinePane::DrawPanes(const uint32_t& vCurrentFrame, PaneFlags& vInOutPaneShown, ImGuiContext* vContextPtr, void* vUserDatas)
 {
 	TimeLineSystem::Instance()->SetActive(false);
 
