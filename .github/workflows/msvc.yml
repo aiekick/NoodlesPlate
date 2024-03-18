@@ -36,9 +36,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      - name: checkout submodules
+        run : git submodule update --init --recursive 
+        
       - name: Configure CMake
         run: cmake -B ${{ env.build }}
-
+      
       # Build is not required unless generated source files are used
       # - name: Build CMake
       #   run: cmake --build ${{ env.build }}
