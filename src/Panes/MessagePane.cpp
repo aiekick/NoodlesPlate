@@ -49,27 +49,26 @@ void MessagePane::Unit()
 
 }
 
-bool MessagePane::DrawPanes(const uint32_t& vCurrentFrame, PaneFlags& vInOutPaneShown, ImGuiContext* vContextPtr, void* vUserDatas)
+bool MessagePane::DrawPanes(const uint32_t& /*vCurrentFrame*/, bool* vOpened, ImGuiContext* /*vContextPtr*/, void* /*vUserDatas*/)
 {
 	IsThereSomeMessages(false);
 
 	if ((puIsThereSomeShaderErrors && puShowErrors) || (puIsThereSomeShaderWarnings && puShowWarnings))
 	{
-		LayoutManager::Instance()->ShowSpecificPane(paneFlag);
+        LayoutManager::Instance()->ShowSpecificPane(GetFlag());  // open the message pane
 	}
 	else
 	{
-		LayoutManager::Instance()->HideSpecificPane(paneFlag); // open the message pane
+        LayoutManager::Instance()->HideSpecificPane(GetFlag());
 	}
 
-	if (vInOutPaneShown & paneFlag)
+	if (vOpened && *vOpened)
 	{
 		static ImGuiWindowFlags flags =
 			ImGuiWindowFlags_NoCollapse |
 			ImGuiWindowFlags_NoBringToFrontOnFocus |
 			ImGuiWindowFlags_MenuBar;
-		if (ImGui::Begin<PaneFlags>(paneName.c_str(),
-			&vInOutPaneShown, paneFlag, flags))
+        if (ImGui::Begin(GetName().c_str(), vOpened, flags))
 		{
 #ifdef USE_DECORATIONS_FOR_RESIZE_CHILD_WINDOWS
 			auto win = ImGui::GetCurrentWindowRead();

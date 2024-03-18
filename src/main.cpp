@@ -257,8 +257,10 @@ int main(int, char** argv)
 			return 1;
 		}
 
-		TracyGpuContext;
-		tracy::SetThreadName("Main");
+#ifdef TRACY_ENABLE
+        TracyGpuContext;
+        tracy::SetThreadName("Main");
+#endif  // TRACY_ENABLE
 
 #if defined(_DEBUG) && defined(_WIN32)
 		ShowWindow(GetConsoleWindow(), SW_SHOW); // hide console
@@ -323,7 +325,6 @@ int main(int, char** argv)
 
 			const auto mainBackendPtr = MainBackend::Instance();
 
-			static size_t idx = 0;
 			while (!GuiBackend::Instance()->WindowShouldClose(MainBackend::sMainThread))
 			{
 				RenderDocController::Instance()->StartCaptureIfResquested();

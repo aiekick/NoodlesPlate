@@ -171,7 +171,7 @@ bool MainFrame::Init() {
 #endif
         LayoutManager::Instance()->InitPanes();
 
-        Messaging::sMessagePaneId = ConsolePane::Instance()->paneFlag;
+        Messaging::sMessagePaneId = ConsolePane::Instance()->GetFlag();
     
 
         if (MainBackend::Instance()->Load(puFileToLoad)) {
@@ -257,13 +257,14 @@ void MainFrame::Display(ct::ivec2 vSize) {
 
         DrawFileDialogs(vSize);
 
-        LayoutManager::Instance()->InitAfterFirstDisplay(ct::toImVec2(vSize));
+        const auto& size = ImVec2((float)vSize.x, (float)vSize.y);
+        LayoutManager::Instance()->InitAfterFirstDisplay(size);
 
         VersionSystem::Instance()->CheckVersionAtStart();
         SettingsDlg::Instance()->DrawDialog();
         VersionSystem::Instance()->DrawNewVersionDialog();
         ShadertoyBackupFileImportDlg::Instance()->DrawDialog();
-        LayoutManager::Instance()->DrawDialogsAndPopups(0U, ImVec2((float)vSize.x, (float)vSize.y));
+        LayoutManager::Instance()->DrawDialogsAndPopups(0U, size);
 
         DrawErrorDialog();
         DoAbout();
@@ -455,7 +456,7 @@ bool MainFrame::DrawImportBar() {
                 puShowErrorDialog = true;
                 puErrorDialogTitle = "Import Error";
                 puErrorDialogMsg.clear();
-                for (const auto msg : msgs) {
+                for (const auto& msg : msgs) {
                     puErrorDialogMsg += msg;
                 }
             }
@@ -1035,7 +1036,8 @@ void MainFrame::DrawMainMenuBar() {
         ImGui::EndMenu();
     }
 
-    LayoutManager::Instance()->DisplayMenu(ct::toImVec2(MainBackend::Instance()->puScreenSize));
+    auto& screenSize = MainBackend::Instance()->puScreenSize;
+    LayoutManager::Instance()->DisplayMenu(ImVec2((float)screenSize.x, (float)screenSize.y));
 
     if (ImGui::BeginMenu(ICON_NDP_COG " Settings")) {
         DrawSettingsMenu_Global();

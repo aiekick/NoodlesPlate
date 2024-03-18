@@ -29,8 +29,6 @@
 #include <ImGuiPack.h>
 
 #include <Metrics/MetricSystem.h>
-
-#include <ImGuiPack.h>
 #include <Panes/MessagePane.h>
 #include <Gui/MainFrame.h>
 #include <Backends/MainBackend.h>
@@ -142,24 +140,57 @@ void MainToolBar::DrawCoolBar() {
             if (ImGui::CoolBarItem()) {
                 const auto aw              = ImGui::GetCoolBarItemWidth();
                 MainToolBar::puFont->Scale = font_scale_ratio * ImGui::GetCoolBarItemScale();
-                ImGui::RadioButtonLabeled_BitWize<PaneFlags>(ImVec2(aw, aw), ICON_NDPTB_VIEW_LIST "##Config", "Config", &LayoutManager::Instance()->pane_Shown, ConfigPane::Instance()->paneFlag, false, true, 0, false, MainToolBar::puFont);
+                ImGui::RadioButtonLabeled_BitWize<LayoutPaneFlag>(ImVec2(aw, aw),
+                                                             ICON_NDPTB_VIEW_LIST "##Config",
+                                                             "Config",
+                                                             &LayoutManager::Instance()->pane_Shown,
+                                                             ConfigPane::Instance()->GetFlag(),
+                                                             false,
+                                                             true,
+                                                             0,
+                                                             false,
+                                                             MainToolBar::puFont);
             }
             if (ImGui::CoolBarItem()) {
                 const auto aw              = ImGui::GetCoolBarItemWidth();
                 MainToolBar::puFont->Scale = font_scale_ratio * ImGui::GetCoolBarItemScale();
-                ImGui::RadioButtonLabeled_BitWize<PaneFlags>(ImVec2(aw, aw), ICON_NDPTB_TUNE "##Uniforms", "Tuning", &LayoutManager::Instance()->pane_Shown, UniformsPane::Instance()->paneFlag, false, true, 0, false, MainToolBar::puFont);
+                ImGui::RadioButtonLabeled_BitWize<LayoutPaneFlag>(ImVec2(aw, aw),
+                                                                  ICON_NDPTB_TUNE "##Uniforms",
+                                                                  "Tuning",
+                                                                  &LayoutManager::Instance()->pane_Shown,
+                                                                  UniformsPane::Instance()->GetFlag(),
+                                                                  false,
+                                                                  true,
+                                                                  0,
+                                                                  false,
+                                                                  MainToolBar::puFont);
             }
 
             if (ImGui::CoolBarItem()) {
                 const auto aw              = ImGui::GetCoolBarItemWidth();
                 MainToolBar::puFont->Scale = font_scale_ratio * ImGui::GetCoolBarItemScale();
-                ImGui::RadioButtonLabeled_BitWize<PaneFlags>(ImVec2(aw, aw), ICON_NDPTB_VECTOR_CURVE "##TimeLine", "TimeLine", &LayoutManager::Instance()->pane_Shown, TimeLinePane::Instance()->paneFlag, false, true, 0, false,
+                ImGui::RadioButtonLabeled_BitWize<LayoutPaneFlag>(ImVec2(aw, aw),
+                                                                  ICON_NDPTB_VECTOR_CURVE "##TimeLine",
+                                                                  "TimeLine",
+                                                                  &LayoutManager::Instance()->pane_Shown,
+                                                                  TimeLinePane::Instance()->GetFlag(),
+                                                                  false,
+                                                                  true,
+                                                                  0,
+                                                                  false,
                                                             MainToolBar::puFont);
             }
             if (ImGui::CoolBarItem()) {
                 const auto aw              = ImGui::GetCoolBarItemWidth();
                 MainToolBar::puFont->Scale = font_scale_ratio * ImGui::GetCoolBarItemScale();
-                ImGui::RadioButtonLabeled_BitWize<PaneFlags>(ImVec2(aw, aw), ICON_NDPTB_LAYERS_TRIPLE "##TuningSwitcher", "Tuning Switcher", &LayoutManager::Instance()->pane_Shown, ConfigSwitcherPane::Instance()->paneFlag, false, true, 0,
+                ImGui::RadioButtonLabeled_BitWize<LayoutPaneFlag>(ImVec2(aw, aw),
+                                                                  ICON_NDPTB_LAYERS_TRIPLE "##TuningSwitcher",
+                                                                  "Tuning Switcher",
+                                                                  &LayoutManager::Instance()->pane_Shown,
+                                                                  ConfigSwitcherPane::Instance()->GetFlag(),
+                                                                  false,
+                                                                  true,
+                                                                  0,
                                                             false, MainToolBar::puFont);
             }
 
@@ -167,28 +198,63 @@ void MainToolBar::DrawCoolBar() {
             if (ImGui::CoolBarItem()) {
                 const auto aw              = ImGui::GetCoolBarItemWidth();
                 MainToolBar::puFont->Scale = font_scale_ratio * ImGui::GetCoolBarItemScale();
-                ImGui::RadioButtonLabeled_BitWize<PaneFlags>(ImVec2(aw, aw), ICON_NDPTB_FILE_DOCUMENT_EDIT "##Code", "Code", &LayoutManager::Instance()->pane_Shown, CodePane::Instance()->paneFlag, false, true, 0, false, MainToolBar::puFont);
+                ImGui::RadioButtonLabeled_BitWize<LayoutPaneFlag>(ImVec2(aw, aw),
+                                                                  ICON_NDPTB_FILE_DOCUMENT_EDIT "##Code",
+                                                                  "Code",
+                                                                  &LayoutManager::Instance()->pane_Shown,
+                                                                  CodePane::Instance()->GetFlag(),
+                                                                  false,
+                                                                  true,
+                                                                  0,
+                                                                  false,
+                                                                  MainToolBar::puFont);
             }
             // #endif
 
             if (ImGui::CoolBarItem()) {
                 const auto aw              = ImGui::GetCoolBarItemWidth();
                 MainToolBar::puFont->Scale = font_scale_ratio * ImGui::GetCoolBarItemScale();
-                ImGui::RadioButtonLabeled_BitWize<PaneFlags>(ImVec2(aw, aw), ICON_NDPTB_FILE_DOCUMENT_BOX "##Notes", "Notes", &LayoutManager::Instance()->pane_Shown, InfosPane::Instance()->paneFlag, false, true, 0, false, MainToolBar::puFont);
+                ImGui::RadioButtonLabeled_BitWize<LayoutPaneFlag>(ImVec2(aw, aw),
+                                                                  ICON_NDPTB_FILE_DOCUMENT_BOX "##Notes",
+                                                                  "Notes",
+                                                                  &LayoutManager::Instance()->pane_Shown,
+                                                                  InfosPane::Instance()->GetFlag(),
+                                                                  false,
+                                                                  true,
+                                                                  0,
+                                                                  false,
+                                                                  MainToolBar::puFont);
             }
 
 #ifdef USE_HELP_IN_APP
             if (ImGui::CoolBarItem()) {
                 const auto aw              = ImGui::GetCoolBarItemWidth();
                 MainToolBar::puFont->Scale = font_scale_ratio * ImGui::GetCoolBarItemScale();
-                ImGui::RadioButtonLabeled_BitWize<PaneFlags>(ImVec2(aw, aw), ICON_NDPTB_COMMENT_QUESTION "##Help", "Help", &LayoutManager::Instance()->pane_Shown, HelpPane::Instance()->paneFlag, false, true, 0, false, MainToolBar::puFont);
+                ImGui::RadioButtonLabeled_BitWize<LayoutPaneFlag>(ImVec2(aw, aw),
+                                                                  ICON_NDPTB_COMMENT_QUESTION "##Help",
+                                                                  "Help",
+                                                                  &LayoutManager::Instance()->pane_Shown,
+                                                                  HelpPane::Instance()->GetFlag(),
+                                                                  false,
+                                                                  true,
+                                                                  0,
+                                                                  false,
+                                                                  MainToolBar::puFont);
             }
 #endif
 
             if (ImGui::CoolBarItem()) {
                 const auto aw              = ImGui::GetCoolBarItemWidth();
                 MainToolBar::puFont->Scale = font_scale_ratio * ImGui::GetCoolBarItemScale();
-                ImGui::RadioButtonLabeled_BitWize<PaneFlags>(ImVec2(aw, aw), ICON_NDPTB_CLIPBOARD_PULSE "##Profiler", "Profiler", &LayoutManager::Instance()->pane_Shown, ProfilerPane::Instance()->paneFlag, false, true, 0, false,
+                ImGui::RadioButtonLabeled_BitWize<LayoutPaneFlag>(ImVec2(aw, aw),
+                                                                  ICON_NDPTB_CLIPBOARD_PULSE "##Profiler",
+                                                                  "Profiler",
+                                                                  &LayoutManager::Instance()->pane_Shown,
+                                                                  ProfilerPane::Instance()->GetFlag(),
+                                                                  false,
+                                                                  true,
+                                                                  0,
+                                                                  false,
                                                             MainToolBar::puFont);
             }
 
@@ -215,21 +281,45 @@ void MainToolBar::DrawCoolBar() {
             if (ImGui::CoolBarItem()) {
                 const auto aw              = ImGui::GetCoolBarItemWidth();
                 MainToolBar::puFont->Scale = font_scale_ratio * ImGui::GetCoolBarItemScale();
-                ImGui::RadioButtonLabeled_BitWize<PaneFlags>(ImVec2(aw, aw), ICON_NDPTB_ATOM_VARIANT "##Inspector", "Inspector", &LayoutManager::Instance()->pane_Shown, InspectorPane::Instance()->paneFlag, false, true, 0, false,
+                ImGui::RadioButtonLabeled_BitWize<LayoutPaneFlag>(ImVec2(aw, aw),
+                                                                  ICON_NDPTB_ATOM_VARIANT "##Inspector",
+                                                                  "Inspector",
+                                                                  &LayoutManager::Instance()->pane_Shown,
+                                                                  InspectorPane::Instance()->GetFlag(),
+                                                                  false,
+                                                                  true,
+                                                                  0,
+                                                                  false,
                                                             MainToolBar::puFont);
             }
 #endif
             if (ImGui::CoolBarItem()) {
                 const auto aw              = ImGui::GetCoolBarItemWidth();
                 MainToolBar::puFont->Scale = font_scale_ratio * ImGui::GetCoolBarItemScale();
-                ImGui::RadioButtonLabeled_BitWize<PaneFlags>(ImVec2(aw, aw), ICON_NDPTB_VIEW_GRID "##BufferPreview", "Buffers Preview", &LayoutManager::Instance()->pane_Shown, BufferPreview::Instance()->paneFlag, false, true, 0, false,
+                ImGui::RadioButtonLabeled_BitWize<LayoutPaneFlag>(ImVec2(aw, aw),
+                                                                  ICON_NDPTB_VIEW_GRID "##BufferPreview",
+                                                                  "Buffers Preview",
+                                                                  &LayoutManager::Instance()->pane_Shown,
+                                                                  BufferPreview::Instance()->GetFlag(),
+                                                                  false,
+                                                                  true,
+                                                                  0,
+                                                                  false,
                                                             MainToolBar::puFont);
             }
 
             if (ImGui::CoolBarItem()) {
                 const auto aw              = ImGui::GetCoolBarItemWidth();
                 MainToolBar::puFont->Scale = font_scale_ratio * ImGui::GetCoolBarItemScale();
-                ImGui::RadioButtonLabeled_BitWize<PaneFlags>(ImVec2(aw, aw), ICON_NDPTB_COMMENT_TEXT_MULTIPLE "##Console", "Console", &LayoutManager::Instance()->pane_Shown, ConsolePane::Instance()->paneFlag, false, true, 0, false,
+                ImGui::RadioButtonLabeled_BitWize<LayoutPaneFlag>(ImVec2(aw, aw),
+                                                                  ICON_NDPTB_COMMENT_TEXT_MULTIPLE "##Console",
+                                                                  "Console",
+                                                                  &LayoutManager::Instance()->pane_Shown,
+                                                                  ConsolePane::Instance()->GetFlag(),
+                                                                  false,
+                                                                  true,
+                                                                  0,
+                                                                  false,
                                                             MainToolBar::puFont);
             }
 

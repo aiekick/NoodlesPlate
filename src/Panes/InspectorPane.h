@@ -15,7 +15,7 @@
 
 #pragma once
 
-#include <AbstractPane.h>
+#include <ImGuiPack/ImGuiPack.h>
 #include <ctools/ConfigAbstract.h>
 
 #include <string>
@@ -26,7 +26,7 @@ class InspectorPane : public AbstractPane, public conf::ConfigAbstract
 public:
 	bool Init() override;
 	void Unit() override;
-	bool DrawPanes(const uint32_t& vCurrentFrame, PaneFlags& vInOutPaneShown, ImGuiContext* vContextPtr = nullptr, void* vUserDatas = nullptr) override;
+	bool DrawPanes(const uint32_t& /*vCurrentFrame*/, bool* vOpened, ImGuiContext* /*vContextPtr*/ = nullptr, void* vUserDatas = nullptr) override;
     
 	// configuration
 	std::string getXml(const std::string& vOffset, const std::string& vUserDatas = "") override;
@@ -43,6 +43,6 @@ public:
 	InspectorPane(); // Prevent construction
 	InspectorPane(const InspectorPane&) {}; // Prevent construction by copying
 	InspectorPane& operator =(const InspectorPane&) { return *this; }; // Prevent assignment
-	~InspectorPane(); // Prevent unwanted destruction};
+    virtual ~InspectorPane();  // Prevent unwanted destruction};
 };
 

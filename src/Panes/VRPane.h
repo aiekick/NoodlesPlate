@@ -26,7 +26,7 @@ class VRPane : public AbstractPane, public conf::ConfigAbstract
 public:
 	bool Init() override;
 	void Unit() override;
-    bool DrawPanes(const uint32_t& vCurrentFrame, PaneFlags& vInOutPaneShown, ImGuiContext* vContextPtr = nullptr, void* vUserDatas = nullptr) override;
+    bool DrawPanes(const uint32_t& /*vCurrentFrame*/, bool* vOpened, ImGuiContext* /*vContextPtr*/ = nullptr, void* vUserDatas = nullptr) override;
     
 	// configuration
 	std::string getXml(const std::string& vOffset, const std::string& vUserDatas = "") override;
@@ -43,6 +43,6 @@ public:
 	VRPane(); // Prevent construction
 	VRPane(const VRPane&) {}; // Prevent construction by copying
 	VRPane& operator =(const VRPane&) { return *this; }; // Prevent assignment
-	~VRPane(); // Prevent unwanted destruction};
+    virtual ~VRPane();  // Prevent unwanted destruction};
 };
 

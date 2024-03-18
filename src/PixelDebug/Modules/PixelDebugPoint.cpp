@@ -320,7 +320,7 @@ void PixelDebugPoint::DrawGraph(size_t vAttachment, RenderPackWeak vRenderPack, 
 				{
 					ImGui::SliderIntDefault(150, "Pixels", &puImagePixelDisplay[vAttachment], 1, 20, 5);
 					const auto center = ImVec2(puLastNormalizedTexturePos.x, puLastNormalizedTexturePos.y);
-					const auto point = ct::toImVec2(ct::fvec2(1.0f / (float)rpPtr->GetSize().x, -1.0f / (float)rpPtr->GetSize().x));
+					const auto point = ImVec2(1.0f / (float)rpPtr->GetSize().x, -1.0f / (float)rpPtr->GetSize().x);
 					const auto radiusInPixel = ImVec2((float)puImagePixelDisplay[vAttachment], (float)puImagePixelDisplay[vAttachment]);
 					ImGui::ImageZoomPoint((ImTextureID)(size_t)rpPtr->GetTextureId((int)vAttachment), 200, center, point, radiusInPixel);
 				}

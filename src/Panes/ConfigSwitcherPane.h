@@ -15,7 +15,7 @@
 
 #pragma once
 
-#include <AbstractPane.h>
+#include <ImGuiPack/ImGuiPack.h>
 #include <ctools/ConfigAbstract.h>
 #include <SoGLSL/src/CodeTree/ShaderKeyConfigSwitcherUnified.h>
 
@@ -27,8 +27,8 @@ class ConfigSwitcherPane : public AbstractPane, public conf::ConfigAbstract
 public:
 	bool Init() override;
 	void Unit() override;
-	bool DrawPanes(const uint32_t& vCurrentFrame, PaneFlags& vInOutPaneShown, ImGuiContext* vContextPtr = nullptr, void* vUserDatas = nullptr) override;
-    bool DrawDialogsAndPopups(const uint32_t& vCurrentFrame, const ImVec2& vMaxSize, ImGuiContext* vContextPtr = nullptr, void* vUserDatas = nullptr) override;
+	bool DrawPanes(const uint32_t& /*vCurrentFrame*/, bool* vOpened, ImGuiContext* /*vContextPtr*/ = nullptr, void* vUserDatas = nullptr) override;
+    bool DrawDialogsAndPopups(const uint32_t& /*vCurrentFrame*/, const ImVec2& vMaxSize, ImGuiContext* vContextPtr = nullptr, void* vUserDatas = nullptr) override;
 
 	// configuration
 	std::string getXml(const std::string& vOffset, const std::string& vUserDatas = "") override;
@@ -45,6 +45,6 @@ public:
 	ConfigSwitcherPane(); // Prevent construction
 	ConfigSwitcherPane(const ConfigSwitcherPane&) {}; // Prevent construction by copying
 	ConfigSwitcherPane& operator =(const ConfigSwitcherPane&) { return *this; }; // Prevent assignment
-	~ConfigSwitcherPane(); // Prevent unwanted destruction};
+    virtual ~ConfigSwitcherPane();  // Prevent unwanted destruction};
 };
 

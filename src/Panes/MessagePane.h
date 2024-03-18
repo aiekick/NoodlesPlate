@@ -15,9 +15,9 @@
 
 #pragma once
 
-#include <AbstractPane.h>
+#include <ImGuiPack/ImGuiPack.h>
 #include <ctools/ConfigAbstract.h>
-#include <ImGuiFileDialog.h>
+#include <ImGuiPack/ImGuiPack.h>
 
 #include <string>
 
@@ -33,7 +33,7 @@ private:
 public:
 	bool Init() override;
 	void Unit() override;
-	bool DrawPanes(const uint32_t& vCurrentFrame, PaneFlags& vInOutPaneShown, ImGuiContext* vContextPtr = nullptr, void* vUserDatas = nullptr) override;
+	bool DrawPanes(const uint32_t& /*vCurrentFrame*/, bool* vOpened, ImGuiContext* /*vContextPtr*/ = nullptr, void* vUserDatas = nullptr) override;
     
 	// configuration
 	std::string getXml(const std::string& vOffset, const std::string& vUserDatas = "") override;
@@ -54,6 +54,6 @@ public:
 	MessagePane(); // Prevent construction
 	MessagePane(const MessagePane&) {}; // Prevent construction by copying
 	MessagePane& operator =(const MessagePane&) { return *this; }; // Prevent assignment
-	~MessagePane(); // Prevent unwanted destruction};
+    virtual ~MessagePane();  // Prevent unwanted destruction};
 };
 

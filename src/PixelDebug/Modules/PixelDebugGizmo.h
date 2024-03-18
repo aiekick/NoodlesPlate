@@ -41,15 +41,17 @@ public:
 	PixelDebugGizmo();
 	~PixelDebugGizmo();
 	
-	void Init(RenderPackWeak vRenderPack);
+	void Init(RenderPackWeak vRenderPack) override;
 
-	bool IsActive() { return puActivated; }
-	void DrawMenu();
-	void DrawTooltips(RenderPackWeak vRenderPack, float vDisplayQuality, CameraSystem *vCamera);
-	void DrawPane(RenderPackWeak vRenderPack, float vDisplayQuality, CameraSystem *vCamera);
-	void Capture(RenderPackWeak vRenderPack, float vDisplayQuality, CameraSystem *vCamera);
-	void Resize(RenderPackWeak vRenderPack, float vDisplayQuality, CameraSystem *vCamera);
-	bool NeedRefresh();
+	bool IsActive() override {
+        return puActivated;
+    }
+    void DrawMenu() override;
+    void DrawTooltips(RenderPackWeak vRenderPack, float vDisplayQuality, CameraSystem *vCamera) override;
+    void DrawPane(RenderPackWeak vRenderPack, float vDisplayQuality, CameraSystem *vCamera) override;
+    void Capture(RenderPackWeak vRenderPack, float vDisplayQuality, CameraSystem *vCamera) override;
+    void Resize(RenderPackWeak vRenderPack, float vDisplayQuality, CameraSystem *vCamera) override;
+    bool NeedRefresh() override;
 
 private:
 	void DrawPoint(ct::fvec2 *vPoint, ct::frect *vRect, float vDisplayQuality);

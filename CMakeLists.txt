@@ -7,17 +7,17 @@ enable_language(C CXX)
 
 project(${PROJECT} CXX)
 
-option(USE_SDL "Enale SDL instead of GLFW (Not fully tested btw)" OFF)
 option(USE_PROFILER_TRACY "Enale Tracy Profiler" OFF)
+option(USE_SDL "Enale SDL instead of GLFW (Not fully tested btw)" OFF)
 option(USE_NETWORK "Enable NETWORK (Shader Inport, Versions, Changelog)" ON)
-option(USE_STD_FILESYSTEM "Enable std::filesystem use for path and ImGuiFileDialog" ON)
-option(USE_PACKAGE_TO_NSIS "Enable packaging to nsis isntaller or zip if false" ON)
 option(BUILD_X32 "Enable the 32 bit version of NoodlesPlate (default is X64)" OFF)
+option(USE_PACKAGE_TO_NSIS "Enable packaging to nsis isntaller or zip if false" ON)
+option(USE_STD_FILESYSTEM "Enable std::filesystem use for path and ImGuiFileDialog" ON)
 
 if (WIN32)
 	# MACOS : VR is not supported
-	# LINUX : OpenXR have issues, so disbaled for the moment
-	option(USE_VR "Enable VR Backend via Openxr" ON)
+	# LINUX : OpenXR have issues, so disabled for the moment
+	option(USE_VR "Enable VR Backend via Openxr" OFF) # disabled many issues and crash with new driver
 	# GPU Metric need the NVApi of Nvidia and as i know is not available on Linux
 	option(USE_GPU_METRIC "Enable Gpu Metrics if available (NVIDIA and WINDOWS only)" ON)
 else()
@@ -94,17 +94,6 @@ set(USE_MSVC_RUNTIME_LIBRARY_DLL OFF CACHE BOOL "" FORCE)
 
 include(cmake/3rdparty.cmake)
 
-if (USE_PROFILER_TRACY)
-	option(USE_CALIBRATED_CONTEXT "Enable Calibrated Context in Tracy for sync cpu/gpu timestamps" OFF)
-	if (USE_CALIBRATED_CONTEXT)
-		add_definitions(-DENABLE_CALIBRATED_CONTEXT)
-	endif()
-	add_definitions(-DTRACY_ENABLE)
-	add_definitions(-DTRACY_ON_DEMAND)
-	add_definitions(-DTRACY_NO_BROADCAST)
-	add_definitions(-DTRACY_ONLY_LOCALHOST=1)
-endif()
-
 if(UNIX)
     if(APPLE)
         add_definitions(-DAPPLE)
@@ -146,8 +135,6 @@ if (TARGET uninstall)
 	set_target_properties(uninstall PROPERTIES FOLDER "cmakeTargets")
 endif()
 
-add_definitions(${GLFW_DEFINITIONS})
-
 file(GLOB PROJECT_MAIN ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp ${CMAKE_CURRENT_SOURCE_DIR}/.clang-format)
 source_group(main FILES ${PROJECT_MAIN})
 file(GLOB_RECURSE PROJECT_SRC_RECURSE ${CMAKE_CURRENT_SOURCE_DIR}/src/*.*)
@@ -181,7 +168,12 @@ add_executable(${PROJECT}
 	${IMGUI_IMPL_SRC}
 	${IMGUI_MISC_SRC}
 	${PROJECT_SRC_RECURSE}
-	${APP_ICON_RESOURCE_WINDOWS})
+	${APP_ICON_RESOURCE_WINDOWS}
+)
+
+if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+	target_compile_options(${PROJECT} PRIVATE -Wno-unused-function)
+endif()
 
 if (USE_IMPLOT)
 	target_compile_definitions(${PROJECT} PUBLIC USE_IMPLOT)
@@ -213,12 +205,6 @@ endif()
 if (USE_IN_APP_GPU_PROFILER)
 	target_compile_definitions(${PROJECT} PUBLIC USE_IN_APP_GPU_PROFILER)
 endif()
- 
-## will put dependencies in output dir
-##add_custom_command(TARGET ${PROJECT} POST_BUILD
-##  COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:${PROJECT}> $<TARGET_FILE_DIR:${PROJECT}>
-##  COMMAND_EXPAND_LISTS
-##)
 
 set_target_properties(${PROJECT} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${FINAL_BIN_DIR}")
 set_target_properties(${PROJECT} PROPERTIES RUNTIME_OUTPUT_DIRECTORY_DEBUG "${FINAL_BIN_DIR}")
@@ -297,14 +283,12 @@ include_directories(
 	3rdparty
 	3rdparty/SoGLSL
 	3rdparty/SoGLSL/3rdparty/ImGuiPack
-	3rdparty/SoGLSL/3rdparty/ImGuiPack/3rdparty/imgui
-	${ZLIB_INCLUDE_DIR}
+	3rdparty/SoGLSL/3rdparty/ImGuiPack/3rdparty/imgui_docking
 	${NVAPI_INCLUDE_DIR}
 	${SOGSL_INCLUDE_DIRS}
 )
 
 target_link_libraries(${PROJECT} PRIVATE 
-	${ZLIB_LIBRARIES}
 	${NVAPI_LIBRARIES}
 	${SOGLSL_LIBRARIES}
 )
@@ -358,7 +342,7 @@ include(CPack)
 
 ## only for Debug
 add_subdirectory(3rdparty/BuildInc)
-set_target_properties(BuildInc PROPERTIES FOLDER 3rdparty/aiekick)
+set_target_properties(BuildInc PROPERTIES FOLDER 3rdparty/aiekick/bin)
 
 add_custom_command(
 	TARGET ${PROJECT} PRE_BUILD

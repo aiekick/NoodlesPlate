@@ -16,6 +16,7 @@
 #pragma once
 
 #include <ctools/cTools.h>
+#include <ImGuiPack/ImGuiPack.h>
 #ifdef WIN32
 #include <windows.h>
 #include <Metrics/Win/KGpuMon.h>

@@ -15,7 +15,7 @@
 
 #pragma once
 
-#include <AbstractPane.h>
+#include <ImGuiPack/ImGuiPack.h>
 #include <ctools/ConfigAbstract.h>
 #include <ImGuiPack.h>
 #include <string>
@@ -26,7 +26,7 @@ class CodePane : public AbstractPane, public conf::ConfigAbstract
 public:
 	bool Init() override;
 	void Unit() override;
-	bool DrawPanes(const uint32_t& vCurrentFrame, PaneFlags& vInOutPaneShown, ImGuiContext* vContextPtr = nullptr, void* vUserDatas = nullptr) override;
+	bool DrawPanes(const uint32_t& /*vCurrentFrame*/, bool* vOpened, ImGuiContext* /*vContextPtr*/ = nullptr, void* vUserDatas = nullptr) override;
     
 	TextEditor* GetEditor();
 
@@ -45,6 +45,6 @@ public:
 	CodePane(); // Prevent construction
 	CodePane(const CodePane&) {}; // Prevent construction by copying
 	CodePane& operator =(const CodePane&) { return *this; }; // Prevent assignment
-	~CodePane(); // Prevent unwanted destruction};
+    virtual ~CodePane();  // Prevent unwanted destruction};
 };
 

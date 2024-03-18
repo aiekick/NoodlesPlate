@@ -19,8 +19,7 @@
 #include <string>
 #include <ctools/ConfigAbstract.h>
 #include <Headers/RenderPackHeaders.h>
-#include <AbstractPane.h>
-#include <ImGuiFileDialog.h>
+#include <ImGuiPack/ImGuiPack.h>
 
 class RenderPack;
 class ProjectFile;
@@ -29,8 +28,7 @@ class BufferPreview : public AbstractPane, public conf::ConfigAbstract
 public:
 	bool Init() override;
 	void Unit() override;
-	bool DrawPanes(const uint32_t& vCurrentFrame, PaneFlags& vInOutPaneShown, ImGuiContext* vContextPtr = nullptr, void* vUserDatas = nullptr) override;
-    bool CanWeDisplay() override;
+	bool DrawPanes(const uint32_t& /*vCurrentFrame*/, bool* vOpened, ImGuiContext* /*vContextPtr*/ = nullptr, void* vUserDatas = nullptr) override;
 
 	// configuration
 	std::string getXml(const std::string& vOffset, const std::string& vUserDatas = "") override;
@@ -51,6 +49,6 @@ public:
 	BufferPreview(); // Prevent construction
 	BufferPreview(const BufferPreview&) {}; // Prevent construction by copying
 	BufferPreview& operator =(const BufferPreview&) { return *this; }; // Prevent assignment
-	~BufferPreview(); // Prevent unwanted destruction};
+	virtual ~BufferPreview(); // Prevent unwanted destruction};
 };
 

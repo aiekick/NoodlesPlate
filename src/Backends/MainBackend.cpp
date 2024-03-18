@@ -835,7 +835,7 @@ bool MainBackend::DoShaderCodeUpdate(std::set<std::string> vFiles, bool vForceUp
     //	CTOOL_DEBUG_BREAK;
 
     if (!glslFilesToUpdatePossibly.empty() || vForceUpdate) {
-        auto countUniforms = UniformVariant::counter;
+        // auto countUniforms = UniformVariant::counter;
         codeChange |= DoShaderCodeUpdateOfRenderPack(puMain_RenderPack, vForceUpdate, &glslFilesToUpdatePossibly);
         for (auto it : puMain_RenderPack->puBuffers) {
             codeChange |= DoShaderCodeUpdateOfRenderPack(it, vForceUpdate, &glslFilesToUpdatePossibly);
@@ -850,23 +850,23 @@ bool MainBackend::DoShaderCodeUpdate(std::set<std::string> vFiles, bool vForceUp
             }
         }
 
-        countUniforms = UniformVariant::counter;
+         // countUniforms = UniformVariant::counter;
         codeChange |= DoShaderCodeUpdateOfRenderPack(pu3dAxis_RenderPack, vForceUpdate, &glslFilesToUpdatePossibly);
         for (auto it : pu3dAxis_RenderPack->puBuffers) {
             codeChange |= DoShaderCodeUpdateOfRenderPack(it, vForceUpdate, &glslFilesToUpdatePossibly);
         }
-        countUniforms = UniformVariant::counter;
+        // countUniforms = UniformVariant::counter;
         codeChange |= DoShaderCodeUpdateOfRenderPack(pu3dGrid_RenderPack, vForceUpdate, &glslFilesToUpdatePossibly);
         for (auto it : pu3dGrid_RenderPack->puBuffers) {
             codeChange |= DoShaderCodeUpdateOfRenderPack(it, vForceUpdate, &glslFilesToUpdatePossibly);
         }
-        countUniforms = UniformVariant::counter;
+        // countUniforms = UniformVariant::counter;
         codeChange |= DoShaderCodeUpdateOfRenderPack(puMesh_RenderPack, vForceUpdate, &glslFilesToUpdatePossibly);
         for (auto it : puMesh_RenderPack->puBuffers) {
             codeChange |= DoShaderCodeUpdateOfRenderPack(it, vForceUpdate, &glslFilesToUpdatePossibly);
         }
         if (GizmoSystem::Instance()->UseCulling()) {
-            countUniforms = UniformVariant::counter;
+            // countUniforms = UniformVariant::counter;
             auto gizmoRP = GizmoSystem::Instance()->GetRenderPack().lock();
             if (gizmoRP) {
                 codeChange |= DoShaderCodeUpdateOfRenderPack(gizmoRP, vForceUpdate, &glslFilesToUpdatePossibly);
@@ -879,9 +879,9 @@ bool MainBackend::DoShaderCodeUpdate(std::set<std::string> vFiles, bool vForceUp
         // codeChange |= DoShaderCodeUpdateOfRenderPack(SoundSystem::Instance()->GetRenderPack(), vForceUpdate, &glslFilesToUpdatePossibly);
 
         if (codeChange) {
-            countUniforms = UniformVariant::counter;
+            //countUniforms = UniformVariant::counter;
             puCodeTree->FillIncludeFileList();
-            countUniforms = UniformVariant::counter;
+            //countUniforms = UniformVariant::counter;
 
             NeedRefresh(true);
             CameraSystem::Instance()->NeedCamChange();
@@ -1778,7 +1778,7 @@ std::string MainBackend::getXml(const std::string& vOffset, const std::string& v
         "</appMaximized>\n";
     str += vOffset + "\t<appRect>" + puAppRectIfNotmaximized.string() + "</appRect>\n";
     str += vOffset + "\t<consolevisibility>" + ct::toStr(puConsoleVisiblity ? "true" : "false") + "</consolevisibility>\n";
-    str += vOffset + "\t<colorbg value=\"" + ct::fvec4(puBackgroundColor).string() + "\"/>\n";
+    str += vOffset + "\t<colorbg value=\"" + ct::fvec4(puBackgroundColor.x, puBackgroundColor.y, puBackgroundColor.z, puBackgroundColor.w).string() + "\"/>\n";
     str += vOffset + "\t<autoplay>" + (puPlayCounterTimers ? "true" : "false") + "</autoplay>\n";
     str += vOffset + "\t<canWeRender>" + (puCanWeRender ? "true" : "false") + "</canWeRender>\n";
     str += vOffset + "\t<worldview>" + (puShow3DSpace ? "true" : "false") + "</worldview>\n";
@@ -1838,7 +1838,8 @@ bool MainBackend::setFromXml(tinyxml2::XMLElement* vElem, tinyxml2::XMLElement* 
                 strName = att->Name();
                 if (strName == "value") {
                     strValue = att->Value();
-                    puBackgroundColor = ct::toImVec4(ct::fvariant(strValue).GetV4());
+                    auto v4 = ct::fvariant(strValue).GetV4();
+                    puBackgroundColor = ImVec4(v4.x, v4.y, v4.z, v4.w);
                 }
             }
         }
@@ -2141,7 +2142,7 @@ void MainBackend::FinalizeUrlLoading_By_CreateOneFile() {
 std::string MainBackend::FinalizeShaderImport_By_CreateFiles(std::string vPath, std::list<ShaderInfos> vShaderInfos) {
     if (!vShaderInfos.empty()) {
         std::string mainBufferName;
-        auto mainPlatform = ShaderPlaform::SPF_UNKNOW;  // on cree les fichier
+        //auto mainPlatform = ShaderPlaform::SPF_UNKNOW;  // on cree les fichier
         std::string file_string;
         for (auto& infos : vShaderInfos) {
             file_string.clear();
@@ -2190,7 +2191,7 @@ std::string MainBackend::FinalizeShaderImport_By_CreateFiles(std::string vPath, 
                 auto filename = name + ".glsl";
 
                 mainBufferName = filename;
-                mainPlatform = infos.platform;
+                //mainPlatform = infos.platform;
 
                 if (vPath.empty()) {
                     FileHelper::Instance()->SaveToFile(file_string, filename, (int)FILE_LOCATION_Enum::FILE_LOCATION_SCRIPT);

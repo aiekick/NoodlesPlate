@@ -4,7 +4,7 @@
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -32,7 +32,7 @@
 #include <SoGLSL/src/Systems/GizmoSystem.h>
 #include <SoGLSL/src/Systems/TimeLineSystem.h>
 
-#include <cinttypes> // printf zu
+#include <cinttypes>  // printf zu
 
 UniformsPane::UniformsPane() = default;
 UniformsPane::~UniformsPane() = default;
@@ -41,183 +41,148 @@ UniformsPane::~UniformsPane() = default;
 //// OVERRIDES ////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////
 
-bool UniformsPane::Init()
-{
-	return true;
+bool UniformsPane::Init() {
+    return true;
 }
 
-void UniformsPane::Unit()
-{
-
+void UniformsPane::Unit() {
 }
 
-bool UniformsPane::DrawPanes(const uint32_t& vCurrentFrame, PaneFlags& vInOutPaneShown, ImGuiContext* vContextPtr, void* vUserDatas)
-{
-	if (vInOutPaneShown & paneFlag)
-	{
-		static ImGuiWindowFlags flags =
-			ImGuiWindowFlags_NoCollapse |
-			ImGuiWindowFlags_NoBringToFrontOnFocus;
-        if (ImGui::Begin<PaneFlags>(paneName.c_str(),
-			&vInOutPaneShown, paneFlag, flags))
-		{
+bool UniformsPane::DrawPanes(const uint32_t& /*vCurrentFrame*/, bool* vOpened, ImGuiContext* /*vContextPtr*/, void* /*vUserDatas*/) {
+    if (vOpened && *vOpened) {
+        static ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBringToFrontOnFocus;
+        if (ImGui::Begin(GetName().c_str(), vOpened, flags)) {
 #ifdef USE_DECORATIONS_FOR_RESIZE_CHILD_WINDOWS
-			auto win = ImGui::GetCurrentWindowRead();
-			if (win->Viewport->Idx != 0)
-				flags |= ImGuiWindowFlags_NoResize;// | ImGuiWindowFlags_NoTitleBar;
-			else
-				flags = ImGuiWindowFlags_NoCollapse |
-				ImGuiWindowFlags_NoBringToFrontOnFocus;
+            auto win = ImGui::GetCurrentWindowRead();
+            if (win->Viewport->Idx != 0)
+                flags |= ImGuiWindowFlags_NoResize;  // | ImGuiWindowFlags_NoTitleBar;
+            else
+                flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBringToFrontOnFocus;
 #endif
-			if (ProjectFile::Instance()->IsLoaded()) {}
-
-			ZoneScopedN("UniformsPane");
-
-			MainFrame::sAnyWindowsHovered |= ImGui::IsWindowHovered();
-
-			DrawImGuiRenderPackCategory(MainBackend::Instance()->puMain_RenderPack, false, false, MainBackend::Instance()->puScreenSize);
-
-			for (auto it : MainBackend::Instance()->puMain_RenderPack->puBuffers)
-			{
-				DrawImGuiRenderPackCategory(it, false, false, MainBackend::Instance()->puScreenSize);
-			}
-
-			for (auto it : MainBackend::Instance()->puMain_RenderPack->puSceneBuffers)
-			{
-				DrawImGuiRenderPackCategory(it, false, false, MainBackend::Instance()->puScreenSize);
-
-				auto itPtr = it.lock();
-				if (itPtr)
-				{
-					for (auto sit : itPtr->puBuffers)
-					{
-						DrawImGuiRenderPackCategory(sit, false, false, MainBackend::Instance()->puScreenSize);
-					}
-				}
-			}
-
-			if (MainBackend::Instance()->puShow3DSpace)
-			{
-				DrawImGuiRenderPackCategory(MainBackend::Instance()->pu3dAxis_RenderPack, false, false, MainBackend::Instance()->puScreenSize);
-				DrawImGuiRenderPackCategory(MainBackend::Instance()->pu3dGrid_RenderPack, false, false, MainBackend::Instance()->puScreenSize);
-			}
-
-			if (MainBackend::Instance()->puShowMesh)
-			{
-				DrawImGuiRenderPackCategory(MainBackend::Instance()->puMesh_RenderPack, false, false, MainBackend::Instance()->puScreenSize);
-			}
-
-			if (GizmoSystem::Instance()->UseCulling())
-			{
-				DrawImGuiRenderPackCategory(GizmoSystem::Instance()->GetRenderPack(), false, false, MainBackend::Instance()->puScreenSize);
+            if (ProjectFile::Instance()->IsLoaded()) {
             }
 
-			if (!MainBackend::Instance()->puCodeTree->puIncludeKeys.empty())
-			{
-				if (ImGui::CollapsingHeader_Button("Included Files", -1, true, 0, false, nullptr))
-				{
-					MainBackend::Instance()->NeedRefresh(MainBackend::Instance()->puCodeTree->
-						DrawImGuiIncludesUniformWidget(MainBackend::Instance()->puDisplay_RenderPack, 
-							SHADER_UNIFORM_FIRST_COLUMN_WIDTH, MainBackend::Instance()->puScreenSize));
-				}
-			}
-		}
+            ZoneScopedN("UniformsPane");
 
-		MainFrame::sAnyWindowsHovered |= ImGui::IsWindowHovered();
+            MainFrame::sAnyWindowsHovered |= ImGui::IsWindowHovered();
 
-		ImGui::End();
-	}
+            DrawImGuiRenderPackCategory(MainBackend::Instance()->puMain_RenderPack, false, false, MainBackend::Instance()->puScreenSize);
 
-	return false;
+            for (auto it : MainBackend::Instance()->puMain_RenderPack->puBuffers) {
+                DrawImGuiRenderPackCategory(it, false, false, MainBackend::Instance()->puScreenSize);
+            }
+
+            for (auto it : MainBackend::Instance()->puMain_RenderPack->puSceneBuffers) {
+                DrawImGuiRenderPackCategory(it, false, false, MainBackend::Instance()->puScreenSize);
+
+                auto itPtr = it.lock();
+                if (itPtr) {
+                    for (auto sit : itPtr->puBuffers) {
+                        DrawImGuiRenderPackCategory(sit, false, false, MainBackend::Instance()->puScreenSize);
+                    }
+                }
+            }
+
+            if (MainBackend::Instance()->puShow3DSpace) {
+                DrawImGuiRenderPackCategory(MainBackend::Instance()->pu3dAxis_RenderPack, false, false, MainBackend::Instance()->puScreenSize);
+                DrawImGuiRenderPackCategory(MainBackend::Instance()->pu3dGrid_RenderPack, false, false, MainBackend::Instance()->puScreenSize);
+            }
+
+            if (MainBackend::Instance()->puShowMesh) {
+                DrawImGuiRenderPackCategory(MainBackend::Instance()->puMesh_RenderPack, false, false, MainBackend::Instance()->puScreenSize);
+            }
+
+            if (GizmoSystem::Instance()->UseCulling()) {
+                DrawImGuiRenderPackCategory(GizmoSystem::Instance()->GetRenderPack(), false, false, MainBackend::Instance()->puScreenSize);
+            }
+
+            if (!MainBackend::Instance()->puCodeTree->puIncludeKeys.empty()) {
+                if (ImGui::CollapsingHeader_Button("Included Files", -1, true, 0, false, nullptr)) {
+                    MainBackend::Instance()->NeedRefresh(MainBackend::Instance()->puCodeTree->DrawImGuiIncludesUniformWidget(
+                        MainBackend::Instance()->puDisplay_RenderPack, SHADER_UNIFORM_FIRST_COLUMN_WIDTH, MainBackend::Instance()->puScreenSize));
+                }
+            }
+        }
+
+        MainFrame::sAnyWindowsHovered |= ImGui::IsWindowHovered();
+
+        ImGui::End();
+    }
+
+    return false;
 }
 
-std::string UniformsPane::getXml(const std::string& vOffset, const std::string& vUserDatas)
-{
-	UNUSED(vOffset);
-	UNUSED(vUserDatas);
+std::string UniformsPane::getXml(const std::string& vOffset, const std::string& vUserDatas) {
+    UNUSED(vOffset);
+    UNUSED(vUserDatas);
 
-	std::string str;
+    std::string str;
 
-	return str;
+    return str;
 }
 
-bool UniformsPane::setFromXml(tinyxml2::XMLElement* vElem, tinyxml2::XMLElement* vParent, const std::string& vUserDatas)
-{
-	UNUSED(vUserDatas);
+bool UniformsPane::setFromXml(tinyxml2::XMLElement* vElem, tinyxml2::XMLElement* vParent, const std::string& vUserDatas) {
+    UNUSED(vUserDatas);
 
-	// The value of this child identifies the name of this element
-	std::string strName;
-	std::string strValue;
-	std::string strParentName;
+    // The value of this child identifies the name of this element
+    std::string strName;
+    std::string strValue;
+    std::string strParentName;
 
-	strName = vElem->Value();
-	if (vElem->GetText())
-		strValue = vElem->GetText();
-	if (vParent != nullptr)
-		strParentName = vParent->Value();
+    strName = vElem->Value();
+    if (vElem->GetText())
+        strValue = vElem->GetText();
+    if (vParent != nullptr)
+        strParentName = vParent->Value();
 
-	return true;
+    return true;
 }
 
-void UniformsPane::DrawImGuiRenderPackCategory(RenderPackWeak vRp, bool vCheckMode, bool /*vShowEditBtn*/, ct::ivec2 vScreenSize)
-{
-	auto rpPtr = vRp.lock();
-	if (rpPtr)
-	{
-		if (rpPtr && rpPtr->GetShaderKey())
-		{
-			if (rpPtr->GetShaderKey()->puShaderGlobalSettings.showFlag)
-			{
-				if (!vCheckMode)
-				{
-					//bool showCat = false;
-					auto editCatched = false;
+void UniformsPane::DrawImGuiRenderPackCategory(RenderPackWeak vRp, bool vCheckMode, bool /*vShowEditBtn*/, ct::ivec2 vScreenSize) {
+    auto rpPtr = vRp.lock();
+    if (rpPtr && rpPtr->GetShaderKey() && rpPtr->GetShaderKey()->puShaderGlobalSettings.showFlag) {
+        if (!vCheckMode) {
+            // bool showCat = false;
+            auto editCatched = false;
 
-					if (rpPtr->CollapsingHeader(rpPtr->puName.c_str(), false, true, &editCatched))
-					{
-						ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), rpPtr->GetShaderKey()->puKey.c_str());
+            if (rpPtr->CollapsingHeader(rpPtr->puName.c_str(), false, true, &editCatched)) {
+                ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%s", rpPtr->GetShaderKey()->puKey.c_str());
 
-						ImGui::PushID(ImGui::IncPUSHID());
-						ImGui::Checkbox("Show UnUsed", &rpPtr->GetShaderKey()->puShaderGlobalSettings.showUnUsedUniforms);
-						ImGui::PopID();
+                ImGui::PushID(ImGui::IncPUSHID());
+                ImGui::Checkbox("Show UnUsed", &rpPtr->GetShaderKey()->puShaderGlobalSettings.showUnUsedUniforms);
+                ImGui::PopID();
 
-						if (rpPtr->puName == "3d Axis")
-						{
-							ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "X"); ImGui::SameLine();
-							ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), "Y"); ImGui::SameLine();
-							ImGui::TextColored(ImVec4(0.0f, 0.0f, 1.0f, 1.0f), "Z");
-						}
+                if (rpPtr->puName == "3d Axis") {
+                    ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "X");
+                    ImGui::SameLine();
+                    ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), "Y");
+                    ImGui::SameLine();
+                    ImGui::TextColored(ImVec4(0.0f, 0.0f, 1.0f, 1.0f), "Z");
+                }
 
-						ImGui::Separator();
+                ImGui::Separator();
 
-						MainBackend::Instance()->NeedRefresh(rpPtr->DrawImGuiUniformWidget(SHADER_UNIFORM_FIRST_COLUMN_WIDTH));
-					}
+                MainBackend::Instance()->NeedRefresh(rpPtr->DrawImGuiUniformWidget(SHADER_UNIFORM_FIRST_COLUMN_WIDTH));
+            }
 
-					if (editCatched)
-					{
-						ImGui::OpenPopup("EditCollapsingHeader");
-						CodeTree::puShaderKeyToEditPopup = rpPtr->GetShaderKey();
-						CodeTree::puShaderKeyWhereCreateUniformsConfig = nullptr;
+            if (editCatched) {
+                ImGui::OpenPopup("EditCollapsingHeader");
+                CodeTree::puShaderKeyToEditPopup = rpPtr->GetShaderKey();
+                CodeTree::puShaderKeyWhereCreateUniformsConfig = nullptr;
 
-						//OpenShader(vRp->GetShaderKey()->puKey);
-					}
+                // OpenShader(vRp->GetShaderKey()->puKey);
+            }
 
-					MainBackend::Instance()->NeedRefresh(MainBackend::Instance()->puCodeTree->DrawPopups(vRp));
-					MainBackend::Instance()->NeedRefresh(MainBackend::Instance()->puCodeTree->DrawDialogs(vRp, vScreenSize));
-				}
-			}
-		}
-	}
+            MainBackend::Instance()->NeedRefresh(MainBackend::Instance()->puCodeTree->DrawPopups(vRp));
+            MainBackend::Instance()->NeedRefresh(MainBackend::Instance()->puCodeTree->DrawDialogs(vRp, vScreenSize));
+        }
+    }
 }
 
-void UniformsPane::DrawImGuiUniformWidget(UniformsMultiLoc* vUniLoc)
-{
-	if (vUniLoc != nullptr)
-	{
-		const auto PaneWidth = ImGui::GetContentRegionAvail().x;
-
-		MainBackend::Instance()->NeedRefresh(
-			MainBackend::Instance()->puCodeTree->DrawImGuiUniformWidgetForPanes(
-				vUniLoc->uniform, PaneWidth, SHADER_UNIFORM_FIRST_COLUMN_WIDTH));
-	}
+void UniformsPane::DrawImGuiUniformWidget(UniformsMultiLoc* vUniLoc) {
+    if (vUniLoc != nullptr) {
+        MainBackend::Instance()->NeedRefresh(//
+            MainBackend::Instance()->puCodeTree->DrawImGuiUniformWidgetForPanes(//
+                vUniLoc->uniform, ImGui::GetContentRegionAvail().x, SHADER_UNIFORM_FIRST_COLUMN_WIDTH));
+    }
 }
