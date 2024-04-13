@@ -97,7 +97,7 @@ bool UniformsPane::DrawPanes(const uint32_t& /*vCurrentFrame*/, bool* vOpened, I
             }
 
             if (!MainBackend::Instance()->puCodeTree->puIncludeKeys.empty()) {
-                if (ImGui::CollapsingHeader_Button("Included Files", -1, true, 0, false, nullptr)) {
+                if (ImGui::CollapsingHeader_Button("Included Files", -1, false, 0, false, nullptr)) {
                     MainBackend::Instance()->NeedRefresh(MainBackend::Instance()->puCodeTree->DrawImGuiIncludesUniformWidget(
                         MainBackend::Instance()->puDisplay_RenderPack, SHADER_UNIFORM_FIRST_COLUMN_WIDTH, MainBackend::Instance()->puScreenSize));
                 }
@@ -150,6 +150,14 @@ void UniformsPane::DrawImGuiRenderPackCategory(RenderPackWeak vRp, bool vCheckMo
 
                 ImGui::PushID(ImGui::IncPUSHID());
                 ImGui::Checkbox("Show UnUsed", &rpPtr->GetShaderKey()->puShaderGlobalSettings.showUnUsedUniforms);
+                ImGui::SameLine();
+                if (ImGui::ContrastedButton(ICON_NDP_RESET, "Reset Search")) {
+                    m_SearchInputText.Clear();
+                }
+                ImGui::SameLine();
+                if (m_SearchInputText.DisplayInputText(200.0f, ICON_NDP_SEARCH, "")) {
+                    rpPtr->GetShaderKey()->puShaderGlobalSettings.searchUniformName = m_SearchInputText.GetText();
+                }
                 ImGui::PopID();
 
                 if (rpPtr->puName == "3d Axis") {

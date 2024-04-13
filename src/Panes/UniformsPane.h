@@ -26,6 +26,9 @@ class RenderPack;
 class ProjectFile;
 class UniformsPane : public AbstractPane, public conf::ConfigAbstract
 {
+private:
+    ImWidgets::InputText m_SearchInputText;
+
 public:
 	bool Init() override;
 	void Unit() override;
