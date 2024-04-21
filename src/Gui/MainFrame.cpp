@@ -169,7 +169,7 @@ bool MainFrame::Init() {
 #endif
         LayoutManager::Instance()->AddPane(BufferPreview::Instance(), ICON_NDP2_VIEW_GRID " Buffers Preview", "", "RIGHT", 0.3f, false, false);
 
-        // SdfFontDesigner
+        // SdfFontDesigner actieved where there is a @FONT section in the current shader
         LayoutManager::Instance()->AddPane(FontPane::Instance(), ICON_NDP2_ALPHA " Sdf Font Designer", "", "LEFT", 0.3f, false, false);
         LayoutManager::Instance()->AddPane(FontPreviewPane::Instance(), ICON_NDP2_SPELLCHECK " Sdf Font Designer Preview", "", "BOTTOM", 0.3f, false, false);
 
@@ -638,6 +638,7 @@ void MainFrame::DrawFileDialogs(const ct::ivec2& vScreenSize) {
         max = ImVec2((float)vScreenSize.x, (float)vScreenSize.y);
         min = max * 0.5f;
     }
+    min = ImVec2((float)vScreenSize.x, (float)vScreenSize.y) * 0.25f;
 
     if (ImGuiFileDialog::Instance()->Display("OpenFileDialog", ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking, min, max)) {
         if (ImGuiFileDialog::Instance()->IsOk()) {
@@ -735,6 +736,9 @@ void MainFrame::DrawMainMenuBar() {
             if (ImGui::BeginMenu("Quad")) {
                 if (ImGui::MenuItem("Base")) {
                     CreateNewShader("Shader_Quad", "Quad_Shader.glsl");
+                }
+                if (ImGui::MenuItem("Font")) {
+                    CreateNewShader("Shader_Font", "Font_Shader.glsl");
                 }
 
                 ImGui::EndMenu();

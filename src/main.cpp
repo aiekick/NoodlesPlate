@@ -211,6 +211,10 @@ int main(int, char** argv) {
     std::setlocale(LC_ALL, ".UTF8");  // this func can affect atof converions...
     std::setlocale(LC_NUMERIC, "C");
 
+#if defined(_DEBUG) && defined(_WIN32)
+    ShowWindow(GetConsoleWindow(), SW_SHOW);  // hide console
+#endif
+
     FileHelper::Instance()->SetAppPath(std::string(argv[0]));
 #ifdef _DEBUG
 #ifdef _MSC_VER
@@ -275,10 +279,6 @@ int main(int, char** argv) {
         TracyGpuContext;
         tracy::SetThreadName("Main");
 #endif  // TRACY_ENABLE
-
-#if defined(_DEBUG) && defined(_WIN32)
-        ShowWindow(GetConsoleWindow(), SW_SHOW);  // hide console
-#endif
 
         // Setup ImGui binding
         IMGUI_CHECKVERSION();

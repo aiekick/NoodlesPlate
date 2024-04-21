@@ -28,6 +28,8 @@
 #include <SoGLSL/src/Buffer/FrameBuffer.h>
 #include <SoGLSL/src/Gui/CustomGuiWidgets.h>
 
+#include <FontDesigner/FontDesigner.h>
+
 #include <Project/ProjectFile.h>
 
 #include <cinttypes> // printf zu
@@ -110,4 +112,8 @@ bool FontPreviewPane::setFromXml(tinyxml2::XMLElement* vElem, tinyxml2::XMLEleme
 		strParentName = vParent->Value();
 
 	return true;
+}
+
+bool FontPreviewPane::CanBeDisplayed() {
+    return FontDesigner::Instance()->isEnabled();
 }

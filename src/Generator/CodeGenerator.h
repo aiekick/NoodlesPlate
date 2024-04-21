@@ -52,7 +52,8 @@ private:
 	ShaderInfos Get_Helper_Space3D();
 
 	// Main Types
-	ShaderInfos Get_Shader_Quad();
+    ShaderInfos Get_Shader_Quad();
+    ShaderInfos Get_Shader_Font();
 	ShaderInfos Get_Shader_Points_2D();
 	ShaderInfos Get_Shader_Points_3D_Lines();
 	ShaderInfos Get_Shader_Points_3D_Triangles();

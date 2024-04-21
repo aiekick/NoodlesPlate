@@ -54,9 +54,14 @@ private:
     GLuint m_FontTextureID = 0;
     Texture2D m_Damier;
 
+    bool m_isEnabled = false;
+
 public:
     bool init();
     void unit();
+
+    void enable(const bool& vEnabled);
+    const bool& isEnabled();
 
     void drawPane();
     void drawOverlay();

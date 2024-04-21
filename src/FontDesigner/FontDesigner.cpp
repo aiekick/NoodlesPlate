@@ -13,6 +13,14 @@ void FontDesigner::unit() {
     m_FontExplorerPtr.reset();
 }
 
+void FontDesigner::enable(const bool& vEnabled) {
+    m_isEnabled = vEnabled;
+}
+
+const bool& FontDesigner::isEnabled() {
+    return m_isEnabled;
+}
+
 void FontDesigner::drawPane() {
     m_displaySystemFontExplorer();
     m_diplayGenerationThread();

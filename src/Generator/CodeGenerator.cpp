@@ -52,6 +52,7 @@ bool CodeGenerator::CreateFilePathName(const std::string& vFilePathName, const s
 
 		// main types
 		else if (vType == "Shader_Quad")								infos = Get_Shader_Quad();
+		else if (vType == "Shader_Font")								infos = Get_Shader_Font();
 		else if (vType == "Shader_Points_2D")							infos = Get_Shader_Points_2D();
 		else if (vType == "Shader_Points_3D_Lines")						infos = Get_Shader_Points_3D_Lines();
 		else if (vType == "Shader_Points_3D_Triangles")					infos = Get_Shader_Points_3D_Triangles();
@@ -1017,6 +1018,109 @@ void main(void)
 }
 )";
 	return infos;
+}
+
+ShaderInfos CodeGenerator::Get_Shader_Font() {
+    ShaderInfos infos;
+    infos.header +=
+        u8R"(
+@FRAMEBUFFER 
+
+//FORMAT(float or byte)
+//COUNT(1 to 8)
+//WRAP(clamp or repeat or mirror)
+//FILTER(linear or nearest)
+//MIPMAP(false or true)
+//SIZE(800,600 or picture:file.jpeg)
+//RATIO(1.5 or picture:file.jpeg)
+
+@UNIFORMS
+
+uniform(sdf) float(0.0:0.1:0.05) 		uSmoothing; // smooth edge
+uniform(sdf) float(-0.4:0.4:0.0) 		uOutlineWidth; // border line thickness
+
+uniform(common) int(frame) 				uFrame;	// frames
+uniform(common) float(time) 			uTime; // time
+
+uniform(texture) sampler2D(sdf)			uAtlas; // sdf texture
+uniform(texture) vec2(sdf)				uAtlasSize; // sdf texture size
+
+uniform(glyph) vec2(glyphpadding) 		uGlyphPadding; // global glyphs padding
+uniform(glyph) int(glyphcount) 			uCountGlyphs; // count glyphs
+uniform(glyph) float(glyphinversions) 	uGlyphInversions[glyphcount]; // glyph inversion ( true is > 0.5, false < 0.5)
+uniform(glyph) vec4(glyphrects) 		uGlyphRects[glyphcount]; // glyph rects : left, bottom, right, top
+uniform(glyph) vec2(glyphcenter) 		uGlyphCenterOffsets[glyphcount]; // glyph center offset : x,y on range 0,0 to 1,1, default is center 0.5,0.5
+
+uniform(color) vec3(color:0)			colorStart; // start filling color
+uniform(color) vec3(color:1)			colorEnd; // end filling color
+
+uniform(sdf) float(-1:1:0) dilat;
+
+@FRAGMENT
+
+layout(location = 0) out vec4 fragColor;
+
+@FONT
+
+// https://github.com/Chlumsky/msdfgen
+float median(vec3 rgb) 
+{
+    return max(min(rgb.r, rgb.g), min(max(rgb.r, rgb.g), rgb.b));
+}
+
+void mainGlyph(in int glyphIndex, in vec2 glyphCoord, in vec2 glyphSize, in vec2 texCoord, in vec2 texSize)
+{
+	vec2 uv = texCoord / texSize;
+	vec4 font = texture(uAtlas, uv);
+				
+	if (uGlyphInversions[glyphIndex] > 0.5) {
+		font = 1.0 - font; // inversion
+	}
+	
+	float glyphSdf = median(font.rgb);
+					
+	// put char between [[ and ]] for adapt your shader for a particular char
+	// example with the char c, we want to inverse here the sdf only for the char c
+	// if (glyphIndex == [[c]])	{ glyphSdf = 1. - glyphSdf; } 
+			 
+	glyphSdf -= dilat;
+
+	float smoothing = uSmoothing;
+	float outlineWidth = uOutlineWidth;
+	float outerEdgeCenter = 0.5 - outlineWidth;
+
+	float alpha = smoothstep(outerEdgeCenter - smoothing, outerEdgeCenter + smoothing, glyphSdf);
+	float border = smoothstep(0.5 - smoothing, 0.5 + smoothing, glyphSdf);
+
+	vec4 col = vec4(
+		mix(colorStart, colorEnd, border),
+		alpha);
+		
+	fragColor = col;
+}
+
+@FRAGMENT
+
+void mainFontMap(vec2 fragCoord) {
+	vec2 uv = fragCoord / uAtlasSize;
+	for (int i = 0; i < uCountGlyphs; i++) {
+		vec4 rc = uGlyphRects[i];			
+		if (uv.x >= rc.x && uv.y >= rc.y && uv.x <= rc.z && uv.y <= rc.w) {
+			vec2 glyphSize = rc.zw - rc.xy;
+			vec2 glyphCoord = mod(uv - rc.xy, glyphSize) - glyphSize * 0.5;
+			glyphCoord -= glyphSize * 0.5 * (uGlyphCenterOffsets[i] * 2.0 - 1.0);			
+			mainGlyph(i, glyphCoord, glyphSize, fragCoord, uAtlasSize);
+			// glyph found so we keep gpu cycles if we break here
+			break;
+		}
+	}
+}
+
+void main(void) {
+	mainFontMap(gl_FragCoord.xy);
+}
+)";
+    return infos;
 }
 
 ShaderInfos CodeGenerator::Get_Shader_Points_2D()

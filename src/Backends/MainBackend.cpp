@@ -2322,9 +2322,7 @@ void MainBackend::SetConsoleVisibility(bool vShow) {
 
 bool MainBackend::LoadFilePathName(const std::string& vFilePathName, const std::string& vType, bool vDontLoadRenderPack) {
     UNUSED(vType);
-
     auto res = false;
-
     if (puMain_RenderPack) {
         const auto filePathName = FileHelper::Instance()->CorrectSlashTypeForFilePathName(vFilePathName);
         auto relativeFilePathName = FileHelper::Instance()->GetPathRelativeToApp(filePathName);
@@ -2342,7 +2340,6 @@ bool MainBackend::LoadFilePathName(const std::string& vFilePathName, const std::
             } catch (const std::exception& ex) {
                 LogVarError("%s", ex.what());
             }
-
             const auto mp = puFileListingExceptions;
             puMain_RenderPack->Finish(false);
             puCodeTree->Clear(mp);
@@ -2350,8 +2347,8 @@ bool MainBackend::LoadFilePathName(const std::string& vFilePathName, const std::
             if (key) {
                 key = puCodeTree->GetShaderKey(relativeFilePathName);
                 if (key) {
+                    FontDesigner::Instance()->enable(key->IsShaderStageNameExist("FONT")); // enable the FontDesigner if a font stage exist
                     sCurrentFileLoaded = relativeFilePathName;
-
                     if (vDontLoadRenderPack) {
                         puMain_RenderPack->SetShaderKey(key, true);
                     } else {
@@ -2371,17 +2368,14 @@ bool MainBackend::LoadFilePathName(const std::string& vFilePathName, const std::
                             }
                         }
                     }
-
                     if (ShaderKeyConfigSwitcherUnified::Instance()->IsActivated()) {
                         // on provoque le refresh si le panel est deja ouvert
                         ShaderKeyConfigSwitcherUnified::Instance()->Activate(true, puCodeTree, puMain_RenderPack, true);
                     }
-
                     CameraSystem::Instance()->NeedCamChange();
                     NeedRefresh(true);
                 }
             }
-
             if (!key) {
                 puMain_RenderPack->SetShaderKey(nullptr);
             }
@@ -2389,13 +2383,11 @@ bool MainBackend::LoadFilePathName(const std::string& vFilePathName, const std::
             LogVarLightInfo("Path not found : %s", relativeFilePathName.c_str());
         }
     }
-
     return res;
 }
 
 void MainBackend::NewFilePathName(const std::string& vFilePathName, const std::string& vType, const std::string& vFilePath) {
     const auto filePathName = FileHelper::Instance()->CorrectSlashTypeForFilePathName(vFilePathName);
-
     if (CodeGenerator::Instance()->CreateFilePathName(filePathName, vType, vFilePath, false)) {
         LoadFilePathName(vFilePathName, ".glsl");
     }

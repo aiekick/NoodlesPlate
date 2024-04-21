@@ -51,6 +51,8 @@
 #include <Panes/FontPreviewPane.h>
 #include <Panes/ConfigSwitcherPane.h>
 
+#include <FontDesigner/FontDesigner.h>
+
 ImFont* MainToolBar::puFont = nullptr;
 
 static const float& font_scale_ratio = 1.0f / 3.5f;
@@ -331,34 +333,36 @@ void MainToolBar::DrawCoolBar() {
 
             MessagePane::Instance()->DrawToolBarButtons(0.0f, MainToolBar::puFont);
 
-            if (ImGui::CoolBarItem()) {
-                const auto aw = ImGui::GetCoolBarItemWidth();
-                MainToolBar::puFont->Scale = font_scale_ratio * ImGui::GetCoolBarItemScale();
-                ImGui::RadioButtonLabeled_BitWize<LayoutPaneFlag>(ImVec2(aw, aw),
-                                                                  ICON_NDPTB_ALPHA "##SdfFontDesigner",
-                                                                  "Sdf Font Designer",
-                                                                  &LayoutManager::Instance()->pane_Shown,
-                                                                  FontPane::Instance()->GetFlag(),
-                                                                  false,
-                                                                  true,
-                                                                  0,
-                                                                  false,
-                                                                  MainToolBar::puFont);
-            }
+            if (FontDesigner::Instance()->isEnabled()) {
+                if (ImGui::CoolBarItem()) {
+                    const auto aw = ImGui::GetCoolBarItemWidth();
+                    MainToolBar::puFont->Scale = font_scale_ratio * ImGui::GetCoolBarItemScale();
+                    ImGui::RadioButtonLabeled_BitWize<LayoutPaneFlag>(ImVec2(aw, aw),
+                                                                      ICON_NDPTB_ALPHA "##SdfFontDesigner",
+                                                                      "Sdf Font Designer",
+                                                                      &LayoutManager::Instance()->pane_Shown,
+                                                                      FontPane::Instance()->GetFlag(),
+                                                                      false,
+                                                                      true,
+                                                                      0,
+                                                                      false,
+                                                                      MainToolBar::puFont);
+                }
 
-            if (ImGui::CoolBarItem()) {
-                const auto aw = ImGui::GetCoolBarItemWidth();
-                MainToolBar::puFont->Scale = font_scale_ratio * ImGui::GetCoolBarItemScale();
-                ImGui::RadioButtonLabeled_BitWize<LayoutPaneFlag>(ImVec2(aw, aw),
-                                                                  ICON_NDPTB_SPELLCHECK "##SdfFontDesigner",
-                                                                  "Sdf Font Designer Preview",
-                                                                  &LayoutManager::Instance()->pane_Shown,
-                                                                  FontPreviewPane::Instance()->GetFlag(),
-                                                                  false,
-                                                                  true,
-                                                                  0,
-                                                                  false,
-                                                                  MainToolBar::puFont);
+                if (ImGui::CoolBarItem()) {
+                    const auto aw = ImGui::GetCoolBarItemWidth();
+                    MainToolBar::puFont->Scale = font_scale_ratio * ImGui::GetCoolBarItemScale();
+                    ImGui::RadioButtonLabeled_BitWize<LayoutPaneFlag>(ImVec2(aw, aw),
+                                                                      ICON_NDPTB_SPELLCHECK "##SdfFontDesigner",
+                                                                      "Sdf Font Designer Preview",
+                                                                      &LayoutManager::Instance()->pane_Shown,
+                                                                      FontPreviewPane::Instance()->GetFlag(),
+                                                                      false,
+                                                                      true,
+                                                                      0,
+                                                                      false,
+                                                                      MainToolBar::puFont);
+                }
             }
 
             if (ImGui::CoolBarItem()) {

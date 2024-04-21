@@ -115,3 +115,7 @@ bool FontPane::setFromXml(tinyxml2::XMLElement* vElem, tinyxml2::XMLElement* vPa
 
 	return true;
 }
+
+bool FontPane::CanBeDisplayed() {
+    return FontDesigner::Instance()->isEnabled();
+}
