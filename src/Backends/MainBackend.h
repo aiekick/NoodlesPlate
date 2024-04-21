@@ -21,8 +21,8 @@
 #include <Headers/RenderPackHeaders.h>
 #include <Gui/GuiBackend.h>
 #include <Renderer/RenderPack.h>
-#include <Systems/Interfaces/MouseInterface.h>
-#include <Systems/Interfaces/CameraInterface.h>
+#include <Interfaces/MouseInterface.h>
+#include <Interfaces/CameraInterface.h>
 
 #include <unordered_set>
 #include <string>

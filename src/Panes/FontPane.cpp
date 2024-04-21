@@ -30,6 +30,8 @@
 
 #include <Project/ProjectFile.h>
 
+#include <FontDesigner/FontDesigner.h>
+
 #include <cinttypes> // printf zu
 
 FontPane::FontPane() = default;
@@ -75,6 +77,7 @@ bool FontPane::DrawPanes(const uint32_t& /*vCurrentFrame*/, bool* vOpened, ImGui
 				ImGui::EndMenuBar();
 			}
 
+			FontDesigner::Instance()->drawPane();
 		}
 
 		MainFrame::sAnyWindowsHovered |= ImGui::IsWindowHovered();

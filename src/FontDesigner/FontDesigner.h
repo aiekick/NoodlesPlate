@@ -1,8 +1,10 @@
 #pragma once
 
 #include <memory>
-
+#include <ctools/cTools.h>
+#include <Texture/Texture2D.h>
 #include <ImGuiPack/ImGuiPack.h>
+#include <Interfaces/CameraInterface.h>
 #include <FontDesigner/Explorer/FontExplorer.h>
 #include <FontDesigner/Generation/GenerationThread.h>
 
@@ -19,6 +21,11 @@ private:
     std::string m_FilePathNameForFntExport;
     std::string m_FontFilePathName;
 
+    bool m_showOnlyFontWithExistingConfig = false;
+
+    ImWidgets::InputText m_SearchInput;
+    ImWidgets::InputText m_CharSetInput;
+
     // custom ImGui Font
     ImFont* m_TestFont = nullptr;
     ImFontConfig m_TestFontConfig;
@@ -26,17 +33,26 @@ private:
 
     std::string m_charSet;
 
-    char m_CurrentSelectedChar;
+    char m_CurrentSelectedChar = 0;
     ct::fvec4 m_SelectionColor;
     ct::fvec4 m_ModificationColor;
 
     // mulit selection
     std::map<char, bool> m_MultiSelection;
-    bool m_GotoSelectedFontName;
-    bool m_ProgressChanged;
-    bool m_NeedRegeneration;
-    bool m_ThreadToStart;
-    bool m_ThreadToStop;
+    bool m_GotoSelectedFontName = false;
+    bool m_ProgressChanged = false;
+    bool m_NeedRegeneration = false;
+    bool m_ThreadToStart = false;
+    bool m_ThreadToStop = false;
+    bool m_JustUpdate = false;
+    bool m_CanTuneUVOffset = false;
+    bool m_CanTuneMouse = false;
+    bool m_CanTuneCamera = false;
+    bool m_OneBigCharMode = false;
+
+    ct::texture m_FontTexture;
+    GLuint m_FontTextureID = 0;
+    Texture2D m_Damier;
 
 public:
     bool init();
@@ -46,7 +62,15 @@ public:
     void drawOverlay();
 
 private:
+    void m_displaySystemFontExplorer();
+    void m_diplayGenerationThread();
+    void m_displayCharSet();
+    void m_displayParams();
+    void m_displayGlyphSelection();
+    void m_displayGlyphInfos();
+    void m_displayTexture();
     void m_displayAllGlyphsOfFont(ImFont* vFontPtr, const float& vWidth);
+
     void LoadPendingFonts();
     void SetFontToLoad(std::string vFontName);
     void GoToSelectedFont();
@@ -55,6 +79,7 @@ private:
     bool ReGenerateFontTexture();
     void UpdateFontHeight();
     void LoadBitmapFontIntoImguiFont();
+    void UpdateGlyphCenterOffsets();
     void UpdateFontTexFromFBO();
     void ExportToFntFile();
     void ResetSelection();
@@ -65,13 +90,13 @@ private:
     void StopWorkerThread();
     void WorkerThreadStoppedOrFinished();
     void SetCharset(std::string vCharSet);
-    void UpdateUniforms(
-        RenderPack* vRenderPack,
-        UniformVariant* vUni,
-        bool vCanUpdateMouse,
-        float vDisplayQuality,
-        CameraInterface* vCamera,
-        ct::frect* vMouseRect);
+	void UpdateUniforms(
+		RenderPackWeak vRenderPack, 
+		UniformVariantPtr vUniPtr, 
+		DisplayQualityType vDisplayQuality, 
+		MouseInterface* vMouse, 
+		CameraInterface* vCamera);
+	
 
 public:
     static FontDesigner* Instance() {

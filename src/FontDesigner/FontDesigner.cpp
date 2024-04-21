@@ -3,619 +3,28 @@
 #include <Gui/GuiBackend.h>
 
 bool FontDesigner::init() {
-    // Sdf Font Designer
     GenerationThread::sGenerationThread = GuiBackend::Instance()->CreateGuiBackendWindow_Hidden(1, 1, "SdfFontDesigner", MainBackend::sMainThread);
+    m_FontExplorerPtr = std::make_unique<FontExplorer>(); 
+    m_FontExplorerPtr->Init();
     return false;
 }
 
 void FontDesigner::unit() {
+    m_FontExplorerPtr.reset();
 }
 
 void FontDesigner::drawPane() {
-    ImGui::Begin("Font Choice",
-                 (bool*)0,
-                 ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoSavedSettings |
-                     ImGuiWindowFlags_NoBringToFrontOnFocus);
-
-    ImGui::SetWindowSize(ImVec2(vWidth, vHeight));
-    ImGui::SetWindowPos(ImVec2(vX, vY));
-
-    ImGui::Separator();
-
-    if (CustomImGui::ImGui_CollapsingHeader("Camera Widget Tuning")) {
-        m_CameraHelper.Draw_ImGui();
-    }
-
-    if (CustomImGui::ImGui_CollapsingHeader("Shader Configuration")) {
-        m_Font_RenderPack->DrawCountSliders();
-        m_Font_RenderPack->DrawComboBoxs();
-        m_Font_RenderPack->DrawBufferParams(false);
-
-        ImGui::Indent();
-
-        for (auto it = m_Font_RenderPack->m_Buffers.begin(); it != m_Font_RenderPack->m_Buffers.end(); ++it) {
-            auto rp = it->second;
-
-            if (CustomImGui::ImGui_CollapsingHeader(rp->m_Name.c_str())) {
-                rp->DrawCountSliders();
-                rp->DrawComboBoxs();
-                rp->DrawBufferParams(true);
-            }
-        }
-
-        ImGui::Unindent();
-    }
-
-    ImGui::Separator();
-
-    if (ImGui::BeginTabBar("##font_tabs", ImGuiTabBarFlags_NoCloseWithMiddleMouseButton)) {
-        if (ImGui::BeginTabItem("Font From System", 0, ImGuiTabItemFlags_NoCloseWithMiddleMouseButton)) {
-            GenerationThread::Params->FontLoadingMode = FontLoadingModeEnum::FONT_LOADING_FROM_SYSTEM;
-            ImGui::EndTabItem();
-        }
-
-        if (ImGui::BeginTabItem("Font From File", 0, ImGuiTabItemFlags_NoCloseWithMiddleMouseButton)) {
-            GenerationThread::Params->FontLoadingMode = FontLoadingModeEnum::FONT_LOADING_FROM_FILE;
-            ImGui::EndTabItem();
-        }
-
-        ImGui::EndTabBar();
-    }
-
-    if (GenerationThread::Params->FontLoadingMode == FontLoadingModeEnum::FONT_LOADING_FROM_SYSTEM) {
-        m_FontFilePathName = "";
-
-        if (m_CurrentSelectedFont.size() == 0) {
-            if (m_FontExplorer->GetSysFontsDBSize() > 0) {
-                auto iter = m_FontExplorer->GetStartIter_SysFontsDB();
-                std::string fontToLoad = iter->first;
-                SetFontToLoad(fontToLoad);
-            }
-        }
-
-        if (CustomImGui::CustomButton("Goto Selected Font")) {
-            m_GotoSelectedFontName = true;
-        }
-
-        ImGui::Separator();
-
-        ImGui::Checkbox("Only Font with Existing Config", &showOnlyFontWithExstingConfig);
-
-        ImGui::Text("Search");
-        ImGui::SameLine();
-        ImGui::InputText("##SearchField", searchBuffer, IM_ARRAYSIZE(searchBuffer));
-        std::string criteria = std::string(searchBuffer);
-
-        ImGui::Text("System Fonts :");
-
-        if (m_FontExplorer->GetSysFontsDBSize() > 0) {
-            ImGui::BeginChild("##Font List");
-            auto itFonts = m_FontExplorer->GetStartIter_SysFontsDB();
-            for (itFonts = m_FontExplorer->GetStartIter_SysFontsDB(); itFonts != m_FontExplorer->GetEndIter_SysFontsDB(); ++itFonts) {
-                std::string fontName = itFonts->first;
-                //			std::string fontPath = itFonts->second;
-
-                bool showItem = false;
-
-                if (criteria.size() > 0) {
-                    if (fontName.find(criteria) != std::string::npos) {
-                        showItem = true;
-                    }
-                } else {
-                    showItem = true;
-                }
-
-                if (showOnlyFontWithExstingConfig) {
-                    if (!itFonts->second.confExist)
-                        showItem = false;
-                }
-
-                if (showItem == true) {
-                    if (m_FirstDrawOccur && m_GotoSelectedFontName && fontName == m_CurrentSelectedFont) {
-                        ImGui::SetScrollHere(0.25f);
-                        m_GotoSelectedFontName = false;
-                    }
-
-                    if (itFonts->second.confExist) {
-                        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.85f, 0.25f, 0.85f, 1.00f));
-                    }
-
-                    if (ImGui::Selectable(fontName.c_str(), (fontName == m_CurrentSelectedFont))) {
-                        SetFontToLoad(fontName);
-                    }
-
-                    if (itFonts->second.confExist) {
-                        ImGui::PopStyleColor();
-                    }
-                }
-            }
-            ImGui::EndChild();
-        }
-    } else if (GenerationThread::Params->FontLoadingMode == FontLoadingModeEnum::FONT_LOADING_FROM_FILE) {
-        m_FontToLoad = "";
-
-        if (CustomImGui::CustomButton("Open Font File")) {
-            ImGuiFileDialog::Instance()->OpenDialog("OpenFontFileDialog", "New File", ".ttf\0.otf\0\0", m_FilePath, m_FileName);
-        }
-    }
-
-    /*if (ImGui::CollapsingHeader("SVG's"))
-    {
-        if (CustomImGui::CustomButton("Add Svg File"))
-        {
-
-        }
-    }*/
-
-#ifdef DEBUG
-    InterfacePanes::Instance()->DrawDebugPane(m_CodeTree);
-#endif
-
-    ImGui::End();
-
-    ImGui::Begin("Tuning",
-                 (bool*)0,
-                 ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoSavedSettings |
-                     ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_AlwaysVerticalScrollbar);
-
-    ImGui::SetWindowSize(ImVec2(vWidth, vHeight));
-    ImGui::SetWindowPos(ImVec2(vX, vY));
-
-    glfwMakeContextCurrent(MainFrame::g_MainThread);
-
-    if (!m_GenerationThread.IsJoinable()) {
-        if (CustomImGui::CustomButton("Generate SDF Font Map [F5]") || ImGui::IsKeyReleased(GLFW_KEY_F5)) {
-            m_ThreadToStart = true;
-            m_ThreadToStop = false;
-            m_JustUpdate = false;
-        }
-
-        if (GenerationThread::Params->Glyphs.size() > 0 && m_NeedRegeneration == false) {
-            ImGui::SameLine();
-            if (CustomImGui::CustomButton("Update Chars [F6]") || ImGui::IsKeyReleased(GLFW_KEY_F6)) {
-                m_ThreadToStart = true;
-                m_ThreadToStop = false;
-                m_JustUpdate = true;
-            }
-        }
-    } else {
-        if (CustomImGui::CustomButton("Stop Generation [F4]") || ImGui::IsKeyReleased(GLFW_KEY_F4)) {
-            m_ThreadToStop = true;
-            m_ThreadToStart = false;
-        }
-
-        ImGui::SameLine();
-        ImGui::ProgressBar(GenerationThread::Progress, ImVec2(200, 0));
-    }
-    ImGui::SameLine();
-
-    if (GenerationThread::Params->charSetNotPacked.size() > 0) {
-        ImGui::Separator();
-
-        ImGui::TextColored(ImVec4(1.0f, 0.2f, 0.2f, 1.0f), "Chars not packed : %s", GenerationThread::Params->charSetNotPacked.c_str());
-    }
-
-    ImGui::Separator();
-
-    /////////////////////////////////////////////////////////////////////////
-    //// CHAR SET ///////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////
-
-    if (CustomImGui::ImGui_CollapsingHeader("Char Set")) {
-        if (CustomImGui::CustomButton("Clear")) {
-            ct::ResetBuffer(charSetBuffer);
-            GenerationThread::Params->IsFontLoaded = false;
-            m_NeedRegeneration = true;
-        }
-        ImGui::SameLine();
-        if (CustomImGui::CustomButton("A..Z")) {
-            ct::AppendToBuffer(charSetBuffer, MAX_CHARSET_SIZE, "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
-            GenerationThread::Params->IsFontLoaded = false;
-            m_NeedRegeneration = true;
-        }
-        ImGui::SameLine();
-        if (CustomImGui::CustomButton("a..z")) {
-            ct::AppendToBuffer(charSetBuffer, MAX_CHARSET_SIZE, "abcdefghijklmnopqrstuvwxyz");
-            GenerationThread::Params->IsFontLoaded = false;
-            m_NeedRegeneration = true;
-        }
-        ImGui::SameLine();
-        if (CustomImGui::CustomButton("0..9")) {
-            ct::AppendToBuffer(charSetBuffer, MAX_CHARSET_SIZE, "0123456789");
-            GenerationThread::Params->IsFontLoaded = false;
-            m_NeedRegeneration = true;
-        }
-        ImGui::SameLine();
-        if (CustomImGui::CustomButton("?..@")) {
-            ct::AppendToBuffer(charSetBuffer, MAX_CHARSET_SIZE, "?.*+-/_'()&:,=!\"[ ]\\{}%@");
-            GenerationThread::Params->IsFontLoaded = false;
-            m_NeedRegeneration = true;
-        }
-
-        if (ImGui::InputTextMultiline(
-                "##CharSet", charSetBuffer, IM_ARRAYSIZE(charSetBuffer), ImVec2(-1.0f, ImGui::GetTextLineHeight() * 8), ImGuiInputTextFlags_AllowTabInput)) {
-            GenerationThread::Params->IsFontLoaded = false;
-            m_NeedRegeneration = true;
-        }
-    }
-
-    GenerationThread::Params->fontName = m_CurrentSelectedFont;
-
-    /////////////////////////////////////////////////////////////////////////
-    //// PARAMS /////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////
-
-    if (CustomImGui::ImGui_CollapsingHeader("Params")) {
-        bool res = false;
-
-        ImGui::Separator();
-
-        res |= CustomImGui::ImGui_InputFloat(281.0f, " Scale", &GenerationThread::Params->scale, defaultparams.scale, "%.3f", "%.3f", true, 0.1f, 0.5f);
-
-        if (GenerationThread::Params->scale < 0.001f)
-            GenerationThread::Params->scale = 0.001f;
-
-        ImGui::Separator();
-
-        res |= CustomImGui::ImGui_RadioButtonLabeled("Auto Frame", 0, &GenerationThread::Params->autoFrame);
-
-        if (GenerationThread::Params->autoFrame == false) {
-            res |= CustomImGui::ImGui_InputInt(305.0f, " Translate X", &GenerationThread::Params->translate.x, 1, 1, defaultparams.translate.x);
-            res |= CustomImGui::ImGui_InputInt(305.0f, " Translate Y", &GenerationThread::Params->translate.y, 1, 1, defaultparams.translate.y);
-        }
-
-        ImGui::Separator();
-
-        res |= CustomImGui::ImGui_RadioButtonLabeled("Auto Size", 0, &GenerationThread::Params->autoSize);
-
-        if (GenerationThread::Params->autoSize == false) {
-            res |= CustomImGui::ImGui_InputInt(305.0f, " Glyph Width", &GenerationThread::Params->glyphSize.x, 1, 1, defaultparams.glyphSize.x);
-            res |= CustomImGui::ImGui_InputInt(305.0f, " Glyph Height", &GenerationThread::Params->glyphSize.y, 1, 1, defaultparams.glyphSize.y);
-
-            ImGui::Separator();
-        }
-
-        res |= CustomImGui::ImGui_InputInt(305.0f, " Tex Max Width", &GenerationThread::Params->texMaxSize.x, 1, 1, defaultparams.texMaxSize.x);
-        res |= CustomImGui::ImGui_InputInt(305.0f, " Tex Max Height", &GenerationThread::Params->texMaxSize.y, 1, 1, defaultparams.texMaxSize.y);
-
-        ImGui::Separator();
-
-        res |= CustomImGui::ImGui_InputInt(305.0f, " Glyph Padding x", &GenerationThread::Params->glyphPadding.x, 1, 1, defaultparams.glyphPadding.x);
-        res |= CustomImGui::ImGui_InputInt(305.0f, " Glyph Padding y", &GenerationThread::Params->glyphPadding.y, 1, 1, defaultparams.glyphPadding.y);
-
-        // ImGui::Separator();
-
-        // res |= CustomImGui::ImGui_InputInt(305.0f, " Texture Padding x", &GenerationThread::Params->texPadding.x, 1, 1, defaultparams.texPadding.x);
-        // res |= CustomImGui::ImGui_InputInt(305.0f, " Texture Padding y", &GenerationThread::Params->texPadding.y, 1, 1, defaultparams.texPadding.y);
-
-        ImGui::Separator();
-
-        ImGui::Text("Algo (Use of MsdfGen) :");
-
-        if (CustomImGui::ImGui_RadioButtonLabeled("Sdf", 0, GenerationThread::Params->algo == AlgoEnum::ALGO_SDF))
-            res |= true, GenerationThread::Params->algo = AlgoEnum::ALGO_SDF;
-        ImGui::SameLine();
-        if (CustomImGui::ImGui_RadioButtonLabeled("PSdf", 0, GenerationThread::Params->algo == AlgoEnum::ALGO_PSDF))
-            res |= true, GenerationThread::Params->algo = AlgoEnum::ALGO_PSDF;
-        ImGui::SameLine();
-        if (CustomImGui::ImGui_RadioButtonLabeled("MSdf", 0, GenerationThread::Params->algo == AlgoEnum::ALGO_MSDF))
-            res |= true, GenerationThread::Params->algo = AlgoEnum::ALGO_MSDF;
-
-        ImGui::Separator();
-
-        if (GenerationThread::Params->algo == AlgoEnum::ALGO_MSDF) {
-            res |= CustomImGui::ImGui_SliderFloat(281.0f,
-                                                  " MSDF Edge Color Angle",
-                                                  &GenerationThread::Params->msdfColoringAngle,
-                                                  0.0f,
-                                                  360.0f,
-                                                  defaultparams.msdfColoringAngle,
-                                                  1.0f,
-                                                  10.0f,
-                                                  "%.0f",
-                                                  0,
-                                                  true);
-        }
-
-        res |= CustomImGui::ImGui_InputFloat(281.0f, " Sdf Range", &GenerationThread::Params->range, defaultparams.range, "%.1f", "%.1f", 0.1f, 1.0f);
-
-        if (GenerationThread::Params->range < 0.001f)
-            GenerationThread::Params->range = 0.001f;
-
-        ImGui::Separator();
-
-        res |= CustomImGui::ImGui_RadioButtonLabeled("Invert Y", 0, &GenerationThread::Params->InvertY);
-    }
-
-    /////////////////////////////////////////////////////////////////////////
-    //// SHADER UNIFORMS ////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////
-
-    DrawImGuiIncludesCategory(m_Font_RenderPack, false, true);
-
-    if (m_Font_RenderPack->m_Buffers.size() > 0) {
-        if (CustomImGui::ImGui_CollapsingHeader("Buffers", -1, false, false, 0)) {
-            DrawImGuiRenderPackCategory(m_Font_RenderPack, false, true);
-        }
-    }
-    /////////////////////////////////////////////////////////////////////////
-    //// MULTI SELECTION ////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////
-
-    if (m_MultiSelection.size() > 0) {
-        if (CustomImGui::ImGui_CollapsingHeader("Multi Selection", -1.0f, true)) {
-            if (CustomImGui::CustomButton("Reset Selection")) {
-                m_MultiSelection.clear();
-            }
-
-            ImGui::Text("UV Offset :");
-
-            bool resetUVCenters = CustomImGui::CustomButton("Reset UV Offset of Selection");
-
-            if (resetUVCenters) {
-                auto uniLst = m_Font_RenderPack->GetShaderKey()->GetUniformsByWidget("glyphcenter");
-                if (uniLst) {
-                    for (auto itSel = m_MultiSelection.begin(); itSel != m_MultiSelection.end(); ++itSel) {
-                        auto glyph = GenerationThread::Params->GetGlyph(itSel->first);
-                        if (glyph) {
-                            if (resetUVCenters) {
-                                glyph->shaderCenterOffset = GlyphStruct().shaderCenterOffset;
-                            }
-                        }
-                    }
-
-                    if (resetUVCenters) {
-                        UpdateGlyphCenterOffsets();
-                    }
-                }
-            }
-
-            ImGui::Text("Invert the SDF One Time Via Uniforms:");
-
-            bool invertAllOneTime = CustomImGui::CustomButton("Invert all selection");
-            ImGui::SameLine();
-            bool resetInversion = CustomImGui::CustomButton("Reset Inversion");
-
-            if (resetInversion || invertAllOneTime) {
-                auto uniLst = m_Font_RenderPack->GetShaderKey()->GetUniformsByWidget("glyphinversions");
-                if (uniLst) {
-                    for (auto itSel = m_MultiSelection.begin(); itSel != m_MultiSelection.end(); ++itSel) {
-                        auto glyph = GenerationThread::Params->GetGlyph(itSel->first);
-                        if (glyph) {
-                            if (invertAllOneTime) {
-                                glyph->dfInverted = !glyph->dfInverted;
-                            } else if (resetInversion) {
-                                glyph->dfInverted = false;
-                            }
-
-                            for (auto itUniLst = uniLst->begin(); itUniLst != uniLst->end(); itUniLst++) {
-                                auto v = *itUniLst;
-                                if (v) {
-                                    if (glyph->dfInverted)
-                                        v->uFloatArr[glyph->idx] = 1.0f;
-                                    else
-                                        v->uFloatArr[glyph->idx] = 0.0f;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            ImGui::Text("Char Set :");
-
-            bool removeFromCharSet = CustomImGui::CustomButton("Remove from Char Set");
-
-            ImGui::Text("Need a new generation, for reflect chnages");
-
-            if (removeFromCharSet) {
-                std::string _charSet = std::string(charSetBuffer);
-
-                for (auto itSel = m_MultiSelection.begin(); itSel != m_MultiSelection.end(); ++itSel) {
-                    auto glyph = GenerationThread::Params->GetGlyph(itSel->first);
-                    if (glyph) {
-                        // on supprime les char selectionné du charset
-                        ct::replaceString(_charSet, ct::toStr(glyph->c), "");
-                    }
-                }
-
-                // on applique le nouveau charset
-                ct::ResetBuffer(charSetBuffer);
-                ct::AppendToBuffer(charSetBuffer, MAX_CHARSET_SIZE, _charSet);
-                GenerationThread::Params->IsFontLoaded = false;
-                m_NeedRegeneration = true;
-            }
-        }
-    }
-
-    /////////////////////////////////////////////////////////////////////////
-    //// SELECTED GLYPH /////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////
-
-    else {
-        if (GenerationThread::Params->Glyphs.size() > 0 && m_CurrentSelectedChar != 0) {
-            if (CustomImGui::ImGui_CollapsingHeader("Selected Glyph", -1.0f, true)) {
-                ImGui::ColorEdit4("Modification Color", &m_ModificationColor.x);
-                ImGui::ColorEdit4("Selection Color", &m_SelectionColor.x);
-
-                if (CustomImGui::CustomButton("Reset Selection")) {
-                    m_CurrentSelectedChar = 0;
-                }
-
-                if (m_CurrentSelectedChar != 0) {
-                    auto glyph = GenerationThread::Params->GetGlyph(m_CurrentSelectedChar);
-                    if (glyph) {
-                        ImGui::Text("Selected char : %c", glyph->c);
-
-                        ImGui::NewLine();
-
-                        ImGui::Text("Shader UV Center offset : %.4f, %.4f", glyph->shaderCenterOffset.x, glyph->shaderCenterOffset.y);
-                        if (CustomImGui::CustomButton("Reset UV Offset")) {
-                            glyph->shaderCenterOffset = GlyphStruct().shaderCenterOffset;
-                            UpdateGlyphCenterOffsets();
-                        }
-
-                        ImGui::NewLine();
-
-                        ImGui::Text("Invert the Glyph (no update needed) :");
-
-                        bool invertAllOneTime = CustomImGui::CustomButton("Invert all selection");
-                        ImGui::SameLine();
-                        bool resetInversion = CustomImGui::CustomButton("Reset Inversion");
-
-                        if (resetInversion || invertAllOneTime) {
-                            if (invertAllOneTime) {
-                                glyph->dfInverted = !glyph->dfInverted;
-                            } else if (resetInversion) {
-                                glyph->dfInverted = false;
-                            }
-
-                            auto uniLst = m_Font_RenderPack->GetShaderKey()->GetUniformsByWidget("glyphinversions");
-                            if (uniLst) {
-                                for (auto itUniLst = uniLst->begin(); itUniLst != uniLst->end(); itUniLst++) {
-                                    auto v = *itUniLst;
-                                    if (v) {
-                                        if (glyph->dfInverted)
-                                            v->uFloatArr[glyph->idx] = 1.0f;
-                                        else
-                                            v->uFloatArr[glyph->idx] = 0.0f;
-                                    }
-                                }
-                            }
-                        }
-
-                        ImGui::Text("Or You can Select Contours you want to invert (need chars Update) :");
-
-                        bool res = false;
-                        int idToPush = 457954654;
-                        auto* itGlyphs = &glyph->contourSdfSigns;
-                        if (itGlyphs) {
-                            for (auto itInv = itGlyphs->begin(); itInv != itGlyphs->end(); ++itInv) {
-                                if (itInv != itGlyphs->begin())
-                                    ImGui::SameLine();
-                                bool b = *itInv;
-                                ImGui::PushID(idToPush++);
-                                res |= ImGui::Checkbox("##checkinvsdf", &b);
-                                ImGui::PopID();
-                                if (res) {
-                                    GenerationThread::Params->ModifiedGlyphs[glyph->c] = true;
-                                }
-                                (*itInv) = b;
-                            }
-                        }
-                        ImGui::Text(
-                            "If not Suffiscient for correct the font map,\n try invert the texture cell color\ninside the shader by using [[char]] for conditionnal on a "
-                            "particular char");
-
-                        ImGui::Text("Char Set :");
-
-                        bool removeFromCharSet = CustomImGui::CustomButton("Remove from Char Set");
-
-                        ImGui::Text("Need a new generation, for reflect chnages");
-
-                        if (removeFromCharSet) {
-                            std::string _charSet = std::string(charSetBuffer);
-
-                            // on supprime les char selectionné du charset
-                            ct::replaceString(_charSet, ct::toStr(glyph->c), "");
-
-                            // on applique le nouveau charset
-                            ct::ResetBuffer(charSetBuffer);
-                            ct::AppendToBuffer(charSetBuffer, MAX_CHARSET_SIZE, _charSet);
-                            GenerationThread::Params->IsFontLoaded = false;
-                            m_NeedRegeneration = true;
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    /////////////////////////////////////////////////////////////////////////
-    //// GLYPHS INFOS ///////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////
-
-    if (GenerationThread::Params->Glyphs.size() > 0) {
-        if (CustomImGui::ImGui_CollapsingHeader("Infos")) {
-            ImGui::Text("Font : name:%s", GenerationThread::Params->fontName.c_str());
-            ImGui::Text("Font : path:%s", GenerationThread::Params->fontPath.c_str());
-
-            int lh = GenerationThread::Params->lineHeight * GenerationThread::Params->scale;
-            int bh = GenerationThread::Params->baseHeight * GenerationThread::Params->scale;
-            ImGui::Text("Font : lineHeight:%i baseHeight:%i", lh, bh);
-
-            int w = GenerationThread::Params->textureSize.x;
-            int h = GenerationThread::Params->textureSize.y;
-            ImGui::Text("Tex : w:%i h:%i", w, h);
-
-            static int ShowGlyphMode = false;
-            if (CustomImGui::ImGui_RadioButtonLabeled("Glyph Rects", 0, ShowGlyphMode == 0))
-                ShowGlyphMode = 0;
-            ImGui::SameLine();
-            if (CustomImGui::ImGui_RadioButtonLabeled("Glyph Infos", 0, ShowGlyphMode == 1))
-                ShowGlyphMode = 1;
-            ImGui::SameLine();
-            if (CustomImGui::ImGui_RadioButtonLabeled("Glyph Select", 0, ShowGlyphMode == 2))
-                ShowGlyphMode = 2;
-
-            int idx = 0;
-            for (auto itGlyphs = GenerationThread::Params->Glyphs.begin(); itGlyphs != GenerationThread::Params->Glyphs.end(); ++itGlyphs) {
-                if (ShowGlyphMode == 0) {
-                    ImGui::Text("%3i %c (%i) l:%.3f b:%.3f r:%.3f t:%.3f",
-                                idx++,
-                                itGlyphs->second.c,
-                                (int)itGlyphs->second.c,
-                                itGlyphs->second.rc.x,
-                                itGlyphs->second.rc.y,
-                                itGlyphs->second.rc.z,
-                                itGlyphs->second.rc.w);
-                } else if (ShowGlyphMode == 1) {
-                    int px = itGlyphs->second.rc.x * w;
-                    int py = itGlyphs->second.rc.y * h;
-                    int psx = (itGlyphs->second.rc.z - itGlyphs->second.rc.x) * w;
-                    int psy = (itGlyphs->second.rc.w - itGlyphs->second.rc.y) * h;
-                    int sx = itGlyphs->second.size.x * GenerationThread::Params->scale;
-                    int sy = itGlyphs->second.size.y * GenerationThread::Params->scale;
-
-                    int ox = itGlyphs->second.offset.x * w;
-                    int oy = itGlyphs->second.offset.y * h;
-                    int hbx = itGlyphs->second.horiBearing.x * GenerationThread::Params->scale;
-                    int hby = itGlyphs->second.horiBearing.y * GenerationThread::Params->scale;
-
-                    int advx = (itGlyphs->second.advx + GenerationThread::Params->glyphPadding.x) * GenerationThread::Params->scale;
-
-                    ImGui::Text("%3i %c (%3i) sx:%3i sy:%3i hbx:%3i hby:%3i adv:%3i", idx++, itGlyphs->second.c, (int)itGlyphs->second.c, sx, sy, hbx, hby, advx);
-                } else if (ShowGlyphMode == 2) {
-                    if (idx % 15 > 0)
-                        ImGui::SameLine();
-
-                    static char selectCharBuffer[1000];
-                    snprintf(selectCharBuffer, 1000, "%c##%3i", itGlyphs->second.c, idx++);
-                    if (CustomImGui::ImGui_RadioButtonLabeled(selectCharBuffer, 0, m_CurrentSelectedChar == itGlyphs->second.c)) {
-                        m_CurrentSelectedChar = itGlyphs->second.c;
-                    }
-                }
-            }
-        }
-    }
-
-    /////////////////////////////////////////////////////////////////////////
-    //// FONT TEXTURE ///////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////
-
-    if (GenerationThread::Params->textureFont > 0) {
-        if (CustomImGui::ImGui_CollapsingHeader("Font Texture")) {
-            float w = vWidth * 0.95f;
-            float h = w * GenerationThread::Params->textureSize.ratioYX();
-            ImGui::Image((ImTextureID)GenerationThread::Params->textureFont, ImVec2(w, h));
-        }
-    }
-
-    ImGui::End();
+    m_displaySystemFontExplorer();
+    m_diplayGenerationThread();
+    m_displayCharSet();
+    m_displayParams();
+    m_displayGlyphSelection();
+    m_displayGlyphInfos();
+    m_displayTexture();
 }
 
 void FontDesigner::drawOverlay() {
-    IsThereSomeMessages();
+    /*IsThereSomeMessages();
 
     if (m_IsThereSomeShaderErrors && m_ShowErrors && GenerationThread::Params->textureFont > 0) {
         DisplayMessages(vX, vY, vWidth, vHeight);
@@ -814,13 +223,13 @@ void FontDesigner::drawOverlay() {
                     ImGui::ColorEdit3("Font Test BackGround", &m_FontTestBackgroundColor.x, ImGuiColorEditFlags_NoInputs);
 
                     bool res =
-                        CustomImGui::ImGui_InputInt(vWidth - 80, "Base Height", &GenerationThread::Params->baseHeight, 1, 2, GenerationThread::Params->defaultBaseHeight);
+                        ImGui::InputInt(vWidth - 80, "Base Height", &GenerationThread::Params->baseHeight, 1, 2, GenerationThread::Params->defaultBaseHeight);
                     res |=
-                        CustomImGui::ImGui_InputInt(vWidth - 80, "Line Height", &GenerationThread::Params->lineHeight, 1, 2, GenerationThread::Params->defaultLineHeight);
+                        ImGui::InputInt(vWidth - 80, "Line Height", &GenerationThread::Params->lineHeight, 1, 2, GenerationThread::Params->defaultLineHeight);
                     if (res) {
                         LoadBitmapFontIntoImguiFont();
                     }
-                    CustomImGui::ImGui_SliderFloat(vWidth - 80, "Font Scale", &m_TestFont->Scale, 0.1f, 10.0f, 1.0f);
+                    ImGui::SliderFloat(vWidth - 80, "Font Scale", &m_TestFont->Scale, 0.1f, 10.0f, 1.0f);
 
                     ImGui::InputTextMultiline("##TestBuffer", fontTestBuffer, 1024, ImVec2(-1, 100));
 
@@ -848,6 +257,532 @@ void FontDesigner::drawOverlay() {
         ImGui::End();
 
         ImGui::PopStyleColor();
+    }*/
+}
+
+void FontDesigner::m_displaySystemFontExplorer() {
+    if (ImGui::CollapsingHeader("Font Selection")) {
+        if (ImGui::BeginTabBar("##font_tabs", ImGuiTabBarFlags_NoCloseWithMiddleMouseButton)) {
+            if (ImGui::BeginTabItem("Font From System", 0, ImGuiTabItemFlags_NoCloseWithMiddleMouseButton)) {
+                GenerationThread::Params->FontLoadingMode = FontLoadingModeEnum::FONT_LOADING_FROM_SYSTEM;
+                ImGui::EndTabItem();
+            }
+
+            if (ImGui::BeginTabItem("Font From File", 0, ImGuiTabItemFlags_NoCloseWithMiddleMouseButton)) {
+                GenerationThread::Params->FontLoadingMode = FontLoadingModeEnum::FONT_LOADING_FROM_FILE;
+                ImGui::EndTabItem();
+            }
+
+            ImGui::EndTabBar();
+        }
+
+        if (GenerationThread::Params->FontLoadingMode == FontLoadingModeEnum::FONT_LOADING_FROM_SYSTEM) {
+            m_FontFilePathName = "";
+
+            if (m_CurrentSelectedFont.size() == 0) {
+                if (m_FontExplorerPtr->GetSysFontsDBSize() > 0) {
+                    auto iter = m_FontExplorerPtr->GetStartIter_SysFontsDB();
+                    std::string fontToLoad = iter->first;
+                    SetFontToLoad(fontToLoad);
+                }
+            }
+
+            if (ImGui::ContrastedButton("Goto Selected Font")) {
+                m_GotoSelectedFontName = true;
+            }
+
+            ImGui::Separator();
+
+            ImGui::Checkbox("Only Font with Existing Config", &m_showOnlyFontWithExistingConfig);
+
+            ImGui::Separator();
+
+            m_SearchInput.DisplayInputText(0.0f, "Search", "");
+
+            ImGui::Separator();
+
+            ImGui::Text("System Fonts :");
+
+            if (m_FontExplorerPtr->GetSysFontsDBSize() > 0) {
+                ImGui::BeginChild("##Font List");
+                auto itFonts = m_FontExplorerPtr->GetStartIter_SysFontsDB();
+                for (itFonts = m_FontExplorerPtr->GetStartIter_SysFontsDB(); itFonts != m_FontExplorerPtr->GetEndIter_SysFontsDB(); ++itFonts) {
+                    std::string fontName = itFonts->first;
+                    //			std::string fontPath = itFonts->second;
+
+                    bool showItem = false;
+
+                    if (m_SearchInput.GetText().size() > 0) {
+                        if (fontName.find(m_SearchInput.GetText()) != std::string::npos) {
+                            showItem = true;
+                        }
+                    } else {
+                        showItem = true;
+                    }
+
+                    if (m_showOnlyFontWithExistingConfig) {
+                        if (!itFonts->second.confExist)
+                            showItem = false;
+                    }
+
+                    if (showItem == true) {
+                        if (m_GotoSelectedFontName && fontName == m_CurrentSelectedFont) {
+                            ImGui::SetScrollHereY(0.25f);
+                            m_GotoSelectedFontName = false;
+                        }
+
+                        if (itFonts->second.confExist) {
+                            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.85f, 0.25f, 0.85f, 1.00f));
+                        }
+
+                        if (ImGui::Selectable(fontName.c_str(), (fontName == m_CurrentSelectedFont))) {
+                            SetFontToLoad(fontName);
+                        }
+
+                        if (itFonts->second.confExist) {
+                            ImGui::PopStyleColor();
+                        }
+                    }
+                }
+                ImGui::EndChild();
+            }
+        } else if (GenerationThread::Params->FontLoadingMode == FontLoadingModeEnum::FONT_LOADING_FROM_FILE) {
+            /*m_FontToLoad = "";
+            if (ImGui::ContrastedButton("Open Font File")) {
+                ImGuiFileDialog::Instance()->OpenDialog("OpenFontFileDialog", "New File", ".ttf\0.otf\0\0", m_FilePath, m_FileName);
+            }*/
+        }
+    }
+}
+
+void FontDesigner::m_diplayGenerationThread() {
+    if (ImGui::CollapsingHeader("Generation")) {
+        GuiBackend::Instance()->MakeContextCurrent(GenerationThread::sGenerationThread);
+
+        if (!m_GenerationThread.IsJoinable()) {
+            if (ImGui::ContrastedButton("Generate SDF Font Map [F5]") || ImGui::IsKeyReleased(ImGuiKey_F5)) {
+                m_ThreadToStart = true;
+                m_ThreadToStop = false;
+                m_JustUpdate = false;
+            }
+
+            if (GenerationThread::Params->Glyphs.size() > 0 && m_NeedRegeneration == false) {
+                ImGui::SameLine();
+                if (ImGui::ContrastedButton("Update Chars [F6]") || ImGui::IsKeyReleased(ImGuiKey_F6)) {
+                    m_ThreadToStart = true;
+                    m_ThreadToStop = false;
+                    m_JustUpdate = true;
+                }
+            }
+        } else {
+            if (ImGui::ContrastedButton("Stop Generation [F4]") || ImGui::IsKeyReleased(ImGuiKey_F4)) {
+                m_ThreadToStop = true;
+                m_ThreadToStart = false;
+            }
+
+            ImGui::SameLine();
+            ImGui::ProgressBar(GenerationThread::Progress, ImVec2(200, 0));
+        }
+
+        if (GenerationThread::Params->charSetNotPacked.size() > 0) {
+            ImGui::Separator();
+
+            ImGui::TextColored(ImVec4(1.0f, 0.2f, 0.2f, 1.0f), "Chars not packed : %s", GenerationThread::Params->charSetNotPacked.c_str());
+        }
+    }
+}
+
+void FontDesigner::m_displayCharSet() {
+    if (ImGui::CollapsingHeader("Char Set")) {
+        if (ImGui::ContrastedButton("Clear")) {
+            m_CharSetInput.Clear();
+            GenerationThread::Params->IsFontLoaded = false;
+            m_NeedRegeneration = true;
+        }
+        ImGui::SameLine();
+        if (ImGui::ContrastedButton("A..Z")) {
+            m_CharSetInput.AddText("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+            GenerationThread::Params->IsFontLoaded = false;
+            m_NeedRegeneration = true;
+        }
+        ImGui::SameLine();
+        if (ImGui::ContrastedButton("a..z")) {
+            m_CharSetInput.AddText("abcdefghijklmnopqrstuvwxyz");
+            GenerationThread::Params->IsFontLoaded = false;
+            m_NeedRegeneration = true;
+        }
+        ImGui::SameLine();
+        if (ImGui::ContrastedButton("0..9")) {
+            m_CharSetInput.AddText("0123456789");
+            GenerationThread::Params->IsFontLoaded = false;
+            m_NeedRegeneration = true;
+        }
+        ImGui::SameLine();
+        if (ImGui::ContrastedButton("?..@")) {
+            m_CharSetInput.AddText("?.*+-/_'()&:,=!\"[ ]\\{}%@");
+            GenerationThread::Params->IsFontLoaded = false;
+            m_NeedRegeneration = true;
+        }
+
+        if (m_CharSetInput.DisplayInputText(0.0f, "CharSet", "", true)) {
+            GenerationThread::Params->IsFontLoaded = false;
+            m_NeedRegeneration = true;
+        }
+    }
+
+    GenerationThread::Params->fontName = m_CurrentSelectedFont;
+}
+
+void FontDesigner::m_displayParams() {
+    /*if (ImGui::CollapsingHeader("Params")) {
+        bool res = false;
+
+        ImGui::Separator();
+
+        res |= ImGui::InputFloat(281.0f, " Scale", &GenerationThread::Params->scale, defaultparams.scale, "%.3f", "%.3f", true, 0.1f, 0.5f);
+
+        if (GenerationThread::Params->scale < 0.001f)
+            GenerationThread::Params->scale = 0.001f;
+
+        ImGui::Separator();
+
+        res |= ImGui::RadioButtonLabeled("Auto Frame", 0, &GenerationThread::Params->autoFrame);
+
+        if (GenerationThread::Params->autoFrame == false) {
+            res |= ImGui::InputInt(305.0f, " Translate X", &GenerationThread::Params->translate.x, 1, 1, defaultparams.translate.x);
+            res |= ImGui::InputInt(305.0f, " Translate Y", &GenerationThread::Params->translate.y, 1, 1, defaultparams.translate.y);
+        }
+
+        ImGui::Separator();
+
+        res |= ImGui::RadioButtonLabeled("Auto Size", 0, &GenerationThread::Params->autoSize);
+
+        if (GenerationThread::Params->autoSize == false) {
+            res |= ImGui::InputInt(305.0f, " Glyph Width", &GenerationThread::Params->glyphSize.x, 1, 1, defaultparams.glyphSize.x);
+            res |= ImGui::InputInt(305.0f, " Glyph Height", &GenerationThread::Params->glyphSize.y, 1, 1, defaultparams.glyphSize.y);
+
+            ImGui::Separator();
+        }
+
+        res |= ImGui::InputInt(305.0f, " Tex Max Width", &GenerationThread::Params->texMaxSize.x, 1, 1, defaultparams.texMaxSize.x);
+        res |= ImGui::InputInt(305.0f, " Tex Max Height", &GenerationThread::Params->texMaxSize.y, 1, 1, defaultparams.texMaxSize.y);
+
+        ImGui::Separator();
+
+        res |= ImGui::InputInt(305.0f, " Glyph Padding x", &GenerationThread::Params->glyphPadding.x, 1, 1, defaultparams.glyphPadding.x);
+        res |= ImGui::InputInt(305.0f, " Glyph Padding y", &GenerationThread::Params->glyphPadding.y, 1, 1, defaultparams.glyphPadding.y);
+
+        // ImGui::Separator();
+
+        // res |= ImGui::InputInt(305.0f, " Texture Padding x", &GenerationThread::Params->texPadding.x, 1, 1, defaultparams.texPadding.x);
+        // res |= ImGui::InputInt(305.0f, " Texture Padding y", &GenerationThread::Params->texPadding.y, 1, 1, defaultparams.texPadding.y);
+
+        ImGui::Separator();
+
+        ImGui::Text("Algo (Use of MsdfGen) :");
+
+        if (ImGui::RadioButtonLabeled("Sdf", 0, GenerationThread::Params->algo == AlgoEnum::ALGO_SDF))
+            res |= true, GenerationThread::Params->algo = AlgoEnum::ALGO_SDF;
+        ImGui::SameLine();
+        if (ImGui::RadioButtonLabeled("PSdf", 0, GenerationThread::Params->algo == AlgoEnum::ALGO_PSDF))
+            res |= true, GenerationThread::Params->algo = AlgoEnum::ALGO_PSDF;
+        ImGui::SameLine();
+        if (ImGui::RadioButtonLabeled("MSdf", 0, GenerationThread::Params->algo == AlgoEnum::ALGO_MSDF))
+            res |= true, GenerationThread::Params->algo = AlgoEnum::ALGO_MSDF;
+
+        ImGui::Separator();
+
+        if (GenerationThread::Params->algo == AlgoEnum::ALGO_MSDF) {
+            res |= ImGui::SliderFloat(281.0f,
+                                      " MSDF Edge Color Angle",
+                                      &GenerationThread::Params->msdfColoringAngle,
+                                      0.0f,
+                                      360.0f,
+                                      defaultparams.msdfColoringAngle,
+                                      1.0f,
+                                      10.0f,
+                                      "%.0f",
+                                      0,
+                                      true);
+        }
+
+        res |= ImGui::InputFloat(281.0f, " Sdf Range", &GenerationThread::Params->range, defaultparams.range, "%.1f", "%.1f", 0.1f, 1.0f);
+
+        if (GenerationThread::Params->range < 0.001f)
+            GenerationThread::Params->range = 0.001f;
+
+        ImGui::Separator();
+
+        res |= ImGui::RadioButtonLabeled("Invert Y", 0, &GenerationThread::Params->InvertY);
+    }*/
+}
+
+void FontDesigner::m_displayGlyphSelection() {
+    /*if (m_MultiSelection.size() > 0) {
+        if (ImGui::CollapsingHeader("Multi Selection", -1.0f, true)) {
+            if (ImGui::ContrastedButton("Reset Selection")) {
+                m_MultiSelection.clear();
+            }
+
+            ImGui::Text("UV Offset :");
+
+            bool resetUVCenters = ImGui::ContrastedButton("Reset UV Offset of Selection");
+
+            if (resetUVCenters) {
+                auto uniLst = m_Font_RenderPack->GetShaderKey()->GetUniformsByWidget("glyphcenter");
+                if (uniLst) {
+                    for (auto itSel = m_MultiSelection.begin(); itSel != m_MultiSelection.end(); ++itSel) {
+                        auto glyph = GenerationThread::Params->GetGlyph(itSel->first);
+                        if (glyph) {
+                            if (resetUVCenters) {
+                                glyph->shaderCenterOffset = GlyphStruct().shaderCenterOffset;
+                            }
+                        }
+                    }
+
+                    if (resetUVCenters) {
+                        UpdateGlyphCenterOffsets();
+                    }
+                }
+            }
+
+            ImGui::Text("Invert the SDF One Time Via Uniforms:");
+
+            bool invertAllOneTime = ImGui::ContrastedButton("Invert all selection");
+            ImGui::SameLine();
+            bool resetInversion = ImGui::ContrastedButton("Reset Inversion");
+
+            if (resetInversion || invertAllOneTime) {
+                auto uniLst = m_Font_RenderPack->GetShaderKey()->GetUniformsByWidget("glyphinversions");
+                if (uniLst) {
+                    for (auto itSel = m_MultiSelection.begin(); itSel != m_MultiSelection.end(); ++itSel) {
+                        auto glyph = GenerationThread::Params->GetGlyph(itSel->first);
+                        if (glyph) {
+                            if (invertAllOneTime) {
+                                glyph->dfInverted = !glyph->dfInverted;
+                            } else if (resetInversion) {
+                                glyph->dfInverted = false;
+                            }
+
+                            for (auto itUniLst = uniLst->begin(); itUniLst != uniLst->end(); itUniLst++) {
+                                auto v = *itUniLst;
+                                if (v) {
+                                    if (glyph->dfInverted)
+                                        v->uFloatArr[glyph->idx] = 1.0f;
+                                    else
+                                        v->uFloatArr[glyph->idx] = 0.0f;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            ImGui::Text("Char Set :");
+
+            bool removeFromCharSet = ImGui::ContrastedButton("Remove from Char Set");
+
+            ImGui::Text("Need a new generation, for reflect chnages");
+
+            if (removeFromCharSet) {
+                std::string _charSet = std::string(charSetBuffer);
+
+                for (auto itSel = m_MultiSelection.begin(); itSel != m_MultiSelection.end(); ++itSel) {
+                    auto glyph = GenerationThread::Params->GetGlyph(itSel->first);
+                    if (glyph) {
+                        // on supprime les char selectionné du charset
+                        ct::replaceString(_charSet, ct::toStr(glyph->c), "");
+                    }
+                }
+
+                // on applique le nouveau charset
+                ct::ResetBuffer(charSetBuffer);
+                ct::AppendToBuffer(charSetBuffer, MAX_CHARSET_SIZE, _charSet);
+                GenerationThread::Params->IsFontLoaded = false;
+                m_NeedRegeneration = true;
+            }
+        }
+    }*/
+
+    /////////////////////////////////////////////////////////////////////////
+    //// SELECTED GLYPH /////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////
+
+    /*else {
+        if (GenerationThread::Params->Glyphs.size() > 0 && m_CurrentSelectedChar != 0) {
+            if (ImGui::CollapsingHeader("Selected Glyph", -1.0f, true)) {
+                ImGui::ColorEdit4("Modification Color", &m_ModificationColor.x);
+                ImGui::ColorEdit4("Selection Color", &m_SelectionColor.x);
+
+                if (ImGui::ContrastedButton("Reset Selection")) {
+                    m_CurrentSelectedChar = 0;
+                }
+
+                if (m_CurrentSelectedChar != 0) {
+                    auto glyph = GenerationThread::Params->GetGlyph(m_CurrentSelectedChar);
+                    if (glyph) {
+                        ImGui::Text("Selected char : %c", glyph->c);
+
+                        ImGui::NewLine();
+
+                        ImGui::Text("Shader UV Center offset : %.4f, %.4f", glyph->shaderCenterOffset.x, glyph->shaderCenterOffset.y);
+                        if (ImGui::ContrastedButton("Reset UV Offset")) {
+                            glyph->shaderCenterOffset = GlyphStruct().shaderCenterOffset;
+                            UpdateGlyphCenterOffsets();
+                        }
+
+                        ImGui::NewLine();
+
+                        ImGui::Text("Invert the Glyph (no update needed) :");
+
+                        bool invertAllOneTime = ImGui::ContrastedButton("Invert all selection");
+                        ImGui::SameLine();
+                        bool resetInversion = ImGui::ContrastedButton("Reset Inversion");
+
+                        if (resetInversion || invertAllOneTime) {
+                            if (invertAllOneTime) {
+                                glyph->dfInverted = !glyph->dfInverted;
+                            } else if (resetInversion) {
+                                glyph->dfInverted = false;
+                            }
+
+                            auto uniLst = m_Font_RenderPack->GetShaderKey()->GetUniformsByWidget("glyphinversions");
+                            if (uniLst) {
+                                for (auto itUniLst = uniLst->begin(); itUniLst != uniLst->end(); itUniLst++) {
+                                    auto v = *itUniLst;
+                                    if (v) {
+                                        if (glyph->dfInverted)
+                                            v->uFloatArr[glyph->idx] = 1.0f;
+                                        else
+                                            v->uFloatArr[glyph->idx] = 0.0f;
+                                    }
+                                }
+                            }
+                        }
+
+                        ImGui::Text("Or You can Select Contours you want to invert (need chars Update) :");
+
+                        bool res = false;
+                        int idToPush = 457954654;
+                        auto* itGlyphs = &glyph->contourSdfSigns;
+                        if (itGlyphs) {
+                            for (auto itInv = itGlyphs->begin(); itInv != itGlyphs->end(); ++itInv) {
+                                if (itInv != itGlyphs->begin())
+                                    ImGui::SameLine();
+                                bool b = *itInv;
+                                ImGui::PushID(idToPush++);
+                                res |= ImGui::Checkbox("##checkinvsdf", &b);
+                                ImGui::PopID();
+                                if (res) {
+                                    GenerationThread::Params->ModifiedGlyphs[glyph->c] = true;
+                                }
+                                (*itInv) = b;
+                            }
+                        }
+                        ImGui::Text(
+                            "If not Suffiscient for correct the font map,\n try invert the texture cell color\ninside the shader by using [[char]] for conditionnal on a "
+                            "particular char");
+
+                        ImGui::Text("Char Set :");
+
+                        bool removeFromCharSet = ImGui::ContrastedButton("Remove from Char Set");
+
+                        ImGui::Text("Need a new generation, for reflect chnages");
+
+                        if (removeFromCharSet) {
+                            std::string _charSet = std::string(charSetBuffer);
+
+                            // on supprime les char selectionné du charset
+                            ct::replaceString(_charSet, ct::toStr(glyph->c), "");
+
+                            // on applique le nouveau charset
+                            ct::ResetBuffer(charSetBuffer);
+                            ct::AppendToBuffer(charSetBuffer, MAX_CHARSET_SIZE, _charSet);
+                            GenerationThread::Params->IsFontLoaded = false;
+                            m_NeedRegeneration = true;
+                        }
+                    }
+                }
+            }
+        }
+    }*/
+}
+
+void FontDesigner::m_displayGlyphInfos() {
+    /*if (ImGui::CollapsingHeader("Params")) {
+        if (GenerationThread::Params->Glyphs.size() > 0) {
+            if (ImGui::CollapsingHeader("Infos")) {
+                ImGui::Text("Font : name:%s", GenerationThread::Params->fontName.c_str());
+                ImGui::Text("Font : path:%s", GenerationThread::Params->fontPath.c_str());
+
+                int lh = GenerationThread::Params->lineHeight * GenerationThread::Params->scale;
+                int bh = GenerationThread::Params->baseHeight * GenerationThread::Params->scale;
+                ImGui::Text("Font : lineHeight:%i baseHeight:%i", lh, bh);
+
+                int w = GenerationThread::Params->textureSize.x;
+                int h = GenerationThread::Params->textureSize.y;
+                ImGui::Text("Tex : w:%i h:%i", w, h);
+
+                static int ShowGlyphMode = false;
+                if (ImGui::RadioButtonLabeled("Glyph Rects", 0, ShowGlyphMode == 0))
+                    ShowGlyphMode = 0;
+                ImGui::SameLine();
+                if (ImGui::RadioButtonLabeled("Glyph Infos", 0, ShowGlyphMode == 1))
+                    ShowGlyphMode = 1;
+                ImGui::SameLine();
+                if (ImGui::RadioButtonLabeled("Glyph Select", 0, ShowGlyphMode == 2))
+                    ShowGlyphMode = 2;
+
+                int idx = 0;
+                for (auto itGlyphs = GenerationThread::Params->Glyphs.begin(); itGlyphs != GenerationThread::Params->Glyphs.end(); ++itGlyphs) {
+                    if (ShowGlyphMode == 0) {
+                        ImGui::Text("%3i %c (%i) l:%.3f b:%.3f r:%.3f t:%.3f",
+                                    idx++,
+                                    itGlyphs->second.c,
+                                    (int)itGlyphs->second.c,
+                                    itGlyphs->second.rc.x,
+                                    itGlyphs->second.rc.y,
+                                    itGlyphs->second.rc.z,
+                                    itGlyphs->second.rc.w);
+                    } else if (ShowGlyphMode == 1) {
+                        int px = itGlyphs->second.rc.x * w;
+                        int py = itGlyphs->second.rc.y * h;
+                        int psx = (itGlyphs->second.rc.z - itGlyphs->second.rc.x) * w;
+                        int psy = (itGlyphs->second.rc.w - itGlyphs->second.rc.y) * h;
+                        int sx = itGlyphs->second.size.x * GenerationThread::Params->scale;
+                        int sy = itGlyphs->second.size.y * GenerationThread::Params->scale;
+
+                        int ox = itGlyphs->second.offset.x * w;
+                        int oy = itGlyphs->second.offset.y * h;
+                        int hbx = itGlyphs->second.horiBearing.x * GenerationThread::Params->scale;
+                        int hby = itGlyphs->second.horiBearing.y * GenerationThread::Params->scale;
+
+                        int advx = (itGlyphs->second.advx + GenerationThread::Params->glyphPadding.x) * GenerationThread::Params->scale;
+
+                        ImGui::Text("%3i %c (%3i) sx:%3i sy:%3i hbx:%3i hby:%3i adv:%3i", idx++, itGlyphs->second.c, (int)itGlyphs->second.c, sx, sy, hbx, hby, advx);
+                    } else if (ShowGlyphMode == 2) {
+                        if (idx % 15 > 0)
+                            ImGui::SameLine();
+
+                        static char selectCharBuffer[1000];
+                        snprintf(selectCharBuffer, 1000, "%c##%3i", itGlyphs->second.c, idx++);
+                        if (ImGui::RadioButtonLabeled(selectCharBuffer, 0, m_CurrentSelectedChar == itGlyphs->second.c)) {
+                            m_CurrentSelectedChar = itGlyphs->second.c;
+                        }
+                    }
+                }
+            }
+        }
+    }*/
+}
+
+void FontDesigner::m_displayTexture() {
+    if (GenerationThread::Params->textureFont > 0) {
+        if (ImGui::CollapsingHeader("Font Texture")) {
+            const auto w = ImGui::GetContentRegionAvail().x * 0.95f;
+            float h = w * GenerationThread::Params->textureSize.ratioYX<float>();
+            ImGui::Image((ImTextureID)GenerationThread::Params->textureFont, ImVec2(w, h));
+        }
     }
 }
 
@@ -961,7 +896,7 @@ bool FontDesigner::LoadFontOnDemand(std::string vFontName, float vFontSize) {
     if (font == 0)
         io.Fonts->AddFontDefault();
 
-    std::string fontPath = m_FontExplorer->GetFontFilePathName(vFontName);
+    std::string fontPath = m_FontExplorerPtr->GetFontFilePathName(vFontName);
     if (fontPath.size() > 0) {
         ImFont* font = io.Fonts->AddFontFromFileTTF(fontPath.c_str(), vFontSize, &config);
         if (font != 0) {
@@ -1042,8 +977,8 @@ bool FontDesigner::ReGenerateFontTexture() {
     // recreate atlas
     ImGuiIO& io = ImGui::GetIO();
 
-    if (g_FontTexture) {
-        glDeleteTextures(1, &g_FontTexture);
+    if (m_FontTextureID) {
+        glDeleteTextures(1, &m_FontTextureID);
         io.Fonts->TexID = 0;
     }
 
@@ -1058,14 +993,14 @@ bool FontDesigner::ReGenerateFontTexture() {
         // Upload texture to graphics system
         GLint last_texture;
         glGetIntegerv(GL_TEXTURE_BINDING_2D, &last_texture);
-        glGenTextures(1, &g_FontTexture);
-        glBindTexture(GL_TEXTURE_2D, g_FontTexture);
+        glGenTextures(1, &m_FontTextureID);
+        glBindTexture(GL_TEXTURE_2D, m_FontTextureID);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
 
         // Store our identifier
-        io.Fonts->TexID = (void*)(intptr_t)g_FontTexture;
+        io.Fonts->TexID = (void*)(intptr_t)m_FontTextureID;
 
         // Restore state
         glBindTexture(GL_TEXTURE_2D, last_texture);
@@ -1118,7 +1053,7 @@ void FontDesigner::UpdateFontHeight() {
 
             int advx = (glyph->advx) * GenerationThread::Params->scale + pdx;
 
-            m_TestFont->AddGlyph((ImWchar)c, hbx, bh - hby, hbx + sx, bh - hby + sy, glyph->rc.x, glyph->rc.y, glyph->rc.z, glyph->rc.w, advx);
+            m_TestFont->AddGlyph(&m_TestFontConfig, (ImWchar) c, hbx, bh - hby, hbx + sx, bh - hby + sy, glyph->rc.x, glyph->rc.y, glyph->rc.z, glyph->rc.w, advx);
         }
 
         m_TestFont->BuildLookupTable();
@@ -1161,7 +1096,7 @@ void FontDesigner::LoadBitmapFontIntoImguiFont() {
 }
 
 void FontDesigner::UpdateFontTexFromFBO() {
-    m_TestFontAtlas.TexID = (ImTextureID)m_Font_RenderPack->GetTextureId(m_PreviewBufferId);
+    //m_TestFontAtlas.TexID = (ImTextureID)m_Font_RenderPack->GetTextureId(m_PreviewBufferId);
 }
 
 void FontDesigner::ExportToFntFile() {
@@ -1377,7 +1312,7 @@ void FontDesigner::DrawFontTexture(ImTextureID vId, ImVec2 vPos, ImVec2 vSize, f
 }
 
 void FontDesigner::UpdateGlyphCenterOffsets() {
-    if (m_GlyphCenterOffsets) {
+    /*if (m_GlyphCenterOffsets) {
         std::string _charSet = GenerationThread::Params->charSet;
         ct::replaceString(_charSet, "\n", "");
         ct::replaceString(_charSet, "\t", "");
@@ -1398,7 +1333,7 @@ void FontDesigner::UpdateGlyphCenterOffsets() {
                 idx++;
             }
         }
-    }
+    }*/
 }
 
 ///////////////////////////////////////////////////////
@@ -1406,22 +1341,22 @@ void FontDesigner::UpdateGlyphCenterOffsets() {
 ///////////////////////////////////////////////////////
 
 void FontDesigner::StartWorkerThread(bool vJustUpdate) {
-    if (!m_GenerationThread.StopWorkerThread()) {
+    /*if (!m_GenerationThread.StopWorkerThread()) {
         GenerationThread::Params->charSet = std::string(charSetBuffer);
 
         m_Font_RenderPack->GetShaderKey()->SaveRenderPackConfig(CONFIG_TYPE_Enum::CONFIG_TYPE_ALL);
 
         m_GenerationThread.CreateThread(std::bind(&MainFrame::WorkerThreadStoppedOrFinished, this), vJustUpdate);
-    }
+    }*/
 }
 
 void FontDesigner::StopWorkerThread() {
-    m_GenerationThread.StopWorkerThread();
+    //m_GenerationThread.StopWorkerThread();
 }
 
 void FontDesigner::WorkerThreadStoppedOrFinished() {
     // on charge les rects
-    DoShaderCodeUpdate(true);
+    /*DoShaderCodeUpdate(true);
 
     RefreshSelectionFromNewFontMap();
 
@@ -1431,16 +1366,15 @@ void FontDesigner::WorkerThreadStoppedOrFinished() {
 
     LoadBitmapFontIntoImguiFont();
 
-    UpdateViewPort(m_DisplayQuality);
+    UpdateViewPort(m_DisplayQuality);*/
 }
 
-void FontDesigner::SetCharset(std::string vCharSet) {
-    ct::ResetBuffer(charSetBuffer);
-    ct::AppendToBuffer(charSetBuffer, MAX_CHARSET_SIZE, vCharSet);
-}
-
-void FontDesigner::UpdateUniforms(RenderPack* vRenderPack, UniformVariant* vUni, bool vCanUpdateMouse, float vDisplayQuality, Camera* vCamera, ct::frect* vMouseRect) {
-    if (vRenderPack && vUni) {
+void FontDesigner::UpdateUniforms(RenderPackWeak vRenderPack,
+                                  UniformVariantPtr vUniPtr,
+                                  DisplayQualityType vDisplayQuality,
+                                  MouseInterface* vMouse,
+                                  CameraInterface* vCamera) {
+    /*if (vRenderPack && vUni) {
         UniformVariant* v = vUni;
         if (v) {
             if (v->widget == "sdf") {
@@ -1565,11 +1499,11 @@ void FontDesigner::UpdateUniforms(RenderPack* vRenderPack, UniformVariant* vUni,
                 }
             }
         }
-    }
+    }*/
 }
 
 void FontDesigner::SaveToPictureFile(std::string vFilePathName, bool vFlipY, int vCountSamples) {
-    if (m_Font_RenderPack) {
+    /*if (m_Font_RenderPack) {
         int maxTextureSize = 0;
 
         glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTextureSize);
@@ -1596,5 +1530,5 @@ void FontDesigner::SaveToPictureFile(std::string vFilePathName, bool vFlipY, int
 
         // on retablit le precedent
         DoShaderCodeUpdate(true);
-    }
+    }*/
 }
