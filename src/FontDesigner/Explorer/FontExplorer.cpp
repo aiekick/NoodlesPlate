@@ -8,6 +8,10 @@
 
 #include <SoGLSL/src/Renderer/RenderPack.h>
 
+#include <FontDesigner/Generation/GenerationThread.h>
+
+#include <ctools/Logger.h>
+
 //////////////////////////////////////////////////////////////////////////////
 
 FontInfosStruct::FontInfosStruct(std::string vfontName, std::string vFilePathName, FontExplorer *vFontExplorer)
@@ -350,11 +354,11 @@ std::string FontExplorer::GetFontParamFileName(std::string vFontName)
 		ct::replaceString(fontName, " ", "_");
 		ct::replaceString(fontName, "(", "_");
 		ct::replaceString(fontName, ")", "_");
-		return FileHelper::Instance()->GetAbsolutePathForConf(fontName + ".conf");
+        return FileHelper::Instance()->GetAbsolutePathForFileLocation(fontName + ".conf", (int)FILE_LOCATION_Enum::FILE_LOCATION_FONTS);
 	}
 	else
 	{
-		LogStr("vFontName est vide");
+		LogVarError("vFontName est vide");
 	}
 	return "";
 }
@@ -367,8 +371,8 @@ void FontExplorer::SaveFontParamFile(std::string vFontName, GenerationThreadPara
 	{
 		std::string fileStream;
 
-		fileStream += "lineheight:" + ct::fvariant(vParams->lineHeight).getS() + "\n";
-		fileStream += "baseheight:" + ct::fvariant(vParams->baseHeight).getS() + "\n";
+		fileStream += "lineheight:" + ct::fvariant(vParams->lineHeight).GetS() + "\n";
+		fileStream += "baseheight:" + ct::fvariant(vParams->baseHeight).GetS() + "\n";
 
 		for (auto it = vParams->Glyphs.begin(); it != vParams->Glyphs.end(); ++it)
 		{
@@ -389,7 +393,7 @@ void FontExplorer::SaveFontParamFile(std::string vFontName, GenerationThreadPara
 					fileStream += std::string(b ? "true" : "false");
 				}
 
-				fileStream += ":" + ct::fvariant(glyph.shaderCenterOffset).getS();
+				fileStream += ":" + ct::fvariant(glyph.shaderCenterOffset).GetS();
 				fileStream += ":" + std::string(glyph.dfInverted ? "true" : "false");
 
 				fileStream += "\n";
@@ -437,11 +441,11 @@ void FontExplorer::LoadFontParamFile(std::string vFontName, GenerationThreadPara
 			{
 				if (vec[0] == "baseheight")
 				{
-					vParams->baseHeight = ct::ivariant(vec[1]).getI();
+					vParams->baseHeight = ct::ivariant(vec[1]).GetI();
 				}
 				else if (vec[0] == "lineheight")
 				{
-					vParams->lineHeight = ct::ivariant(vec[1]).getI();
+					vParams->lineHeight = ct::ivariant(vec[1]).GetI();
 				}
 				else
 				{
@@ -456,7 +460,7 @@ void FontExplorer::LoadFontParamFile(std::string vFontName, GenerationThreadPara
 							vParams->Glyphs[c].contourSdfSigns.clear();
 							for (auto itB = arrBool.begin(); itB != arrBool.end(); ++itB)
 							{
-								bool b = ct::fvariant(*itB).getB();
+								bool b = ct::fvariant(*itB).GetB();
 								vParams->Glyphs[c].contourSdfSigns.push_back(b);
 							}
 						}
@@ -465,14 +469,14 @@ void FontExplorer::LoadFontParamFile(std::string vFontName, GenerationThreadPara
 						{
 							std::string centerOffset = vec[2];
 							// le dernier c'est le vec2 du shader uv offset
-							vParams->Glyphs[c].shaderCenterOffset = ct::fvariant(centerOffset).getV2();
+							vParams->Glyphs[c].shaderCenterOffset = ct::fvariant(centerOffset).GetV2();
 						}
 
 						if (vec.size() > 3)
 						{
 							std::string dfInverted = vec[3];
 							// le dernier c'est le bool du shader dfInverted
-							vParams->Glyphs[c].dfInverted = ct::fvariant(dfInverted).getB();
+							vParams->Glyphs[c].dfInverted = ct::fvariant(dfInverted).GetB();
 						}
 					}
 				}

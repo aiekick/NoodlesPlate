@@ -41,7 +41,7 @@ struct GLFWmonitor;
 class MainBackend : public conf::ConfigAbstract
 {
 public:
-	static GuiBackend_Window sMainThread;
+    static GuiBackend_Window sMainThread;
 	static std::string sCurrentFileLoaded;
 	static int sFullScreenWindowedMonitorIndex;
 	static bool sDecorationWindowed;

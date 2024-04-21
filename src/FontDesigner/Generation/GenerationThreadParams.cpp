@@ -1,8 +1,8 @@
 // This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-#include "GenerationThreadParams.h"
-#include "Globals.h"
+#include <FontDesigner/Generation/GenerationThreadParams.h>
+#include <Headers/Globals.h>
 
 GenerationThreadParams::GenerationThreadParams()
 {
@@ -137,8 +137,7 @@ void GenerationThreadParams::SetGlyph(char vC, GlyphStruct vGlyph)
 //// CONFIGURATION ////////////////////////////////////
 ///////////////////////////////////////////////////////
 
-std::string GenerationThreadParams::getXml(const std::string& vOffset)
-{
+std::string GenerationThreadParams::getXml(const std::string& vOffset, const std::string& vUserDatas) {
 	std::string str;
 
 	str += vOffset + "<scale>" + ct::toStr(scale) + "</scale>\n";
@@ -149,15 +148,8 @@ std::string GenerationThreadParams::getXml(const std::string& vOffset)
 	str += vOffset + "<glyphPadding>" + glyphPadding.string() + "</glyphPadding>\n";
 	str += vOffset + "<texPadding>" + texPadding.string() + "</texPadding>\n";
 	str += vOffset + "<texMaxSize>" + texMaxSize.string() + "</texMaxSize>\n";
-	// http://xml.silmaril.ie/specials.html
-	std::string charSetStr = charSet;
-	ct::replaceString(charSetStr, "<", "&lt;");
-	ct::replaceString(charSetStr, "&", "&amp;");
-	ct::replaceString(charSetStr, ">", "&gt;");
-	ct::replaceString(charSetStr, "\"", "&quot;");
-	ct::replaceString(charSetStr, "'", "&apos;");
-	str += vOffset + "<charSet>" + ct::toStr(charSetStr) + "</charSet>\n";
-	str += vOffset + "<fontName>" + ct::toStr(fontName) + "</fontName>\n";
+    str += vOffset + "<charSet>" + charSet + "</charSet>\n";
+	str += vOffset + "<fontName>" + fontName + "</fontName>\n";
 	str += vOffset + "<algo>" + ct::toStr((int)algo) + "</algo>\n";
 	str += vOffset + "<theme>" + ct::toStr(theme) + "</theme>\n";
 	str += vOffset + "<range>" + ct::toStr(range) + "</range>\n";
@@ -178,8 +170,7 @@ std::string GenerationThreadParams::getXml(const std::string& vOffset)
 	return str;
 }
 
-void GenerationThreadParams::setFromXml(tinyxml2::XMLElement* vElem, tinyxml2::XMLElement* vParent)
-{
+bool GenerationThreadParams::setFromXml(tinyxml2::XMLElement* vElem, tinyxml2::XMLElement* vParent, const std::string& vUserDatas) {
 	// The value of this child identifies the name of this element
 	std::string strName = "";
 	std::string strValue = "";
@@ -193,54 +184,45 @@ void GenerationThreadParams::setFromXml(tinyxml2::XMLElement* vElem, tinyxml2::X
 		strParentName = vParent->Value();
 
 	if (strName == "scale") 
-		scale = ct::fvariant(strValue).getF();
+		scale = ct::fvariant(strValue).GetF();
 	if (strName == "autoFrame") 
-		autoFrame = ct::ivariant(strValue).getB();
+		autoFrame = ct::ivariant(strValue).GetB();
 	if (strName == "autoSize") 
-		autoSize = ct::ivariant(strValue).getB();
+		autoSize = ct::ivariant(strValue).GetB();
 	if (strName == "translate") 
-		translate = ct::ivariant(strValue).getV2();
+		translate = ct::ivariant(strValue).GetV2();
 	if (strName == "glyphSize") 
-		glyphSize = ct::ivariant(strValue).getV2();
+		glyphSize = ct::ivariant(strValue).GetV2();
 	if (strName == "glyphPadding") 
-		glyphPadding = ct::ivariant(strValue).getV2();
+		glyphPadding = ct::ivariant(strValue).GetV2();
 	if (strName == "texPadding") 
-		texPadding = ct::ivariant(strValue).getV2();
+		texPadding = ct::ivariant(strValue).GetV2();
 	if (strName == "texMaxSize") 
-		texMaxSize = ct::ivariant(strValue).getV2();
+		texMaxSize = ct::ivariant(strValue).GetV2();
 	if (strName == "charSet")
-	{
-		// http://xml.silmaril.ie/specials.html
-		std::string charSetStr = strValue;
-		ct::replaceString(charSetStr, "&lt;", "<");
-		ct::replaceString(charSetStr, "&amp;", "&");
-		ct::replaceString(charSetStr, "&gt;", ">");
-		ct::replaceString(charSetStr, "&quot;", "\"");
-		ct::replaceString(charSetStr, "&apos;", "'");
-		charSet = charSetStr;
-	}
+        charSet = strValue;
 	if (strName == "fontName") 
 		fontName = strValue;
 	if (strName == "algo") 
-		algo = (AlgoEnum)ct::ivariant(strValue).getI();
+		algo = (AlgoEnum)ct::ivariant(strValue).GetI();
 	if (strName == "theme") 
-		theme = ct::ivariant(strValue).getI();
+		theme = ct::ivariant(strValue).GetI();
 	if (strName == "range") 
-		range = ct::fvariant(strValue).getF();
+		range = ct::fvariant(strValue).GetF();
 	if (strName == "msdfColoringAngle") 
-		msdfColoringAngle = ct::fvariant(strValue).getF();
+		msdfColoringAngle = ct::fvariant(strValue).GetF();
 	if (strName == "InvertY") 
-		InvertY = ct::ivariant(strValue).getB();
+		InvertY = ct::ivariant(strValue).GetB();
 	if (strName == "exportflipy")
-		exportFlipY = ct::ivariant(strValue).getB();
+		exportFlipY = ct::ivariant(strValue).GetB();
 	if (strName == "autoUpdate") 
-		autoUpdate = ct::ivariant(strValue).getB();
+		autoUpdate = ct::ivariant(strValue).GetB();
 	if (strName == "ExportTexType") 
-		ExportTexType = (FontTextureTypeEnum)ct::ivariant(strValue).getI();
+		ExportTexType = (FontTextureTypeEnum)ct::ivariant(strValue).GetI();
 	if (strName == "FontLoadingMode") 
-		FontLoadingMode = (FontLoadingModeEnum)ct::ivariant(strValue).getI();
+		FontLoadingMode = (FontLoadingModeEnum)ct::ivariant(strValue).GetI();
 	if (strName == "formatFloat") 
-		formatFloat = ct::ivariant(strValue).getB();
+		formatFloat = ct::ivariant(strValue).GetB();
 	if (strName == "lastshader") 
 		lastShader = strValue;
 	if (strName == "exportFileName") 
@@ -250,9 +232,11 @@ void GenerationThreadParams::setFromXml(tinyxml2::XMLElement* vElem, tinyxml2::X
 	if (strName == "openPath") 
 		openPath = strValue;
 	if (strName == "SubSamples") 
-		SubSamples = ct::ivariant(strValue).getI();
+		SubSamples = ct::ivariant(strValue).GetI();
 	if (strName == "FontFileLoaded") 
 		FontFileLoaded = strValue;
 
 	///////////////////////////////////////////
+
+	return true;
 }

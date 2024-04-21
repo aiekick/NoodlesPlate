@@ -798,7 +798,7 @@ uniform(_useGizmoCull==true) mat4(culling) _GizmoCull; // _GizmoCullingVolume
 // Volume Culling
 
 // based on http://iquilezles.org/www/articles/intersectors/intersectors.htm
-void getSpherePoint( in vec3 ro, in vec3 rd, in mat4 txx, out vec3 facePoint, out vec2 d, out vec3 nor)
+void GetSpherePoint( in vec3 ro, in vec3 rd, in mat4 txx, out vec3 facePoint, out vec2 d, out vec3 nor)
 {
 	mat4 txi = inverse(txx);
 	
@@ -874,7 +874,7 @@ bool getCullingPoint(in vec3 ro, in vec3 rd, out vec3 facePoint, out vec2 d, ino
 		}
 		else if (_cullingType == 1) // sphere
 		{
-			getSpherePoint(ro, rd, _GizmoCull, facePoint, d, nor);
+			GetSpherePoint(ro, rd, _GizmoCull, facePoint, d, nor);
 		}
 		
 		if (d.y > d.x)
@@ -2527,7 +2527,7 @@ vec2 maxObj(vec2 a, vec2 b)
 	return b;
 }
 
-vec2 getSDF(vec3 p)
+vec2 GetSDF(vec3 p)
 {
 	float dSphere = length(p - sphereOrigin[3].xyz) - sphereRadius;
 	vec2 resSDF = vec2(dSphere, 0);
@@ -2546,7 +2546,7 @@ float march(in vec3 ro, in vec3 rd)
 	for (int i = 0; i < countSteps; i++)
 	{
 		if (d*d / s > 1e5 || d > maxDistance) break;
-		s = getSDF(ro + rd * d).x;
+		s = GetSDF(ro + rd * d).x;
 		d += s * stepScale;
 	}
 	return d;
@@ -2556,20 +2556,20 @@ vec3 getNor(vec3 p, float k)
 {
 	vec3 eps = vec3(k, 0., 0.);
 	vec3 nor = vec3(
-		getSDF(p + eps.xyy).x - getSDF(p - eps.xyy).x,
-		getSDF(p + eps.yxy).x - getSDF(p - eps.yxy).x,
-		getSDF(p + eps.yyx).x - getSDF(p - eps.yyx).x);
+		GetSDF(p + eps.xyy).x - GetSDF(p - eps.xyy).x,
+		GetSDF(p + eps.yxy).x - GetSDF(p - eps.yxy).x,
+		GetSDF(p + eps.yyx).x - GetSDF(p - eps.yyx).x);
 	return normalize(nor);
 }
 
-float getSha(in vec3 ro, in vec3 rd, in float hn)
+float GetSha(in vec3 ro, in vec3 rd, in float hn)
 {
 	float res = 1.0;
 	float t = 0.0005;
 	float h = 1.0;
 	for (int i = 0; i < 40; i++)
 	{
-		h = getSDF(ro + rd * t).x;
+		h = GetSDF(ro + rd * t).x;
 		res = min(res, hn*h / t);
 		t += clamp(h, 0.02, 2.0);
 	}
@@ -2584,7 +2584,7 @@ float getAO(in vec3 p, in vec3 nor)
 	{
 		float hr = 0.01 + 0.12 * float(i) / 4.0;
 		vec3 aopos = nor * hr + p;
-		float dd = getSDF(aopos).x;
+		float dd = GetSDF(aopos).x;
 		occ += -(dd - hr)*sca;
 		sca *= 0.95;
 	}
@@ -2613,13 +2613,13 @@ vec3 material(in vec3 pos, in vec3 camdir)
 	float sha = 1.0;
 	float ao = 1.0;
 
-	float mat = getSDF(pos).y;
+	float mat = GetSDF(pos).y;
 	if (mat < 1.)
 		tex = matColor0;
 	else if (mat < 2.)
 		tex = matColor1;
 
-	sha = 0.5 + 0.5 * getSha(pos, norm, 2.0);
+	sha = 0.5 + 0.5 * GetSha(pos, norm, 2.0);
 	ao = getAO(pos, norm);
 
 	vec3 l1 = light(d1, light0Col, tex, norm, camdir);
@@ -2857,7 +2857,7 @@ layout(location = 0) out vec4 fragColor;
 vec2 minObj(vec2 a, vec2 b){if (a.x < b.x)return a;return b;}
 vec2 maxObj(vec2 a, vec2 b){if (a.x > b.x)return a;return b;}
 
-vec2 getSDF(vec3 p)
+vec2 GetSDF(vec3 p)
 {
 	vec2 sphere = vec2(length(p - sphereOrigin[3].xyz) - 0.5, 0.);
 	p = (p - cubeOrigin[3].xyz) * mat3(cubeOrigin);
@@ -2869,9 +2869,9 @@ vec3 getNor(vec3 p, float k)
 {
 	vec3 eps = vec3(k, 0., 0.);
 	vec3 nor = vec3(
-		getSDF(p + eps.xyy).x - getSDF(p - eps.xyy).x,
-		getSDF(p + eps.yxy).x - getSDF(p - eps.yxy).x,
-		getSDF(p + eps.yyx).x - getSDF(p - eps.yyx).x);
+		GetSDF(p + eps.xyy).x - GetSDF(p - eps.xyy).x,
+		GetSDF(p + eps.yxy).x - GetSDF(p - eps.yxy).x,
+		GetSDF(p + eps.yyx).x - GetSDF(p - eps.yyx).x);
 	return normalize(nor);
 }
 
@@ -2879,12 +2879,12 @@ bool march(vec3 ro, vec3 rd, float far, int iters, float prec, out vec2 md)
 {
 	float d = 0.;
 	vec3 p = ro;
-	vec2 s = getSDF(p);
+	vec2 s = GetSDF(p);
 	for (int i=0;i<iters;i++)
 	{
 		if (abs(s.x)<d*d*1e-6&&i>0) break;
 		if (d>far) return false;
-		s = getSDF(p);
+		s = GetSDF(p);
 		d += s.x * prec;
 		p = ro+rd*d;
 	}
@@ -2906,7 +2906,7 @@ void mainImage(inout vec4 fragColor, in vec2 fragCoord)
 	vec2 d = vec2(0);
 	if (getCullingPoint(eye, rd, ro, d, maxDistance, nor))
 	{
-		float s = getSDF(ro).x;
+		float s = GetSDF(ro).x;
 		if (s < 0.0)
 		{
 			CalcDepth(rd, d.x); 
@@ -2931,7 +2931,7 @@ void mainImage(inout vec4 fragColor, in vec2 fragCoord)
 				
 				vec3 p = ro + rd * md.x;
 				nor = getNor(p, normalPrec);
-				float my = getSDF(p).y;
+				float my = GetSDF(p).y;
 				vec3 matColor = vec3(0);
 				if (my < 1.) matColor = matColor0;
 				else if (my < 2.) matColor = matColor1;

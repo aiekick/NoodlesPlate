@@ -5,19 +5,22 @@
 
 #include <FontDesigner/Generation/GenerationThreadParams.h>
 
-#include <future>
+#include <Gui/GuiBackend.h>
+
 #include <functional>
+#include <future>
 #include <thread>
 #include <atomic>
-#include <mutex>
 #include <string>
 #include <vector>
+#include <mutex>
 #include <list>
 using namespace std;
 
 class GenerationThread
 {
 public:
+    static GuiBackend_Window sGenerationThread;
 	static GenerationThreadParams *Params;
 	static std::mutex workerThread_Mutex;
 	static std::atomic<float> Progress;

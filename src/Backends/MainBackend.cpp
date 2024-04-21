@@ -30,7 +30,9 @@
 #include <ImGuiPack.h>
 
 // SoGLSL
+#include <SoGLSL/src/Res/CustomFont.h>
 #include <SoGLSL/src/Gui/GuiBackend.h>
+#include <SoGLSL/src/Res/CustomFont2.h>
 #include <SoGLSL/src/CodeTree/CodeTree.h>
 #include <SoGLSL/src/Buffer/FrameBuffer.h>
 #include <SoGLSL/src/CodeTree/ShaderKey.h>
@@ -54,21 +56,21 @@
 #include <SoGLSL/src/Mesh/Operations/MeshLoader.h>
 #include <SoGLSL/src/Buffer/FrameBuffersPipeLine.h>
 #include <SoGLSL/src/Systems/RenderDocController.h>
+#include <SoGLSL/src/Importer/ShadertoyBackupFileImportDlg.h>
 #include <SoGLSL/src/CodeTree/ShaderKeyConfigSwitcherUnified.h>
-#include <SoGLSL/src/Res/CustomFont.h>
-#include <SoGLSL/src/Res/CustomFont2.h>
 
 // This Project
-#include <Generator/CodeGenerator.h>
-#include <Systems/PictureExportSystem.h>
-#include <Headers/NoodlesPlateBuild.h>
 #include <Metrics/MetricSystem.h>
 #include <Systems/TemplateSystem.h>
+#include <Generator/CodeGenerator.h>
 #include <Systems/UrlLibrarySystem.h>
+#include <Headers/NoodlesPlateBuild.h>
+#include <Systems/PictureExportSystem.h>
+
+#include <FontDesigner/FontDesigner.h>
+#include <FontDesigner/Generation/GenerationThread.h>
+
 #include <filesystem>
-
-#include <SoGLSL/src/Importer/ShadertoyBackupFileImportDlg.h>
-
 #include <algorithm>
 
 #define MAIN_RENDERPACK_KEY "main"
@@ -130,13 +132,14 @@ void MainBackend::CreateWindows() {
 
     MainBackend::sMainThread =
         GuiBackend::Instance()->CreateGuiBackendWindow_Visible(sNormalWindowSize.x, sNormalWindowSize.y, prMainThreadWindowTitle.c_str());
+
     if (MainBackend::sMainThread.win) {
         GuiBackend::MakeContextCurrent(MainBackend::sMainThread);
 
         GuiBackend::Instance()->SwapInterval(1);  // Enable vsync
-        GuiBackend::Instance()->SetWindowFocusCallback(MainBackend::sMainThread, window_focus_callback);
         GuiBackend::Instance()->SetWindowPosCallback(MainBackend::sMainThread, window_pos_callback);
         GuiBackend::Instance()->SetDropCallback(MainBackend::sMainThread, glfw_window_drop_callback);
+        GuiBackend::Instance()->SetWindowFocusCallback(MainBackend::sMainThread, window_focus_callback);
 
         GuiBackend::Instance()->SetEmbeddedIconApp(MainBackend::sMainThread, "IDI_ICON1");
     }
@@ -201,9 +204,9 @@ void MainBackend::Unit() {
 #endif
 
     TextureSound::Release();
+    FontDesigner::Instance()->unit();
     MetricSystem::Instance()->Unit();
     GamePadSystem::Instance()->Unit();
-    ;
     SoundSystem::Instance()->Unit();
     MidiSystem::Instance()->Unit();
 
@@ -269,20 +272,21 @@ bool MainBackend::Init(const ct::ivec2& vScreenSize) {
 
     MetricSystem::Instance()->Init();
 
-    FileHelper::Instance()->RegisterPath((int)FILE_LOCATION_Enum::FILE_LOCATION_SCRIPT, "scripts");
-    FileHelper::Instance()->RegisterPath((int)FILE_LOCATION_Enum::FILE_LOCATION_ASSET_GENERAL, "assets");
-    FileHelper::Instance()->RegisterPath((int)FILE_LOCATION_Enum::FILE_LOCATION_ASSET_TEXTURE_2D, "assets");
-    FileHelper::Instance()->RegisterPath((int)FILE_LOCATION_Enum::FILE_LOCATION_ASSET_TEXTURE_3D, "assets");
-    FileHelper::Instance()->RegisterPath((int)FILE_LOCATION_Enum::FILE_LOCATION_ASSET_CUBEMAP, "assets");
-    FileHelper::Instance()->RegisterPath((int)FILE_LOCATION_Enum::FILE_LOCATION_ASSET_SOUND, "assets");
-    FileHelper::Instance()->RegisterPath((int)FILE_LOCATION_Enum::FILE_LOCATION_ASSET_MESH, "assets");
-    FileHelper::Instance()->RegisterPath((int)FILE_LOCATION_Enum::FILE_LOCATION_EXPORT, "exports");
+    FileHelper::Instance()->RegisterPath((int)FILE_LOCATION_Enum::FILE_LOCATION_APP, "");
     FileHelper::Instance()->RegisterPath((int)FILE_LOCATION_Enum::FILE_LOCATION_CONF, "conf");
+    FileHelper::Instance()->RegisterPath((int)FILE_LOCATION_Enum::FILE_LOCATION_FONTS, "fonts");
     FileHelper::Instance()->RegisterPath((int)FILE_LOCATION_Enum::FILE_LOCATION_DEBUG, "debug");
     FileHelper::Instance()->RegisterPath((int)FILE_LOCATION_Enum::FILE_LOCATION_SHAPES, "shapes");
     FileHelper::Instance()->RegisterPath((int)FILE_LOCATION_Enum::FILE_LOCATION_IMPORT, "imports");
+    FileHelper::Instance()->RegisterPath((int)FILE_LOCATION_Enum::FILE_LOCATION_SCRIPT, "scripts");
+    FileHelper::Instance()->RegisterPath((int)FILE_LOCATION_Enum::FILE_LOCATION_EXPORT, "exports");
+    FileHelper::Instance()->RegisterPath((int)FILE_LOCATION_Enum::FILE_LOCATION_ASSET_MESH, "assets");
+    FileHelper::Instance()->RegisterPath((int)FILE_LOCATION_Enum::FILE_LOCATION_ASSET_SOUND, "assets");
+    FileHelper::Instance()->RegisterPath((int)FILE_LOCATION_Enum::FILE_LOCATION_ASSET_CUBEMAP, "assets");
+    FileHelper::Instance()->RegisterPath((int)FILE_LOCATION_Enum::FILE_LOCATION_ASSET_GENERAL, "assets");
+    FileHelper::Instance()->RegisterPath((int)FILE_LOCATION_Enum::FILE_LOCATION_ASSET_TEXTURE_2D, "assets");
+    FileHelper::Instance()->RegisterPath((int)FILE_LOCATION_Enum::FILE_LOCATION_ASSET_TEXTURE_3D, "assets");
     FileHelper::Instance()->RegisterPath((int)FILE_LOCATION_Enum::FILE_LOCATION_SCRIPT_INCLUDE, "");
-    FileHelper::Instance()->RegisterPath((int)FILE_LOCATION_Enum::FILE_LOCATION_APP, "");
 
     FileHelper::Instance()->puSearchPaths.emplace_back("predefined");
     FileHelper::Instance()->puSearchPaths.emplace_back("predefined" + FileHelper::Instance()->puSlashType + "shaders");
@@ -307,6 +311,7 @@ bool MainBackend::Init(const ct::ivec2& vScreenSize) {
     SoundSystem::Instance()->Init(nullptr);
     MidiSystem::Instance()->Init(nullptr);
     TemplateSystem::Instance()->Init();
+    FontDesigner::Instance()->init();
     CameraSystem::Instance()->NeedCamChange();
 
 #ifdef USE_NETWORK
@@ -745,11 +750,11 @@ void MainBackend::ApplyColorClearing() {
 void MainBackend::SetCustomWidgetsOfRenderPack(RenderPackWeak vRenderPack) {
     auto rpPtr = vRenderPack.lock();
     if (rpPtr) {
+        rpPtr->AddCustomWidgetNameAndPropagateToChilds(uType::uTypeEnum::U_VEC4, "bgcolor", 0);
         rpPtr->AddCustomWidgetNameAndPropagateToChilds(uType::uTypeEnum::U_FLOAT, "usemsaa", 0);
         rpPtr->AddCustomWidgetNameAndPropagateToChilds(uType::uTypeEnum::U_FLOAT, "show3dSpace", 0);
-        rpPtr->AddCustomWidgetNameAndPropagateToChilds(uType::uTypeEnum::U_INT, "currentattachment", 0);
         rpPtr->AddCustomWidgetNameAndPropagateToChilds(uType::uTypeEnum::U_SAMPLER2D, "desktop", 0);
-        rpPtr->AddCustomWidgetNameAndPropagateToChilds(uType::uTypeEnum::U_VEC4, "bgcolor", 0);
+        rpPtr->AddCustomWidgetNameAndPropagateToChilds(uType::uTypeEnum::U_INT, "currentattachment", 0);
     }
 }
 

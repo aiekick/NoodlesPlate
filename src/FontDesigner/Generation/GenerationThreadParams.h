@@ -1,10 +1,10 @@
 #pragma once
 
 #include <ctools/cTools.h>
-#include <ctools/ConfigAbstract.h>
 #include <Headers/Globals.h>
 #include <msdfgen/core/Shape.h>
 #include <msdfgen/core/Bitmap.h>
+#include <ctools/ConfigAbstract.h>
 
 ///////////////////////////////////////////////////////
 //// WORKER THREAD ////////////////////////////////////
@@ -173,6 +173,6 @@ public:
 	//// CONFIGURATION ////////////////////////////////////
 	///////////////////////////////////////////////////////
 
-	std::string getXml(const std::string& vOffset);
-	void setFromXml(tinyxml2::XMLElement* vElem, tinyxml2::XMLElement* vParent);
+    std::string getXml(const std::string& vOffset, const std::string& vUserDatas) override;
+    bool setFromXml(tinyxml2::XMLElement* vElem, tinyxml2::XMLElement* vParent, const std::string& vUserDatas) override;
 };

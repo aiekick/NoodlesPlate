@@ -1,12 +1,10 @@
 #pragma once
 
-#include "Globals.h"
+#include <Headers/Globals.h>
 
-#include "cTools.h"
+#include <ctools/cTools.h>
 
 #include <vector>
-
-#include "ModelRendering.h"
 
 #include "GenerationThreadParams.h"
 
@@ -29,20 +27,19 @@
 #include <sstream>
 #include <exception>
 
-#include "FontExplorer.h"
+#include <FontDesigner/Explorer/FontExplorer.h>
 
-#include "core\Bitmap.h"
+#include <msdfgen/core/Bitmap.h>
+
+#include <Headers/Globals.h>
 
 #include "stb_rect_pack.h"
-#include "stb\stb_image_write.h"
 
-#include "Globals.h"
-
-struct GLFWwindow;
 class RenderPack;
 class FontExplorer;
 class Generator
 {
+
 private:
 	FontExplorer *m_FontExplorer;
 
@@ -78,7 +75,7 @@ private: // texture methods
 	void Upload1ChannelData(stbrp_coord *vX, stbrp_coord *vY,
 		msdfgen::Bitmap<float> *vBuffer, int vMaxWidth);
 	void Upload3ChannelData(stbrp_coord *vX, stbrp_coord *vY,
-		msdfgen::Bitmap<msdfgen::FloatRGB> *vBuffer, int vMaxWidth);
+		msdfgen::Bitmap<float, 3> *vBuffer, int vMaxWidth);
 
 	void CreateAndUploadFontTexture(ct::ivec2 vSize, bool vJustUpdate = false);
 	void UpdateFontTexture(ct::fvec2 vOffset, ct::fvec2 vSize);

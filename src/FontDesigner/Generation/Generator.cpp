@@ -1,19 +1,20 @@
 #define STB_RECT_PACK_IMPLEMENTATION
+#include <FontDesigner/Generation/Generator.h>
 
-#include "Generator.h"
-
-#include "FrameBuffer.h"
-#include "ModelRendering.h"
-#include "RenderPack.h"
-#include "MainFrame.h"
-#include <GLFW/glfw3.h>
 #include <omp.h>
 
+#include <ctools/Logger.h>
+
 #include <msdfgen.h>
-#include "Generator.h"
-#include "FontExplorer.h"
-#include "GenerationThread.h"
-#include "GenerationThreadParams.h"
+#include <FontDesigner/Explorer/FontExplorer.h>
+#include <FontDesigner/Generation/GenerationThread.h>
+#include <FontDesigner/Generation/GenerationThreadParams.h>
+
+#include <SoGLSL/src/Gui/GuiBackend.h>
+
+#include <Backends/MainBackend.h>
+
+#include "stb_image_write.h"
 
 Generator::Generator(GLFWwindow *vWin, GenerationThreadParams *vParams)
 {
@@ -39,7 +40,7 @@ void Generator::GenerateFullMap(
 	std::atomic< GLuint >& vCurrentTexture,
 	std::atomic< float >& vGenerationTime)
 {
-	glfwMakeContextCurrent(MainFrame::g_GenerationThread);
+    GuiBackend::Instance()->MakeContextCurrent(GenerationThread::sGenerationThread);
 
 	FreeImageBuffer();
 
@@ -94,7 +95,7 @@ void Generator::GenerateFullMap(
 
 					double LARGE_VALUE = 1e8;
 					double l = LARGE_VALUE, b = LARGE_VALUE, r = -LARGE_VALUE, t = -LARGE_VALUE;
-					glyph->shape.bounds(l, b, r, t);
+                    glyph->shape.bound(l, b, r, t);
 					l -= m_Params->glyphPadding.x / m_Params->scale;
 					b -= m_Params->glyphPadding.y / m_Params->scale;
 					r += m_Params->glyphPadding.x / m_Params->scale;
@@ -150,7 +151,7 @@ void Generator::GenerateFullMap(
 						}
 						else if (m_Params->algo == AlgoEnum::ALGO_MSDF)
 						{
-							msdfgen::Bitmap<msdfgen::FloatRGB> sdf((int)binPackRect.rect->w, (int)binPackRect.rect->h);
+							msdfgen::Bitmap<float, 3> sdf((int)binPackRect.rect->w, (int)binPackRect.rect->h);
 
 							generateMSDF(sdf, glyph->shape, sdfRange, m_Params->scale, _translate);
 
@@ -226,9 +227,8 @@ void Generator::UpdateGhars(
 	std::atomic< float >& vProgress,
 	std::atomic< bool >& vWorking,
 	std::atomic< GLuint >& vCurrentTexture,
-	std::atomic< float >& vGenerationTime)
-{
-	glfwMakeContextCurrent(MainFrame::g_GenerationThread);
+	std::atomic< float >& vGenerationTime) {
+    GuiBackend::Instance()->MakeContextCurrent(GenerationThread::sGenerationThread);
 
 	if (m_Params->IsFontLoaded && m_Params->textureFont > 0)
 	{
@@ -256,7 +256,7 @@ void Generator::UpdateGhars(
 
 						double LARGE_VALUE = 1e8;
 						double l = LARGE_VALUE, b = LARGE_VALUE, r = -LARGE_VALUE, t = -LARGE_VALUE;
-						glyph->shape.bounds(l, b, r, t);
+						glyph->shape.bound(l, b, r, t);
 						l -= m_Params->glyphPadding.x / m_Params->scale;
 						b -= m_Params->glyphPadding.y / m_Params->scale;
 						r += m_Params->glyphPadding.x / m_Params->scale;
@@ -332,7 +332,7 @@ void Generator::UpdateGhars(
 
 void Generator::InvertGlyph(GlyphStruct *vGlyph)
 {
-	glfwMakeContextCurrent(MainFrame::g_GenerationThread);
+	GuiBackend::Instance()->MakeContextCurrent(GenerationThread::sGenerationThread);
 
 	std::vector<bool> *signs = &vGlyph->contourSdfSigns;
 
@@ -360,7 +360,7 @@ void Generator::InvertGlyph(GlyphStruct *vGlyph)
 
 bool Generator::CreateImageBuffer()
 {
-	glfwMakeContextCurrent(MainFrame::g_GenerationThread);
+	GuiBackend::Instance()->MakeContextCurrent(GenerationThread::sGenerationThread);
 
 	bool res = false;
 
@@ -387,7 +387,7 @@ bool Generator::CreateImageBuffer()
 
 bool Generator::CreateImageBuffer(int vWidth, int vHeight)
 {
-	glfwMakeContextCurrent(MainFrame::g_GenerationThread);
+	GuiBackend::Instance()->MakeContextCurrent(GenerationThread::sGenerationThread);
 
 	bool res = false;
 
@@ -410,7 +410,7 @@ bool Generator::CreateImageBuffer(int vWidth, int vHeight)
 
 void Generator::FreeImageBuffer()
 {
-	glfwMakeContextCurrent(MainFrame::g_GenerationThread);
+	GuiBackend::Instance()->MakeContextCurrent(GenerationThread::sGenerationThread);
 
 	SAFE_DELETE_ARRAY(m_Params->m_ImageData);
 	m_Params->m_ImageDataSize = 0;
@@ -419,7 +419,7 @@ void Generator::FreeImageBuffer()
 void Generator::Upload1ChannelData(stbrp_coord *vX, stbrp_coord *vY,
 	msdfgen::Bitmap<float> *vBuffer, int vMaxWidth)
 {
-	glfwMakeContextCurrent(MainFrame::g_GenerationThread);
+	GuiBackend::Instance()->MakeContextCurrent(GenerationThread::sGenerationThread);
 
 	if (m_Params->bytesPerPixel == 3 || m_Params->bytesPerPixel == 1)
 	{
@@ -434,7 +434,7 @@ void Generator::Upload1ChannelData(stbrp_coord *vX, stbrp_coord *vY,
 				{
 					for (int i = 0; i < w; i++)
 					{
-						float red = vBuffer->operator()(i, j);
+                        float *red = vBuffer->operator()(i, j);
 
 						int xo = i + (int)*vX;
 						int yo = j + (int)*vY;
@@ -445,13 +445,13 @@ void Generator::Upload1ChannelData(stbrp_coord *vX, stbrp_coord *vY,
 						{
 							if (m_Params->bytesPerPixel == 3)
 							{
-								m_Params->m_ImageData[o + 0] = (GLubyte)ct::clamp<int>(int(red * 0x100), 0xff);
+								m_Params->m_ImageData[o + 0] = (GLubyte)ct::clamp<int>(int(red[0] * 0x100), 0xff);
 								m_Params->m_ImageData[o + 1] = m_Params->m_ImageData[o + 0];
 								m_Params->m_ImageData[o + 2] = m_Params->m_ImageData[o + 1];
 							}
 							else if (m_Params->bytesPerPixel == 1)
 							{
-								m_Params->m_ImageData[o + 0] = (GLubyte)ct::clamp<int>(int(red * 0x100), 0xff);
+								m_Params->m_ImageData[o + 0] = (GLubyte)ct::clamp<int>(int(red[0] * 0x100), 0xff);
 							}
 						}
 						else
@@ -465,14 +465,14 @@ void Generator::Upload1ChannelData(stbrp_coord *vX, stbrp_coord *vY,
 	}
 	else
 	{
-		LogStr("msdf only support RGB or ALPHA");
+		LogVarError("msdf only support RGB or ALPHA");
 	}
 }
 
 void Generator::Upload3ChannelData(stbrp_coord *vX, stbrp_coord *vY,
-	msdfgen::Bitmap<msdfgen::FloatRGB> *vBuffer, int vMaxWidth)
+	msdfgen::Bitmap<float, 3> *vBuffer, int vMaxWidth)
 {
-	glfwMakeContextCurrent(MainFrame::g_GenerationThread);
+	GuiBackend::Instance()->MakeContextCurrent(GenerationThread::sGenerationThread);
 
 	if (m_Params->bytesPerPixel == 3)
 	{
@@ -487,7 +487,7 @@ void Generator::Upload3ChannelData(stbrp_coord *vX, stbrp_coord *vY,
 				{
 					for (int i = 0; i < w; i++)
 					{
-						msdfgen::FloatRGB rgb = vBuffer->operator()(i, j);
+                        float* rgb = vBuffer->operator()(i, j);
 
 						int xo = i + (int)*vX;
 						int yo = j + (int)*vY;
@@ -498,9 +498,9 @@ void Generator::Upload3ChannelData(stbrp_coord *vX, stbrp_coord *vY,
 						{
 							if (m_Params->bytesPerPixel == 3)
 							{
-								m_Params->m_ImageData[o + 0] = (GLubyte)ct::clamp<int>(int(rgb.r * 0x100), 0xff);
-								m_Params->m_ImageData[o + 1] = (GLubyte)ct::clamp<int>(int(rgb.g * 0x100), 0xff);
-								m_Params->m_ImageData[o + 2] = (GLubyte)ct::clamp<int>(int(rgb.b * 0x100), 0xff);
+								m_Params->m_ImageData[o + 0] = (GLubyte)ct::clamp<int>(int(rgb[0] * 0x100), 0xff);
+								m_Params->m_ImageData[o + 1] = (GLubyte)ct::clamp<int>(int(rgb[1] * 0x100), 0xff);
+								m_Params->m_ImageData[o + 2] = (GLubyte)ct::clamp<int>(int(rgb[2] * 0x100), 0xff);
 							}
 						}
 						else
@@ -514,13 +514,13 @@ void Generator::Upload3ChannelData(stbrp_coord *vX, stbrp_coord *vY,
 	}
 	else
 	{
-		LogStr("msdf only support RGB");
+		LogVarError("msdf only support RGB");
 	}
 }
 
 void Generator::CreateAndUploadFontTexture(ct::ivec2 vSize, bool vJustUpdate)
 {
-	glfwMakeContextCurrent(MainFrame::g_GenerationThread);
+	GuiBackend::Instance()->MakeContextCurrent(GenerationThread::sGenerationThread);
 
 	if (m_Params->m_ImageData != 0 && m_Params->m_ImageDataSize > 0)
 	{
@@ -603,7 +603,7 @@ void Generator::CreateAndUploadFontTexture(ct::ivec2 vSize, bool vJustUpdate)
 
 void Generator::UpdateFontTexture(ct::fvec2 vOffset, ct::fvec2 vSize)
 {
-	glfwMakeContextCurrent(MainFrame::g_GenerationThread);
+	GuiBackend::Instance()->MakeContextCurrent(GenerationThread::sGenerationThread);
 
 	if (m_Params->m_ImageData != 0 && m_Params->m_ImageDataSize > 0 && m_Params->textureFont > 0)
 	{
@@ -664,7 +664,7 @@ void Generator::UpdateFontTexture(ct::fvec2 vOffset, ct::fvec2 vSize)
 
 bool Generator::SaveFontTextureToPng(std::string vFilePathName)
 {
-	glfwMakeContextCurrent(MainFrame::g_GenerationThread);
+	GuiBackend::Instance()->MakeContextCurrent(GenerationThread::sGenerationThread);
 
 	int res = stbi_write_png(vFilePathName.c_str(),
 		m_Params->texMaxSize.x,
