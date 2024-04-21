@@ -1,4 +1,4 @@
-// NoodlesPlate Copyright (C) 2017-2023 Stephane Cuillerdier aka Aiekick
+// NoodlesPlate Copyright (C) 2017-2024 Stephane Cuillerdier aka Aiekick
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -69,3 +69,20 @@
 #define SHADER_FRAGMENT_SHEET_NAME "Fragment"
 #define SHADER_GEOMETRY_SHEET_NAME "Geometry"
 #define SHADER_NOTES_SHEET_NAME "Notes"
+
+// SdfFontDesigner
+#define defaultCharSet "ABCDEFGHIJKLMNOPQRSTUVWXYZ\nabcdefghijklmnopqrstuvwxyz\n0123456789\n?.*+-/_'()&:,=!\" \\@"
+#define TRANSPARENCY_DAMIER_ZOOM 5.0f
+enum AlgoEnum {
+    ALGO_SDF = 0,  // MSDFGEN SDF
+    ALGO_PSDF,     // MSDFGEN PSEUDO SDF
+    ALGO_MSDF      // MSDFGEN MSDF
+};
+enum FontTextureTypeEnum {
+    FONT_TEXTURE_TYPE_BASE = 0,  // SDF FONT TEXTURE
+    FONT_TEXTURE_TYPE_RENDERED   // SHADER FONT TEXTURE
+};
+enum FontLoadingModeEnum {
+    FONT_LOADING_FROM_SYSTEM = 0,  // FONT from system32/fonts on windows
+    FONT_LOADING_FROM_FILE         // FONT from file path name
+};

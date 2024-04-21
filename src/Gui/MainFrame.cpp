@@ -1,4 +1,4 @@
-// NoodlesPlate Copyright (C) 2017-2023 Stephane Cuillerdier aka Aiekick
+// NoodlesPlate Copyright (C) 2017-2024 Stephane Cuillerdier aka Aiekick
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -54,34 +54,37 @@
 
 // this project
 #include <Headers/NoodlesPlateBuild.h>
-#include <Config/SettingsDlg.h>
-#include <Config/StaticConfig.h>
+#include <Systems/PictureExportSystem.h>
+#include <Systems/UrlLibrarySystem.h>
+#include <Systems/TemplateSystem.h>
+#include <Systems/VersionSystem.h>
 #include <Metrics/MetricSystem.h>
 #include <Backends/MainBackend.h>
-#include <Systems/PictureExportSystem.h>
-#include <Systems/TemplateSystem.h>
-#include <ImGuiThemeHelper.h>
-#include <Systems/UrlLibrarySystem.h>
-#include <Systems/VersionSystem.h>
+#include <Config/StaticConfig.h>
 #include <Systems/PathSystem.h>
+#include <Config/SettingsDlg.h>
+#include <ImGuiThemeHelper.h>
 #include <Messaging.h>
 
 // Panes
 #include <Panes/CodePane.h>
-#include <Panes/ConfigPane.h>
+#include <Panes/FontPane.h> // SdfFontDesigner
 #include <Panes/HelpPane.h>
 #include <Panes/InfosPane.h>
 #include <Panes/NodesPane.h>
-#include <Panes/TimeLinePane.h>
-#include <Panes/UniformsPane.h>
+#include <Panes/ConfigPane.h>
 #include <Panes/ConsolePane.h>
 #include <Panes/MessagePane.h>
+#include <Panes/TimeLinePane.h>
+#include <Panes/UniformsPane.h>
 #include <Panes/ProfilerPane.h>
 #include <Panes/InspectorPane.h>
-#include <Panes/ConfigSwitcherPane.h>
 #include <Panes/BufferPreview.h>
+#include <Panes/FontPreviewPane.h> // SdfFontDesigner
+#include <Panes/ConfigSwitcherPane.h>
 
 #include <Res/CustomFont.h>
+#include <Res/CustomFont2.h>
 
 #if defined(__WIN32__) || defined(WIN32) || defined(_WIN32) || defined(__WIN64__) || defined(WIN64) || defined(_WIN64) || defined(_MSC_VER)
 #include <ShlObj.h> // for quick acces places
@@ -166,13 +169,16 @@ bool MainFrame::Init() {
 #endif
         LayoutManager::Instance()->AddPane(BufferPreview::Instance(), ICON_NDP2_VIEW_GRID " Buffers Preview", "", "RIGHT", 0.3f, false, false);
 
+        // SdfFontDesigner
+        LayoutManager::Instance()->AddPane(FontPane::Instance(), ICON_NDP2_ALPHA " Sdf Font Designer", "", "LEFT", 0.3f, false, false);
+        LayoutManager::Instance()->AddPane(FontPreviewPane::Instance(), ICON_NDP2_SPELLCHECK " Sdf Font Designer Preview", "", "BOTTOM", 0.3f, false, false);
+
 #ifdef USE_VR
         VRGui::Instance()->SetCodeTree(MainBackend::Instance()->puCodeTree);
 #endif
         LayoutManager::Instance()->InitPanes();
 
-        Messaging::sMessagePaneId = ConsolePane::Instance()->GetFlag();
-    
+        Messaging::sMessagePaneId = ConsolePane::Instance()->GetFlag();    
 
         if (MainBackend::Instance()->Load(puFileToLoad)) {
             SaveConfigFile("config.xml");

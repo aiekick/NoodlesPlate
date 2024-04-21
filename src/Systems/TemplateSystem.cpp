@@ -1,4 +1,4 @@
-// NoodlesPlate Copyright (C) 2017-2023 Stephane Cuillerdier aka Aiekick
+// NoodlesPlate Copyright (C) 2017-2024 Stephane Cuillerdier aka Aiekick
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -276,8 +276,8 @@ void TemplateSystem::SetNameOfBuffers(const char * /*vFilter*/, IGFDUserDatas /*
 
 	for (auto it = puSelectedFileToCopy.newNames.begin(); it != puSelectedFileToCopy.newNames.end(); ++it)
 	{
-		ImGui::Text(it->first.c_str());
-		snprintf(buffer, 99, it->second.c_str());
+        ImGui::Text("%s", it->first.c_str());
+        snprintf(buffer, 99, "%s", it->second.c_str());
 		ImGui::PushID(ImGui::IncPUSHID());
 		auto isOk = puSelectedFileToCopy.errors[it->first];
 		ImGui::PushStyleColor(ImGuiCol_FrameBg, ImGui::GetUniformLocColor(isOk ? 1 : -1));
