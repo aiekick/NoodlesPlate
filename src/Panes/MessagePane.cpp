@@ -53,15 +53,6 @@ bool MessagePane::DrawPanes(const uint32_t& /*vCurrentFrame*/, bool* vOpened, Im
 {
 	IsThereSomeMessages(false);
 
-	if ((puIsThereSomeShaderErrors && puShowErrors) || (puIsThereSomeShaderWarnings && puShowWarnings))
-	{
-        LayoutManager::Instance()->ShowSpecificPane(GetFlag());  // open the message pane
-	}
-	else
-	{
-        LayoutManager::Instance()->HideSpecificPane(GetFlag());
-	}
-
 	if (vOpened && *vOpened)
 	{
 		static ImGuiWindowFlags flags =
@@ -150,7 +141,7 @@ bool MessagePane::DrawPanes(const uint32_t& /*vCurrentFrame*/, bool* vOpened, Im
 
 		ImGui::End();
 	}
-
+		
 	return false;
 }
 
@@ -284,4 +275,14 @@ void MessagePane::DrawToolBarButtons(float /*vWidth*/, ImFont* vFontSymbol) {
 			ImGui::PopStyleColor(8);
 		}
 	}
+}
+
+bool MessagePane::CanBeDisplayed() {
+    IsThereSomeMessages(false);
+    if ((puIsThereSomeShaderErrors && puShowErrors) || (puIsThereSomeShaderWarnings && puShowWarnings)) {
+        LayoutManager::Instance()->ShowSpecificPane(GetFlag());  // open the message pane
+        return true;
+    }
+    LayoutManager::Instance()->HideSpecificPane(GetFlag());
+    return false;
 }

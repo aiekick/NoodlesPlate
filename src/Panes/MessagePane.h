@@ -43,6 +43,8 @@ public:
 
 	void DrawToolBarButtons(float vWidth, ImFont* vFontSymbol);
 
+    bool CanBeDisplayed() override;
+
 public: // singleton
 	static std::shared_ptr<MessagePane> Instance()
 	{
