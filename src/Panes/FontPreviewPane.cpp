@@ -4,7 +4,7 @@
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -32,7 +32,7 @@
 
 #include <Project/ProjectFile.h>
 
-#include <cinttypes> // printf zu
+#include <cinttypes>  // printf zu
 
 FontPreviewPane::FontPreviewPane() = default;
 FontPreviewPane::~FontPreviewPane() = default;
@@ -41,77 +41,64 @@ FontPreviewPane::~FontPreviewPane() = default;
 //// OVERRIDES ////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////
 
-bool FontPreviewPane::Init()
-{
-	return true;
+bool FontPreviewPane::Init() {
+    return true;
 }
 
-void FontPreviewPane::Unit()
-{
-
+void FontPreviewPane::Unit() {
 }
 
-bool FontPreviewPane::DrawPanes(const uint32_t& /*vCurrentFrame*/, bool* vOpened, ImGuiContext* /*vContextPtr*/, void* /*vUserDatas*/)
-{
-	if (vOpened && *vOpened)
-	{
-		static ImGuiWindowFlags flags =
-			ImGuiWindowFlags_NoCollapse |
-			ImGuiWindowFlags_NoBringToFrontOnFocus |
-			ImGuiWindowFlags_MenuBar;
-        if (ImGui::Begin(GetName().c_str(), vOpened, flags))
-		{
+bool FontPreviewPane::DrawPanes(const uint32_t& /*vCurrentFrame*/, bool* vOpened, ImGuiContext* /*vContextPtr*/, void* /*vUserDatas*/) {
+    if (vOpened && *vOpened) {
+        static ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_MenuBar;
+        if (ImGui::Begin(GetName().c_str(), vOpened, flags)) {
 #ifdef USE_DECORATIONS_FOR_RESIZE_CHILD_WINDOWS
-			auto win = ImGui::GetCurrentWindowRead();
-			if (win->Viewport->Idx != 0)
-				flags |= ImGuiWindowFlags_NoResize;// | ImGuiWindowFlags_NoTitleBar;
-			else
-				flags = ImGuiWindowFlags_NoCollapse |
-				ImGuiWindowFlags_NoBringToFrontOnFocus |
-				ImGuiWindowFlags_MenuBar;
+            auto win = ImGui::GetCurrentWindowRead();
+            if (win->Viewport->Idx != 0)
+                flags |= ImGuiWindowFlags_NoResize;  // | ImGuiWindowFlags_NoTitleBar;
+            else
+                flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_MenuBar;
 #endif
-			if (ProjectFile::Instance()->IsLoaded()) {}
+            if (ProjectFile::Instance()->IsLoaded()) {
+            }
 
-			if (ImGui::BeginMenuBar())
-			{
-				ImGui::EndMenuBar();
-			}
-		}
+            if (ImGui::BeginMenuBar()) {
+                ImGui::EndMenuBar();
+            }
+        }
 
-		MainFrame::sAnyWindowsHovered |= ImGui::IsWindowHovered();
+        MainFrame::sAnyWindowsHovered |= ImGui::IsWindowHovered();
 
-		ImGui::End();
-	}
+        ImGui::End();
+    }
 
-	return false;
+    return false;
 }
 
-std::string FontPreviewPane::getXml(const std::string& vOffset, const std::string& vUserDatas)
-{
-	UNUSED(vOffset);
-	UNUSED(vUserDatas);
+std::string FontPreviewPane::getXml(const std::string& vOffset, const std::string& vUserDatas) {
+    UNUSED(vOffset);
+    UNUSED(vUserDatas);
 
-	std::string str;
+    std::string str;
 
-	return str;
+    return str;
 }
 
-bool FontPreviewPane::setFromXml(tinyxml2::XMLElement* vElem, tinyxml2::XMLElement* vParent, const std::string& vUserDatas)
-{
-	UNUSED(vUserDatas);
+bool FontPreviewPane::setFromXml(tinyxml2::XMLElement* vElem, tinyxml2::XMLElement* vParent, const std::string& vUserDatas) {
+    UNUSED(vUserDatas);
 
-	// The value of this child identifies the name of this element
-	std::string strName;
-	std::string strValue;
-	std::string strParentName;
+    // The value of this child identifies the name of this element
+    std::string strName;
+    std::string strValue;
+    std::string strParentName;
 
-	strName = vElem->Value();
-	if (vElem->GetText())
-		strValue = vElem->GetText();
-	if (vParent != nullptr)
-		strParentName = vParent->Value();
+    strName = vElem->Value();
+    if (vElem->GetText())
+        strValue = vElem->GetText();
+    if (vParent != nullptr)
+        strParentName = vParent->Value();
 
-	return true;
+    return true;
 }
 
 bool FontPreviewPane::CanBeDisplayed() {

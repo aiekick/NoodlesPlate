@@ -4,7 +4,7 @@
 
 bool FontDesigner::init() {
     GenerationThread::sGenerationThread = GuiBackend::Instance()->CreateGuiBackendWindow_Hidden(1, 1, "SdfFontDesigner", MainBackend::sMainThread);
-    m_FontExplorerPtr = std::make_unique<FontExplorer>(); 
+    m_FontExplorerPtr = std::make_unique<FontExplorer>();
     m_FontExplorerPtr->Init();
     return false;
 }
@@ -598,7 +598,7 @@ void FontDesigner::m_displayGlyphSelection() {
                 for (auto itSel = m_MultiSelection.begin(); itSel != m_MultiSelection.end(); ++itSel) {
                     auto glyph = GenerationThread::Params->GetGlyph(itSel->first);
                     if (glyph) {
-                        // on supprime les char selectionné du charset
+                        // on supprime les char selectionnï¿½ du charset
                         ct::replaceString(_charSet, ct::toStr(glyph->c), "");
                     }
                 }
@@ -700,7 +700,7 @@ void FontDesigner::m_displayGlyphSelection() {
                         if (removeFromCharSet) {
                             std::string _charSet = std::string(charSetBuffer);
 
-                            // on supprime les char selectionné du charset
+                            // on supprime les char selectionnï¿½ du charset
                             ct::replaceString(_charSet, ct::toStr(glyph->c), "");
 
                             // on applique le nouveau charset
@@ -1061,7 +1061,7 @@ void FontDesigner::UpdateFontHeight() {
 
             int advx = (glyph->advx) * GenerationThread::Params->scale + pdx;
 
-            m_TestFont->AddGlyph(&m_TestFontConfig, (ImWchar) c, hbx, bh - hby, hbx + sx, bh - hby + sy, glyph->rc.x, glyph->rc.y, glyph->rc.z, glyph->rc.w, advx);
+            m_TestFont->AddGlyph(&m_TestFontConfig, (ImWchar)c, hbx, bh - hby, hbx + sx, bh - hby + sy, glyph->rc.x, glyph->rc.y, glyph->rc.z, glyph->rc.w, advx);
         }
 
         m_TestFont->BuildLookupTable();
@@ -1104,7 +1104,7 @@ void FontDesigner::LoadBitmapFontIntoImguiFont() {
 }
 
 void FontDesigner::UpdateFontTexFromFBO() {
-    //m_TestFontAtlas.TexID = (ImTextureID)m_Font_RenderPack->GetTextureId(m_PreviewBufferId);
+    // m_TestFontAtlas.TexID = (ImTextureID)m_Font_RenderPack->GetTextureId(m_PreviewBufferId);
 }
 
 void FontDesigner::ExportToFntFile() {
@@ -1218,10 +1218,10 @@ void FontDesigner::RefreshSelectionFromNewFontMap() {
 
     // GenerationThread::Params->ModifiedGlyphs.clear();
 
-    // on va maj les coordonnées du char
+    // on va maj les coordonnï¿½es du char
     // car au rehcragment du sdf, le pointeur sur le glyph peut pointer sur un autre esapce memoire
-    // hors zone alloué ou tout bonnement sur le mauvais glyph
-    // on avait stocké le char selectionné pour ca, pour pouvoir rerooter
+    // hors zone allouï¿½ ou tout bonnement sur le mauvais glyph
+    // on avait stockï¿½ le char selectionnï¿½ pour ca, pour pouvoir rerooter
     if (m_CurrentSelectedChar != 0) {
         auto glyph = GenerationThread::Params->GetGlyph(m_CurrentSelectedChar);
         if (glyph != 0) {
@@ -1359,7 +1359,7 @@ void FontDesigner::StartWorkerThread(bool vJustUpdate) {
 }
 
 void FontDesigner::StopWorkerThread() {
-    //m_GenerationThread.StopWorkerThread();
+    // m_GenerationThread.StopWorkerThread();
 }
 
 void FontDesigner::WorkerThreadStoppedOrFinished() {

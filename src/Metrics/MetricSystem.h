@@ -4,7 +4,7 @@
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -22,49 +22,51 @@
 #include <Metrics/Win/KGpuMon.h>
 #endif
 
-class MetricSystem
-{
+class MetricSystem {
 private:
-	bool m_ApiInitialized = false;
+    bool m_ApiInitialized = false;
 #ifdef USE_GPU_METRIC
-	KGpuMon m_KGpuMon;
+    KGpuMon m_KGpuMon;
 #endif
 
 private:
-	ct::ActionTime puActionTime_GPUChecker;
-	ct::ActionTime puActionTime_MemoryChecker;
+    ct::ActionTime puActionTime_GPUChecker;
+    ct::ActionTime puActionTime_MemoryChecker;
 
 public:
-	static MetricSystem* Instance()
-	{
-		static MetricSystem _instance;
-		return &_instance;
-	}
+    static MetricSystem* Instance() {
+        static MetricSystem _instance;
+        return &_instance;
+    }
 
 protected:
-	MetricSystem(); // Prevent construction
-	MetricSystem(const MetricSystem&) = default; // Prevent construction by copying
-	MetricSystem& operator =(const MetricSystem&) { return *this; }; // Prevent assignment
-	~MetricSystem(); // Prevent unwanted destruction
+    MetricSystem();                               // Prevent construction
+    MetricSystem(const MetricSystem&) = default;  // Prevent construction by copying
+    MetricSystem& operator=(const MetricSystem&) {
+        return *this;
+    };                // Prevent assignment
+    ~MetricSystem();  // Prevent unwanted destruction
 
 public:
-	void Init();
-	void Unit();
+    void Init();
+    void Unit();
 
-	void DrawImGui();
-	void DrawTooltip(ImVec2 vPos);
-	void CaptureDatas(long vDelayInMs = 500);
-	bool GetAppMemoryString(int vDelay, std::string* vStringToDisplay);
-	bool IsOK() { return m_ApiInitialized; }
+    void DrawImGui();
+    void DrawTooltip(ImVec2 vPos);
+    void CaptureDatas(long vDelayInMs = 500);
+    bool GetAppMemoryString(int vDelay, std::string* vStringToDisplay);
+    bool IsOK() {
+        return m_ApiInitialized;
+    }
 
 private:
 #ifdef USE_GPU_METRIC
 
-	void CaptureAndLogDatas();
-	void DrawGpu(const GpuInfoStruct& vGpuInfoStruct);
-	void DrawDisplayDeviceInfos(size_t vDisplayDeviceIdx);
-	void DrawMemoryInfos(const GpuInfoStruct& vGpuInfoStruct);
-	void DrawGpuInfos(const GpuInfoStruct& vGpuInfoStruct);
+    void CaptureAndLogDatas();
+    void DrawGpu(const GpuInfoStruct& vGpuInfoStruct);
+    void DrawDisplayDeviceInfos(size_t vDisplayDeviceIdx);
+    void DrawMemoryInfos(const GpuInfoStruct& vGpuInfoStruct);
+    void DrawGpuInfos(const GpuInfoStruct& vGpuInfoStruct);
 #endif
-	std::string GetMemoryUsage();
+    std::string GetMemoryUsage();
 };

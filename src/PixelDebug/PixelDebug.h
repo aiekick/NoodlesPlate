@@ -4,7 +4,7 @@
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -26,37 +26,35 @@
 
 class CameraSystem;
 class RenderPack;
-class PixelDebug : public PixelDebugAbstract, public conf::ConfigAbstract
-{
+class PixelDebug : public PixelDebugAbstract, public conf::ConfigAbstract {
 public:
-	//bool puActivate_PixelDebug_DF;
+    // bool puActivate_PixelDebug_DF;
 
 private:
-	PixelDebugPoint puMouseDebugPoint;
-	PixelDebugLine puLineDebugPoint;
-	PixelDebugNormal puNormalDebugPoint;
-	//PixelDebugDistanceField puDFDebugPoint;
-	PixelDebugGizmo puGizmoDebugPoint;
+    PixelDebugPoint puMouseDebugPoint;
+    PixelDebugLine puLineDebugPoint;
+    PixelDebugNormal puNormalDebugPoint;
+    // PixelDebugDistanceField puDFDebugPoint;
+    PixelDebugGizmo puGizmoDebugPoint;
 
 private:
-	ct::ActionTime puActionTime;
-	int puMeasureFrequencie = 0;
+    ct::ActionTime puActionTime;
+    int puMeasureFrequencie = 0;
 
 public:
-	PixelDebug();
-	~PixelDebug();
-	
-	void Init(RenderPackWeak vRenderPack = RenderPackWeak()) override;
-	bool IsActive() override;
-	void DrawMenu() override;
-	void DrawTooltips(RenderPackWeak vRenderPack, float vDisplayQuality, CameraSystem *vCamera = nullptr) override;
-	void DrawPane(RenderPackWeak vRenderPack, float vDisplayQuality, CameraSystem *vCamera = nullptr) override;
-	void Capture(RenderPackWeak vRenderPack, float vDisplayQuality, CameraSystem *vCamera = nullptr) override;
-	void Resize(RenderPackWeak vRenderPack, float vDisplayQuality, CameraSystem *vCamera = nullptr) override;
-	bool NeedRefresh() override;
+    PixelDebug();
+    ~PixelDebug();
+
+    void Init(RenderPackWeak vRenderPack = RenderPackWeak()) override;
+    bool IsActive() override;
+    void DrawMenu() override;
+    void DrawTooltips(RenderPackWeak vRenderPack, float vDisplayQuality, CameraSystem* vCamera = nullptr) override;
+    void DrawPane(RenderPackWeak vRenderPack, float vDisplayQuality, CameraSystem* vCamera = nullptr) override;
+    void Capture(RenderPackWeak vRenderPack, float vDisplayQuality, CameraSystem* vCamera = nullptr) override;
+    void Resize(RenderPackWeak vRenderPack, float vDisplayQuality, CameraSystem* vCamera = nullptr) override;
+    bool NeedRefresh() override;
 
 public:
-	std::string getXml(const std::string& vOffset, const std::string& vUserDatas) override;
-	bool setFromXml(tinyxml2::XMLElement* vElem, tinyxml2::XMLElement* vParent, const std::string& vUserDatas) override;
-
+    std::string getXml(const std::string& vOffset, const std::string& vUserDatas) override;
+    bool setFromXml(tinyxml2::XMLElement* vElem, tinyxml2::XMLElement* vParent, const std::string& vUserDatas) override;
 };

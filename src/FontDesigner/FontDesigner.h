@@ -95,13 +95,7 @@ private:
     void StopWorkerThread();
     void WorkerThreadStoppedOrFinished();
     void SetCharset(std::string vCharSet);
-	void UpdateUniforms(
-		RenderPackWeak vRenderPack, 
-		UniformVariantPtr vUniPtr, 
-		DisplayQualityType vDisplayQuality, 
-		MouseInterface* vMouse, 
-		CameraInterface* vCamera);
-	
+    void UpdateUniforms(RenderPackWeak vRenderPack, UniformVariantPtr vUniPtr, DisplayQualityType vDisplayQuality, MouseInterface* vMouse, CameraInterface* vCamera);
 
 public:
     static FontDesigner* Instance() {

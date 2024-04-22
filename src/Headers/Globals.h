@@ -4,7 +4,7 @@
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -15,18 +15,18 @@
 
 #pragma once
 
-//DEFINES
-//#define MESHIZER_VERBOSE_MODE
-//#define USE_EMBEDDED_SCRIPTS
+// DEFINES
+// #define MESHIZER_VERBOSE_MODE
+// #define USE_EMBEDDED_SCRIPTS
 #define SAVE_SHADERS_TO_FILE_FOR_DEBUG_WHEN_ERRORS
 #define SAVE_SHADERS_TO_FILE_FOR_DEBUG_WHEN_NO_ERRORS
-//#define SHOW_LOGS_FOR_TEMPLATES
+// #define SHOW_LOGS_FOR_TEMPLATES
 #define USE_HELP_IN_APP
 #define USE_COOLBAR
-//#define USE_NODEGRPAH
-//#define USE_DESKTOP_TEXTURE
+// #define USE_NODEGRPAH
+// #define USE_DESKTOP_TEXTURE
 #define USE_DECORATIONS_FOR_RESIZE_CHILD_WINDOWS
-//#define USE_SOUNDS
+// #define USE_SOUNDS
 
 // RenderPacks
 #define RP_MAIN 0
@@ -37,7 +37,7 @@
 // VARS
 #define MAX_CONFIG_COUNT_PER_SHADER_TYPE 1000
 #define MAX_UNIFORM_COMMENT_BUFFER_SIZE 512
-#define MAX_UNIFORM_BUFFER_SIZE 1024 
+#define MAX_UNIFORM_BUFFER_SIZE 1024
 #define DEFAULT_RENDERING_QUALITY 1.0f
 
 #define HEADER_PANE_HEIGHT 32.0f
@@ -45,8 +45,8 @@
 #define PALETTE_PANE_WIDTH 120.0f
 #define MAX_SEARCH_SIZE 255
 #define MAX_CHARSET_SIZE 1024
-#define MAX_OPENCL_BUFFER_ERROR_SIZE 2048 
-#define MAX_SHADER_BUFFER_ERROR_SIZE 2048 
+#define MAX_OPENCL_BUFFER_ERROR_SIZE 2048
+#define MAX_SHADER_BUFFER_ERROR_SIZE 2048
 #define MAX_FILE_DIALOG_NAME_BUFFER 1024
 #define SHADER_UNIFORM_FIRST_COLUMN_WIDTH 150.0f
 #define TRANSPARENCY_DAMIER_ZOOM 5.0f

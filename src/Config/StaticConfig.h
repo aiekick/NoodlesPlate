@@ -4,7 +4,7 @@
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -23,27 +23,27 @@ on doit utiliser cette classe dans les cas :
 - quand on veut avoir des parametres globaux li� au soft et non a une classe
 */
 
-class StaticConfig : public conf::ConfigAbstract
-{
-public: // params
-	bool puUseTransparancy = false;
-	float puGlobalUIScale = 1.0f;
-	bool puEnableDPISupport = false;
+class StaticConfig : public conf::ConfigAbstract {
+public:  // params
+    bool puUseTransparancy = false;
+    float puGlobalUIScale = 1.0f;
+    bool puEnableDPISupport = false;
 
 public:
-	static StaticConfig* Instance()
-	{
-		static StaticConfig _instance;
-		return &_instance;
-	}
+    static StaticConfig* Instance() {
+        static StaticConfig _instance;
+        return &_instance;
+    }
 
 protected:
-	StaticConfig(); // Prevent construction
-	StaticConfig(const StaticConfig&) {}; // Prevent construction by copying
-	StaticConfig& operator =(const StaticConfig&) { return *this; }; // Prevent assignment
-	~StaticConfig() = default; // Prevent unwanted destruction
+    StaticConfig();                       // Prevent construction
+    StaticConfig(const StaticConfig&){};  // Prevent construction by copying
+    StaticConfig& operator=(const StaticConfig&) {
+        return *this;
+    };                          // Prevent assignment
+    ~StaticConfig() = default;  // Prevent unwanted destruction
 
 public:
-	std::string getXml(const std::string& vOffset, const std::string& vUserDatas) override;
-	bool setFromXml(tinyxml2::XMLElement* vElem, tinyxml2::XMLElement* vParent, const std::string& vUserDatas) override;
+    std::string getXml(const std::string& vOffset, const std::string& vUserDatas) override;
+    bool setFromXml(tinyxml2::XMLElement* vElem, tinyxml2::XMLElement* vParent, const std::string& vUserDatas) override;
 };

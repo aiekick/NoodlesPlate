@@ -1,8 +1,8 @@
-/* 
+/*
    Not found the orioginla code
    so dont know any infos about the licensing
 */
- 
+
 // This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
@@ -14,46 +14,27 @@
 #include <ImGuiPack.h>
 
 KGpuMon::KGpuMon(void) = default;
-KGpuMon::~KGpuMon(void)
-{
+KGpuMon::~KGpuMon(void) {
     Unit();
 }
 
 // display information about the calling function and related error
-void ShowErrorDetails(const NvAPI_Status nvRetVal, const char* pFunctionName)
-{
-    switch (nvRetVal)
-    {
-    case NVAPI_ERROR:
-        LogVarError("[%s] ERROR: NVAPI_ERROR", pFunctionName);
-        break;
-    case NVAPI_INVALID_ARGUMENT:
-        LogVarError("[%s] ERROR: NVAPI_INVALID_ARGUMENT - pDynamicPstatesInfo is NULL ", pFunctionName);
-        break;
-    case NVAPI_HANDLE_INVALIDATED:
-        LogVarError("[%s] ERROR: NVAPI_HANDLE_INVALIDATED", pFunctionName);
-        break;
-    case NVAPI_EXPECTED_PHYSICAL_GPU_HANDLE:
-        LogVarError("[%s] ERROR: NVAPI_EXPECTED_PHYSICAL_GPU_HANDLE", pFunctionName);
-        break;
-    case NVAPI_INCOMPATIBLE_STRUCT_VERSION:
-        LogVarError("[%s] ERROR: NVAPI_INCOMPATIBLE_STRUCT_VERSION", pFunctionName);
-        break;
-    case NVAPI_NOT_SUPPORTED:
-        LogVarError("[%s] ERROR: NVAPI_NOT_SUPPORTED", pFunctionName);
-        break;
-    default:
-        LogVarError("[%s] ERROR: 0x%x", pFunctionName, nvRetVal);
-        break;
+void ShowErrorDetails(const NvAPI_Status nvRetVal, const char* pFunctionName) {
+    switch (nvRetVal) {
+        case NVAPI_ERROR: LogVarError("[%s] ERROR: NVAPI_ERROR", pFunctionName); break;
+        case NVAPI_INVALID_ARGUMENT: LogVarError("[%s] ERROR: NVAPI_INVALID_ARGUMENT - pDynamicPstatesInfo is NULL ", pFunctionName); break;
+        case NVAPI_HANDLE_INVALIDATED: LogVarError("[%s] ERROR: NVAPI_HANDLE_INVALIDATED", pFunctionName); break;
+        case NVAPI_EXPECTED_PHYSICAL_GPU_HANDLE: LogVarError("[%s] ERROR: NVAPI_EXPECTED_PHYSICAL_GPU_HANDLE", pFunctionName); break;
+        case NVAPI_INCOMPATIBLE_STRUCT_VERSION: LogVarError("[%s] ERROR: NVAPI_INCOMPATIBLE_STRUCT_VERSION", pFunctionName); break;
+        case NVAPI_NOT_SUPPORTED: LogVarError("[%s] ERROR: NVAPI_NOT_SUPPORTED", pFunctionName); break;
+        default: LogVarError("[%s] ERROR: 0x%x", pFunctionName, nvRetVal); break;
     }
 }
 
-bool KGpuMon::Init()
-{
+bool KGpuMon::Init() {
     // Before any of the NVAPI functions can be used NvAPI_Initialize() must be called
     NvAPI_Status nvRetValue = NvAPI_Initialize();
-    if (NVAPI_OK != nvRetValue)
-    {
+    if (NVAPI_OK != nvRetValue) {
         ShowErrorDetails(nvRetValue, "NvAPI_Initialize");
         return false;
     }
@@ -62,25 +43,21 @@ bool KGpuMon::Init()
     NvU32 uiNumGPUs = 0;
     NvPhysicalGpuHandle nvGPUHandle[NVAPI_MAX_PHYSICAL_GPUS];
     nvRetValue = NvAPI_EnumPhysicalGPUs(nvGPUHandle, &uiNumGPUs);
-    if (NVAPI_OK != nvRetValue)
-    {
+    if (NVAPI_OK != nvRetValue) {
         ShowErrorDetails(nvRetValue, "NvAPI_EnumPhysicalGPUs");
         NvAPI_Unload();
         return false;
     }
 
     // In the case that no GPUs were detected
-    if (0 == uiNumGPUs)
-    {
+    if (0 == uiNumGPUs) {
         LogVarError("No NVIDIA GPUs were detected.\r\n");
         NvAPI_Unload();
         return false;
     }
 
-    if (EnupuDisplayDevices())
-    {
-        for (auto& device : pupDisplayDevices)
-        {
+    if (EnupuDisplayDevices()) {
+        for (auto& device : pupDisplayDevices) {
             if (!GetGpuHandles(device.nvDisplayHandle, device))
                 return false;
         }
@@ -89,18 +66,15 @@ bool KGpuMon::Init()
     return true;
 }
 
-bool KGpuMon::Unit()
-{
+bool KGpuMon::Unit() {
     pupDisplayDevices.clear();
     NvAPI_Unload();
 
     return true;
 }
 
-void KGpuMon::CaptureGPUDatas()
-{
-    for (auto& device : pupDisplayDevices)
-    {
+void KGpuMon::CaptureGPUDatas() {
+    for (auto& device : pupDisplayDevices) {
         GetDisplayDeviceGpuUsages(device.nvDisplayHandle, device);
         GetDisplayDeviceMemoryInfo(device.nvDisplayHandle, device);
         GetDisplayDeviceGpuTemperatures(device.nvDisplayHandle, device);
@@ -110,29 +84,24 @@ void KGpuMon::CaptureGPUDatas()
     }
 }
 
-std::vector<DisplayCardInfosStruct>* KGpuMon::GetDevices()
-{
+std::vector<DisplayCardInfosStruct>* KGpuMon::GetDevices() {
     return &pupDisplayDevices;
 }
 
-DisplayCardInfosStruct* KGpuMon::GetDevice(size_t vDeviceId)
-{
+DisplayCardInfosStruct* KGpuMon::GetDevice(size_t vDeviceId) {
     if (pupDisplayDevices.size() > vDeviceId)
         return &pupDisplayDevices[vDeviceId];
     return nullptr;
 }
 
-size_t KGpuMon::EnupuDisplayDevices()
-{
+size_t KGpuMon::EnupuDisplayDevices() {
     NvAPI_Status nvResult = NVAPI_ERROR;
     NvDisplayHandle nvDisplayDeviceHandle = 0;
 
-    for (int nIndex = 0; nIndex < MAX_DISPLAY_CARDS; ++nIndex)
-    {
+    for (int nIndex = 0; nIndex < MAX_DISPLAY_CARDS; ++nIndex) {
         nvResult = NvAPI_EnumNvidiaDisplayHandle(nIndex, &nvDisplayDeviceHandle);
-        if (nvResult == NVAPI_OK)
-        {
-            if (puNvDisplayHandles.find(nvDisplayDeviceHandle) == puNvDisplayHandles.end()) // non trouvé
+        if (nvResult == NVAPI_OK) {
+            if (puNvDisplayHandles.find(nvDisplayDeviceHandle) == puNvDisplayHandles.end())  // non trouvé
             {
                 puNvDisplayHandles.emplace(nvDisplayDeviceHandle);
 
@@ -146,8 +115,7 @@ size_t KGpuMon::EnupuDisplayDevices()
     return pupDisplayDevices.size();
 }
 
-bool KGpuMon::GetGpuHandles(const NvDisplayHandle nvDisplayHandle, DisplayCardInfosStruct& vDisplayDeviceInfo)
-{
+bool KGpuMon::GetGpuHandles(const NvDisplayHandle nvDisplayHandle, DisplayCardInfosStruct& vDisplayDeviceInfo) {
     bool bResult = false;
 
     NvAPI_Status nvStatus;
@@ -158,28 +126,25 @@ bool KGpuMon::GetGpuHandles(const NvDisplayHandle nvDisplayHandle, DisplayCardIn
 
     pnvHandles = new NvPhysicalGpuHandle[NVAPI_MAX_PHYSICAL_GPUS];
     nvStatus = NvAPI_GetPhysicalGPUsFromDisplay(nvDisplayHandle, pnvHandles, &uiGpuCount);
-    if (nvStatus == NVAPI_OK)
-    {
+    if (nvStatus == NVAPI_OK) {
         vDisplayDeviceInfo.info.gpuCount = ct::mini<uint32_t>(uiGpuCount, MAX_GPU_NUM);
-        for (nIndex = 0; nIndex < vDisplayDeviceInfo.info.gpuCount; ++nIndex)
-        {
+        for (nIndex = 0; nIndex < vDisplayDeviceInfo.info.gpuCount; ++nIndex) {
             vDisplayDeviceInfo.info.gpuInfo[nIndex].nvGpuHandle = pnvHandles[nIndex];
         }
 
         bResult = true;
     }
 
-    delete[]pnvHandles;
+    delete[] pnvHandles;
     pnvHandles = 0;
 
     return bResult;
 }
 
-bool KGpuMon::GetDisplayDeviceGpuUsages(const NvDisplayHandle nvDisplayHandle, DisplayCardInfosStruct& vDisplayDeviceInfo)
-{
+bool KGpuMon::GetDisplayDeviceGpuUsages(const NvDisplayHandle nvDisplayHandle, DisplayCardInfosStruct& vDisplayDeviceInfo) {
     UNUSED(nvDisplayHandle);
     UNUSED(vDisplayDeviceInfo);
-    
+
     bool bResult = false;
 
     /*
@@ -204,20 +169,16 @@ bool KGpuMon::GetDisplayDeviceGpuUsages(const NvDisplayHandle nvDisplayHandle, D
     return bResult;
 }
 
-bool KGpuMon::GetDisplayDeviceMemoryInfo(const NvDisplayHandle nvDisplayHandle, DisplayCardInfosStruct& vDisplayDeviceInfo)
-{
+bool KGpuMon::GetDisplayDeviceMemoryInfo(const NvDisplayHandle nvDisplayHandle, DisplayCardInfosStruct& vDisplayDeviceInfo) {
     UNUSED(nvDisplayHandle);
 
-    if (vDisplayDeviceInfo.info.gpuCount)
-    {
+    if (vDisplayDeviceInfo.info.gpuCount) {
         NV_DISPLAY_DRIVER_MEMORY_INFO deviceMemoryStatus;
         deviceMemoryStatus.version = NV_DISPLAY_DRIVER_MEMORY_INFO_VER;
-        for (size_t nIndex = 0; nIndex < vDisplayDeviceInfo.info.gpuCount; ++nIndex)
-        {
+        for (size_t nIndex = 0; nIndex < vDisplayDeviceInfo.info.gpuCount; ++nIndex) {
             vDisplayDeviceInfo.info.gpuInfo[nIndex].memsFound = false;
             auto nvRetValue = NvAPI_GPU_GetMemoryInfo(vDisplayDeviceInfo.info.gpuInfo[nIndex].nvGpuHandle, (NV_DISPLAY_DRIVER_MEMORY_INFO*)&deviceMemoryStatus);
-            if (nvRetValue == NVAPI_OK)
-            {
+            if (nvRetValue == NVAPI_OK) {
                 vDisplayDeviceInfo.info.gpuInfo[nIndex].mem = deviceMemoryStatus;
                 vDisplayDeviceInfo.info.gpuInfo[nIndex].memsFound = true;
             }
@@ -225,23 +186,20 @@ bool KGpuMon::GetDisplayDeviceMemoryInfo(const NvDisplayHandle nvDisplayHandle, 
 
         return true;
     }
-    
 
     return false;
 }
 
-bool KGpuMon::GetDisplayDeviceGpuTemperatures(const NvDisplayHandle nvDisplayHandle, DisplayCardInfosStruct& vDisplayDeviceInfo)
-{
+bool KGpuMon::GetDisplayDeviceGpuTemperatures(const NvDisplayHandle nvDisplayHandle, DisplayCardInfosStruct& vDisplayDeviceInfo) {
     UNUSED(nvDisplayHandle);
 
     NV_GPU_THERMAL_SETTINGS temperatureInfo;
     temperatureInfo.version = NV_GPU_THERMAL_SETTINGS_VER_2;
-    for (size_t nIndex = 0U; nIndex < vDisplayDeviceInfo.info.gpuCount; ++nIndex)
-    {
+    for (size_t nIndex = 0U; nIndex < vDisplayDeviceInfo.info.gpuCount; ++nIndex) {
         vDisplayDeviceInfo.info.gpuInfo[nIndex].tempsFound = false;
-        auto nvRetValue = NvAPI_GPU_GetThermalSettings(vDisplayDeviceInfo.info.gpuInfo[nIndex].nvGpuHandle, NVAPI_THERMAL_TARGET_ALL, (NV_GPU_THERMAL_SETTINGS *)&temperatureInfo);
-        if (nvRetValue == NVAPI_OK)
-        {
+        auto nvRetValue =
+            NvAPI_GPU_GetThermalSettings(vDisplayDeviceInfo.info.gpuInfo[nIndex].nvGpuHandle, NVAPI_THERMAL_TARGET_ALL, (NV_GPU_THERMAL_SETTINGS*)&temperatureInfo);
+        if (nvRetValue == NVAPI_OK) {
             vDisplayDeviceInfo.info.gpuInfo[nIndex].temp = temperatureInfo;
             vDisplayDeviceInfo.info.gpuInfo[nIndex].tempsFound = true;
         }
@@ -252,17 +210,14 @@ bool KGpuMon::GetDisplayDeviceGpuTemperatures(const NvDisplayHandle nvDisplayHan
     return false;
 }
 
-bool KGpuMon::GetDisplayDeviceGpuTachometers(const NvDisplayHandle nvDisplayHandle, DisplayCardInfosStruct& vDisplayDeviceInfo)
-{
+bool KGpuMon::GetDisplayDeviceGpuTachometers(const NvDisplayHandle nvDisplayHandle, DisplayCardInfosStruct& vDisplayDeviceInfo) {
     UNUSED(nvDisplayHandle);
 
     NvU32 nTacho = 0;
-    for (size_t nIndex = 0U; nIndex < vDisplayDeviceInfo.info.gpuCount; ++nIndex)
-    {
+    for (size_t nIndex = 0U; nIndex < vDisplayDeviceInfo.info.gpuCount; ++nIndex) {
         vDisplayDeviceInfo.info.gpuInfo[nIndex].tachosFound = false;
         auto nvRetValue = NvAPI_GPU_GetTachReading(vDisplayDeviceInfo.info.gpuInfo[nIndex].nvGpuHandle, &nTacho);
-        if (nvRetValue == NVAPI_OK)
-        {
+        if (nvRetValue == NVAPI_OK) {
             vDisplayDeviceInfo.info.gpuInfo[nIndex].tacho = nTacho;
             vDisplayDeviceInfo.info.gpuInfo[nIndex].tachosFound = true;
         }
@@ -273,8 +228,7 @@ bool KGpuMon::GetDisplayDeviceGpuTachometers(const NvDisplayHandle nvDisplayHand
     return false;
 }
 
-bool KGpuMon::GetDisplayDeviceGpuClock(const NvDisplayHandle nvDisplayHandle, DisplayCardInfosStruct& vDisplayDeviceInfo)
-{
+bool KGpuMon::GetDisplayDeviceGpuClock(const NvDisplayHandle nvDisplayHandle, DisplayCardInfosStruct& vDisplayDeviceInfo) {
     UNUSED(nvDisplayHandle);
 
     NV_GPU_CLOCK_FREQUENCIES clockInfo;
@@ -283,8 +237,7 @@ bool KGpuMon::GetDisplayDeviceGpuClock(const NvDisplayHandle nvDisplayHandle, Di
     if (vDisplayDeviceInfo.info.gpuCount > 0) {
         for (size_t nIndex = 0U; nIndex < vDisplayDeviceInfo.info.gpuCount; ++nIndex) {
             vDisplayDeviceInfo.info.gpuInfo[nIndex].clocksFound = false;
-            auto nvRetValue =
-                NvAPI_GPU_GetAllClockFrequencies(vDisplayDeviceInfo.info.gpuInfo[nIndex].nvGpuHandle, (NV_GPU_CLOCK_FREQUENCIES*)&clockInfo);
+            auto nvRetValue = NvAPI_GPU_GetAllClockFrequencies(vDisplayDeviceInfo.info.gpuInfo[nIndex].nvGpuHandle, (NV_GPU_CLOCK_FREQUENCIES*)&clockInfo);
             if (nvRetValue == NVAPI_OK) {
                 vDisplayDeviceInfo.info.gpuInfo[nIndex].clock = clockInfo;
                 vDisplayDeviceInfo.info.gpuInfo[nIndex].clocksFound = true;
@@ -296,8 +249,7 @@ bool KGpuMon::GetDisplayDeviceGpuClock(const NvDisplayHandle nvDisplayHandle, Di
     return false;
 }
 
-bool KGpuMon::GetDisplayDeviceGpuCooler(const NvDisplayHandle nvDisplayHandle, DisplayCardInfosStruct& vDisplayDeviceInfo)
-{
+bool KGpuMon::GetDisplayDeviceGpuCooler(const NvDisplayHandle nvDisplayHandle, DisplayCardInfosStruct& vDisplayDeviceInfo) {
     UNUSED(nvDisplayHandle);
     UNUSED(vDisplayDeviceInfo);
 

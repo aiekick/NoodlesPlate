@@ -189,8 +189,10 @@ void UniformsPane::DrawImGuiRenderPackCategory(RenderPackWeak vRp, bool vCheckMo
 
 void UniformsPane::DrawImGuiUniformWidget(UniformsMultiLoc* vUniLoc) {
     if (vUniLoc != nullptr) {
-        MainBackend::Instance()->NeedRefresh(//
-            MainBackend::Instance()->puCodeTree->DrawImGuiUniformWidgetForPanes(//
-                vUniLoc->uniform, ImGui::GetContentRegionAvail().x, SHADER_UNIFORM_FIRST_COLUMN_WIDTH));
+        MainBackend::Instance()->NeedRefresh(                                     //
+            MainBackend::Instance()->puCodeTree->DrawImGuiUniformWidgetForPanes(  //
+                vUniLoc->uniform,
+                ImGui::GetContentRegionAvail().x,
+                SHADER_UNIFORM_FIRST_COLUMN_WIDTH));
     }
 }

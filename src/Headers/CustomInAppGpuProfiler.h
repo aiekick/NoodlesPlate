@@ -25,7 +25,7 @@
 // #define IAGP_GPU_CONTEXT void*
 #define IAGP_GPU_CONTEXT GLFWwindow*
 
-//#define IAGP_GET_CURRENT_CONTEXT GetCurrentContext
+// #define IAGP_GET_CURRENT_CONTEXT GetCurrentContext
 inline IAGP_GPU_CONTEXT GetCurrentContext() {
     return glfwGetCurrentContext();
 }
@@ -69,4 +69,3 @@ inline void SetCurrentContext(IAGP_GPU_CONTEXT vContext) {
 // define your fucntion for log error message of IAGP only in debug
 // #define LOG_DEBUG_ERROR_MESSAGE LogDebugError
 #define IAGP_LOG_DEBUG_ERROR_MESSAGE LogVarDebugError
-

@@ -4,7 +4,7 @@
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -22,28 +22,27 @@
 #include <string>
 
 class ProjectFile;
-class TimeLinePane : public AbstractPane, public conf::ConfigAbstract
-{
+class TimeLinePane : public AbstractPane, public conf::ConfigAbstract {
 public:
-	bool Init() override;
-	void Unit() override;
-	bool DrawPanes(const uint32_t& /*vCurrentFrame*/, bool* vOpened, ImGuiContext* /*vContextPtr*/ = nullptr, void* vUserDatas = nullptr) override;
-    
-	// configuration
-	std::string getXml(const std::string& vOffset, const std::string& vUserDatas = "") override;
-	bool setFromXml(tinyxml2::XMLElement* vElem, tinyxml2::XMLElement* vParent, const std::string& vUserDatas = "") override;
-	
-public: // singleton
-	static std::shared_ptr<TimeLinePane> Instance()
-	{
-		static auto _instance = std::make_shared<TimeLinePane>();
-		return _instance;
-	}
+    bool Init() override;
+    void Unit() override;
+    bool DrawPanes(const uint32_t& /*vCurrentFrame*/, bool* vOpened, ImGuiContext* /*vContextPtr*/ = nullptr, void* vUserDatas = nullptr) override;
+
+    // configuration
+    std::string getXml(const std::string& vOffset, const std::string& vUserDatas = "") override;
+    bool setFromXml(tinyxml2::XMLElement* vElem, tinyxml2::XMLElement* vParent, const std::string& vUserDatas = "") override;
+
+public:  // singleton
+    static std::shared_ptr<TimeLinePane> Instance() {
+        static auto _instance = std::make_shared<TimeLinePane>();
+        return _instance;
+    }
 
 public:
-	TimeLinePane(); // Prevent construction
-	TimeLinePane(const TimeLinePane&) {}; // Prevent construction by copying
-	TimeLinePane& operator =(const TimeLinePane&) { return *this; }; // Prevent assignment
+    TimeLinePane();                       // Prevent construction
+    TimeLinePane(const TimeLinePane&){};  // Prevent construction by copying
+    TimeLinePane& operator=(const TimeLinePane&) {
+        return *this;
+    };                        // Prevent assignment
     virtual ~TimeLinePane();  // Prevent unwanted destruction};
 };
-
