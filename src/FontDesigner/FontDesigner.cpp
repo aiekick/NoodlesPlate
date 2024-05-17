@@ -2,7 +2,7 @@
 #include <Backends/MainBackend.h>
 #include <Gui/GuiBackend.h>
 
-bool FontDesigner::init() {
+bool FontDesigner::init(CodeTreeWeak vCodeTree) {
     GenerationThread::sGenerationThread = GuiBackend::Instance()->CreateGuiBackendWindow_Hidden(1, 1, "SdfFontDesigner", MainBackend::sMainThread);
     m_FontExplorerPtr = std::make_unique<FontExplorer>();
     m_FontExplorerPtr->Init();
@@ -268,6 +268,62 @@ void FontDesigner::drawOverlay() {
     }*/
 }
 
+void FontDesigner::ComputeKey(ShaderKeyWeak vShaderkey) {
+    auto ptr = vShaderkey.lock();
+    if (ptr != nullptr) {
+        auto exist = ptr->IsShaderStageNameExist("FONT");
+        if (exist) {
+            // we need to insert the font stage in the fragment stage
+            // for the compilation suceeed
+            auto* codeTreePtr = ptr->puParentCodeTree.get();
+            if (codeTreePtr != nullptr) {
+                codeTreePtr->AddOrUpdateFromString("")
+            }
+        }
+        enable(exist);
+    }
+}
+
+std::string FontDesigner::InitRenderPack(const GuiBackend_Window& vWin, CodeTreePtr vCodeTree) {
+    if (vCodeTree) {
+        auto shader_string = m_GetBaseShaderString();
+        m_BaseKeyPtr = vCodeTree->LoadFromString("FontDesignerBaseCode", shader_string, "FontDesignerBaseCode.glsl", "", KEY_TYPE_Enum::KEY_TYPE_SHADER);
+        m_BaseRenderPackPtr =
+            RenderPack::createBufferWithFileWithoutLoading(vWin, "FontDesignerBase", ct::ivec3(1024, 1024, 0), m_BaseKeyPtr, false, true);
+    }
+
+    return {};
+}
+
+bool FontDesigner::LoadRenderPack() {
+    if (m_BaseRenderPackPtr) {
+        return m_BaseRenderPackPtr->Load();
+    }
+    return false;
+}
+
+void FontDesigner::SaveRenderPack() {
+
+}
+
+void FontDesigner::FinishRenderPack() {
+    if (m_BaseRenderPackPtr) {
+        m_BaseRenderPackPtr->Finish(false);
+    }
+}
+
+void FontDesigner::DestroyRenderPack() {
+    m_BaseRenderPackPtr.reset();
+}
+
+RenderPackWeak FontDesigner::GetRenderPack() {
+    return m_BaseRenderPackPtr;
+}
+
+ShaderKeyPtr FontDesigner::GetShaderKey() {
+    return m_BaseKeyPtr;
+}
+
 void FontDesigner::m_displaySystemFontExplorer() {
     if (ImGui::CollapsingHeader("Font Selection")) {
         if (ImGui::BeginTabBar("##font_tabs", ImGuiTabBarFlags_NoCloseWithMiddleMouseButton)) {
@@ -289,7 +345,7 @@ void FontDesigner::m_displaySystemFontExplorer() {
 
             if (m_CurrentSelectedFont.size() == 0) {
                 if (m_FontExplorerPtr->GetSysFontsDBSize() > 0) {
-                    auto iter = m_FontExplorerPtr->GetStartIter_SysFontsDB();
+                    auto iter = m_FontExplorerPtr->begin();
                     std::string fontToLoad = iter->first;
                     SetFontToLoad(fontToLoad);
                 }
@@ -313,9 +369,9 @@ void FontDesigner::m_displaySystemFontExplorer() {
 
             if (m_FontExplorerPtr->GetSysFontsDBSize() > 0) {
                 ImGui::BeginChild("##Font List");
-                auto itFonts = m_FontExplorerPtr->GetStartIter_SysFontsDB();
-                for (itFonts = m_FontExplorerPtr->GetStartIter_SysFontsDB(); itFonts != m_FontExplorerPtr->GetEndIter_SysFontsDB(); ++itFonts) {
-                    std::string fontName = itFonts->first;
+
+                for (const auto& font : *m_FontExplorerPtr.get()) {
+                    std::string fontName = font.first;
                     //			std::string fontPath = itFonts->second;
 
                     bool showItem = false;
@@ -329,7 +385,7 @@ void FontDesigner::m_displaySystemFontExplorer() {
                     }
 
                     if (m_showOnlyFontWithExistingConfig) {
-                        if (!itFonts->second.confExist)
+                        if (!font.second.confExist)
                             showItem = false;
                     }
 
@@ -339,7 +395,7 @@ void FontDesigner::m_displaySystemFontExplorer() {
                             m_GotoSelectedFontName = false;
                         }
 
-                        if (itFonts->second.confExist) {
+                        if (font.second.confExist) {
                             ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.85f, 0.25f, 0.85f, 1.00f));
                         }
 
@@ -347,7 +403,7 @@ void FontDesigner::m_displaySystemFontExplorer() {
                             SetFontToLoad(fontName);
                         }
 
-                        if (itFonts->second.confExist) {
+                        if (font.second.confExist) {
                             ImGui::PopStyleColor();
                         }
                     }
@@ -788,7 +844,7 @@ void FontDesigner::m_displayTexture() {
     if (GenerationThread::Params->textureFont > 0) {
         if (ImGui::CollapsingHeader("Font Texture")) {
             const auto w = ImGui::GetContentRegionAvail().x * 0.95f;
-            float h = w * GenerationThread::Params->textureSize.ratioYX<float>();
+            const float h = w * GenerationThread::Params->textureSize.ratioYX<float>();
             ImGui::Image((ImTextureID)GenerationThread::Params->textureFont, ImVec2(w, h));
         }
     }
@@ -824,6 +880,52 @@ void FontDesigner::m_displayAllGlyphsOfFont(ImFont* vFontPtr, const float& vWidt
         }
         vFontPtr->FallbackGlyph = glyph_fallback;
     }
+}
+
+std::string FontDesigner::m_GetBaseShaderString() {
+    return u8R"(
+@FRAMEBUFFER 
+
+//FORMAT(float or byte)
+//COUNT(1 to 8)
+//WRAP(clamp or repeat or mirror)
+//FILTER(linear or nearest)
+//MIPMAP(false or true)
+//SIZE(800,600 or picture:file.jpeg)
+//RATIO(1.5 or picture:file.jpeg)
+
+@UNIFORMS
+
+uniform(texture) vec2(sdf) uAtlasSize; // sdf texture size
+uniform(glyph) int(glyphcount) uCountGlyphs; // count glyphs
+uniform(glyph) vec4(glyphrects) uGlyphRects[glyphcount]; // glyph rects : left, bottom, right, top
+uniform(glyph) vec2(glyphcenter) uGlyphCenterOffsets[glyphcount]; // glyph center offset : x,y on range 0,0 to 1,1, default is center 0.5,0.5
+
+@FRAGMENT
+
+layout(location = 0) out vec4 fragColor;
+
+[[FONT_CODE]]
+
+void mainFontMap(vec2 fragCoord) {
+	vec2 uv = fragCoord / uAtlasSize;
+	for (int i = 0; i < uCountGlyphs; i++) {
+		vec4 rc = uGlyphRects[i];			
+		if (uv.x >= rc.x && uv.y >= rc.y && uv.x <= rc.z && uv.y <= rc.w) {
+			vec2 glyphSize = rc.zw - rc.xy;
+			vec2 glyphCoord = mod(uv - rc.xy, glyphSize) - glyphSize * 0.5;
+			glyphCoord -= glyphSize * 0.5 * (uGlyphCenterOffsets[i] * 2.0 - 1.0);			
+			fragColor = mainGlyph(i, glyphCoord, glyphSize, fragCoord, uAtlasSize);
+			// glyph found so we keep gpu cycles if we break here
+			break;
+		}
+	}
+}
+
+void main(void) {
+	mainFontMap(gl_FragCoord.xy);
+}
+)";
 }
 
 void FontDesigner::SetFontToLoad(std::string vFontName) {

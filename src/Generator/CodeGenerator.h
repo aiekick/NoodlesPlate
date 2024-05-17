@@ -53,7 +53,8 @@ private:
 
     // Main Types
     ShaderInfos Get_Shader_Quad();
-    ShaderInfos Get_Shader_Font();
+    ShaderInfos Get_Shader_Font_Base();
+    ShaderInfos Get_Shader_Font_Glyph();
     ShaderInfos Get_Shader_Points_2D();
     ShaderInfos Get_Shader_Points_3D_Lines();
     ShaderInfos Get_Shader_Points_3D_Triangles();

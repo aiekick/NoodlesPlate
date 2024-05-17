@@ -68,8 +68,8 @@ public:
 
     std::string GetFontFilePathName(std::string vFontName);
 
-    std::map<std::string, FontInfosStruct>::iterator GetStartIter_SysFontsDB();
-    std::map<std::string, FontInfosStruct>::iterator GetEndIter_SysFontsDB();
+    std::map<std::string, FontInfosStruct>::iterator begin();
+    std::map<std::string, FontInfosStruct>::iterator end();
     size_t GetSysFontsDBSize();
     bool IsFontExisting(std::string vFontName);
 

@@ -55,8 +55,10 @@ bool CodeGenerator::CreateFilePathName(const std::string& vFilePathName,
         // main types
         else if (vType == "Shader_Quad")
             infos = Get_Shader_Quad();
-        else if (vType == "Shader_Font")
-            infos = Get_Shader_Font();
+        else if (vType == "Shader_Font_Base")
+            infos = Get_Shader_Font_Base();
+        else if (vType == "Shader_Font_Glyph")
+            infos = Get_Shader_Font_Glyph();
         else if (vType == "Shader_Points_2D")
             infos = Get_Shader_Points_2D();
         else if (vType == "Shader_Points_3D_Lines")
@@ -1047,7 +1049,7 @@ void main(void)
     return infos;
 }
 
-ShaderInfos CodeGenerator::Get_Shader_Font() {
+ShaderInfos CodeGenerator::Get_Shader_Font_Base() {
     ShaderInfos infos;
     infos.header +=
         u8R"(
@@ -1061,6 +1063,46 @@ ShaderInfos CodeGenerator::Get_Shader_Font() {
 //SIZE(800,600 or picture:file.jpeg)
 //RATIO(1.5 or picture:file.jpeg)
 
+@UNIFORMS
+
+uniform(texture) vec2(sdf)				uAtlasSize; // sdf texture size
+
+uniform(glyph) int(glyphcount) 			uCountGlyphs; // count glyphs
+uniform(glyph) vec4(glyphrects) 		uGlyphRects[glyphcount]; // glyph rects : left, bottom, right, top
+uniform(glyph) vec2(glyphcenter) 		uGlyphCenterOffsets[glyphcount]; // glyph center offset : x,y on range 0,0 to 1,1, default is center 0.5,0.5
+
+@FRAGMENT
+
+layout(location = 0) out vec4 fragColor;
+
+[[FONT_CODE]]
+
+void mainFontMap(vec2 fragCoord) {
+	vec2 uv = fragCoord / uAtlasSize;
+	for (int i = 0; i < uCountGlyphs; i++) {
+		vec4 rc = uGlyphRects[i];			
+		if (uv.x >= rc.x && uv.y >= rc.y && uv.x <= rc.z && uv.y <= rc.w) {
+			vec2 glyphSize = rc.zw - rc.xy;
+			vec2 glyphCoord = mod(uv - rc.xy, glyphSize) - glyphSize * 0.5;
+			glyphCoord -= glyphSize * 0.5 * (uGlyphCenterOffsets[i] * 2.0 - 1.0);			
+			fragColor = mainGlyph(i, glyphCoord, glyphSize, fragCoord, uAtlasSize);
+			// glyph found so we keep gpu cycles if we break here
+			break;
+		}
+	}
+}
+
+void main(void) {
+	mainFontMap(gl_FragCoord.xy);
+}
+)";
+    return infos;
+}
+
+ShaderInfos CodeGenerator::Get_Shader_Font_Glyph() {
+    ShaderInfos infos;
+    infos.header +=
+        u8R"(
 @UNIFORMS
 
 uniform(sdf) float(0.0:0.1:0.05) 		uSmoothing; // smooth edge
@@ -1082,10 +1124,6 @@ uniform(color) vec3(color:0)			colorStart; // start filling color
 uniform(color) vec3(color:1)			colorEnd; // end filling color
 
 uniform(sdf) float(-1:1:0) dilat;
-
-@FRAGMENT
-
-layout(location = 0) out vec4 fragColor;
 
 @FONT
 
@@ -1124,27 +1162,6 @@ void mainGlyph(in int glyphIndex, in vec2 glyphCoord, in vec2 glyphSize, in vec2
 		alpha);
 		
 	fragColor = col;
-}
-
-@FRAGMENT
-
-void mainFontMap(vec2 fragCoord) {
-	vec2 uv = fragCoord / uAtlasSize;
-	for (int i = 0; i < uCountGlyphs; i++) {
-		vec4 rc = uGlyphRects[i];			
-		if (uv.x >= rc.x && uv.y >= rc.y && uv.x <= rc.z && uv.y <= rc.w) {
-			vec2 glyphSize = rc.zw - rc.xy;
-			vec2 glyphCoord = mod(uv - rc.xy, glyphSize) - glyphSize * 0.5;
-			glyphCoord -= glyphSize * 0.5 * (uGlyphCenterOffsets[i] * 2.0 - 1.0);			
-			mainGlyph(i, glyphCoord, glyphSize, fragCoord, uAtlasSize);
-			// glyph found so we keep gpu cycles if we break here
-			break;
-		}
-	}
-}
-
-void main(void) {
-	mainFontMap(gl_FragCoord.xy);
 }
 )";
     return infos;

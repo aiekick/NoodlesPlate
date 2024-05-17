@@ -72,19 +72,15 @@ static int ftCubicTo(const FT_Vector *control1, const FT_Vector *control2, const
 
 //////////////////////////////////////////////////////////////////////////////
 
-FontExplorer::FontExplorer() {
-    // on met rien ici pour pas risquer de creer une boucle infinie
-    // vu que FontExplorer::Instance() risquerait d'etre appel� ici
-}
+FontExplorer::FontExplorer() = default;
 
-FontExplorer::~FontExplorer() {
-}
+FontExplorer::~FontExplorer() = default;
 
 void FontExplorer::Finish(GenerationThreadParams *vParams) {
     SaveFontParamFile(vParams->m_CurrentFont, vParams);
 }
 
-void FontExplorer::Init() {
+void FontExplorer::Init() { 
     ListSystemsFont_Win32();
 }
 
@@ -281,11 +277,11 @@ std::string FontExplorer::GetFontFilePathName(std::string vFontName) {
     return "";
 }
 
-std::map<std::string, FontInfosStruct>::iterator FontExplorer::GetStartIter_SysFontsDB() {
+std::map<std::string, FontInfosStruct>::iterator FontExplorer::begin() {
     return m_SystemFontsDataBase.begin();
 }
 
-std::map<std::string, FontInfosStruct>::iterator FontExplorer::GetEndIter_SysFontsDB() {
+std::map<std::string, FontInfosStruct>::iterator FontExplorer::end() {
     return m_SystemFontsDataBase.end();
 }
 

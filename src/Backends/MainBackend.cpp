@@ -319,7 +319,7 @@ bool MainBackend::Init(const ct::ivec2& vScreenSize) {
     SoundSystem::Instance()->Init(nullptr);
     MidiSystem::Instance()->Init(nullptr);
     TemplateSystem::Instance()->Init();
-    FontDesigner::Instance()->init();
+    FontDesigner::Instance()->init(puCodeTree);
     CameraSystem::Instance()->NeedCamChange();
 
 #ifdef USE_NETWORK
@@ -431,6 +431,7 @@ bool MainBackend::Init(const ct::ivec2& vScreenSize) {
     //////////////////////////////////////////////////////////////////////////////////////////////
 
     path = GizmoSystem::Instance()->InitRenderPack(MainBackend::sMainThread, puCodeTree);
+    puFileListingExceptions.emplace(path);
     path = SoundSystem::Instance()->InitRenderPack(MainBackend::sMainThread, puCodeTree);
     puFileListingExceptions.emplace(path);
 
@@ -2439,7 +2440,7 @@ bool MainBackend::LoadFilePathName(const std::string& vFilePathName, const std::
             if (key) {
                 key = puCodeTree->GetShaderKey(relativeFilePathName);
                 if (key) {
-                    FontDesigner::Instance()->enable(key->IsShaderStageNameExist("FONT"));  // enable the FontDesigner if a font stage exist
+                    FontDesigner::Instance()->ComputeKey(key);
                     sCurrentFileLoaded = relativeFilePathName;
                     if (vDontLoadRenderPack) {
                         puMain_RenderPack->SetShaderKey(key, true);

@@ -5,10 +5,13 @@
 #include <Texture/Texture2D.h>
 #include <ImGuiPack/ImGuiPack.h>
 #include <Interfaces/CameraInterface.h>
+#include <Interfaces/SubSystemInterface.h>
 #include <FontDesigner/Explorer/FontExplorer.h>
 #include <FontDesigner/Generation/GenerationThread.h>
+#include <CodeTree/ShaderKey.h>
+#include <Renderer/RenderPack.h>
 
-class FontDesigner {
+class FontDesigner : public SubSystemInterface {
 private:
     std::unique_ptr<FontExplorer> m_FontExplorerPtr = nullptr;
     GenerationThread m_GenerationThread;
@@ -56,8 +59,11 @@ private:
 
     bool m_isEnabled = false;
 
+    ShaderKeyPtr m_BaseKeyPtr = nullptr;
+    RenderPackPtr m_BaseRenderPackPtr = nullptr;
+
 public:
-    bool init();
+    bool init(CodeTreeWeak vCodeTree);
     void unit();
 
     void enable(const bool& vEnabled);
@@ -65,6 +71,16 @@ public:
 
     void drawPane();
     void drawOverlay();
+
+    void ComputeKey(ShaderKeyWeak vShaderkey);
+
+    std::string InitRenderPack(const GuiBackend_Window& vWin, CodeTreePtr vCodeTree) override;
+    bool LoadRenderPack() override;
+    void SaveRenderPack() override;
+    void FinishRenderPack() override;
+    void DestroyRenderPack() override;
+    RenderPackWeak GetRenderPack() override;
+    ShaderKeyPtr GetShaderKey() override;
 
 private:
     void m_displaySystemFontExplorer();
@@ -75,6 +91,8 @@ private:
     void m_displayGlyphInfos();
     void m_displayTexture();
     void m_displayAllGlyphsOfFont(ImFont* vFontPtr, const float& vWidth);
+
+    std::string m_GetBaseShaderString();
 
     void LoadPendingFonts();
     void SetFontToLoad(std::string vFontName);
