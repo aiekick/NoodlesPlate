@@ -1,10 +1,10 @@
-// NoodlesPlate Copyright (C) 2017-2023 Stephane Cuillerdier aka Aiekick
+// NoodlesPlate Copyright (C) 2017-2024 Stephane Cuillerdier aka Aiekick
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -47,9 +47,7 @@ bool BufferPreview::Init() {
 void BufferPreview::Unit() {
 }
 
-bool BufferPreview::DrawPanes(const uint32_t& /*vCurrentFrame*/, bool* vOpened, ImGuiContext* /*vContextPtr*/,
-                              void* /*vUserDatas*/) {
-
+bool BufferPreview::DrawPanes(const uint32_t& /*vCurrentFrame*/, bool* vOpened, ImGuiContext* /*vContextPtr*/, void* /*vUserDatas*/) {
     if (vOpened && *vOpened) {
         static ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_MenuBar;
         if (ImGui::Begin(GetName().c_str(), vOpened, flags)) {
@@ -123,13 +121,25 @@ void BufferPreview::DrawBufferPipe(RenderPackWeak vRP, const char* vLabel, const
         if (pipe) {
             for (auto i = 0; i < pipe->getCountTextures(); i++) {
                 const auto backId = pipe->getBackFboID();
-                ImGui::TextureOverLay(aw, pipe->getBackTexture(i).get(), ImVec4(0, 1, 0, 1), ct::toStr("Color %i for FBO %u", i, backId).c_str(),
-                                      ImVec4(0, 0, 0, 1), ImVec4(0, 0, 0, 0), ImVec2(0, 1), ImVec2(1, 0));
+                ImGui::TextureOverLay(aw,
+                                      pipe->getBackTexture(i).get(),
+                                      ImVec4(0, 1, 0, 1),
+                                      ct::toStr("Color %i for FBO %u", i, backId).c_str(),
+                                      ImVec4(0, 0, 0, 1),
+                                      ImVec4(0, 0, 0, 0),
+                                      ImVec2(0, 1),
+                                      ImVec2(1, 0));
             }
 
             const auto backId = pipe->getBackFboID();
-            ImGui::TextureOverLay(aw, pipe->getBackDepthTexture().get(), ImVec4(0, 1, 0, 1), ct::toStr("Depth for FBO %u", backId).c_str(),
-                                  ImVec4(0, 0, 0, 1), ImVec4(0, 0, 0, 0), ImVec2(0, 1), ImVec2(1, 0));
+            ImGui::TextureOverLay(aw,
+                                  pipe->getBackDepthTexture().get(),
+                                  ImVec4(0, 1, 0, 1),
+                                  ct::toStr("Depth for FBO %u", backId).c_str(),
+                                  ImVec4(0, 0, 0, 1),
+                                  ImVec4(0, 0, 0, 0),
+                                  ImVec2(0, 1),
+                                  ImVec2(1, 0));
         }
         ImGui::EndGroup();
     }
@@ -154,9 +164,14 @@ int BufferPreview::DrawBufferChain(RenderPackWeak vRoot, RenderPackWeak vRP, con
                         auto rrp = rootPtr->puBuffers.get(uni->bufferShaderName).lock();
                         if (rrp && rrp->GetPipe() && rrp->GetPipe()->getCountTextures() > 0) {
                             const auto backId = rrp->GetPipe()->getBackFboID();
-                            ImGui::TextureOverLay(aw, rrp->GetPipe()->getBackTexture(0).get(), ImVec4(0, 1, 0, 1),
+                            ImGui::TextureOverLay(aw,
+                                                  rrp->GetPipe()->getBackTexture(0).get(),
+                                                  ImVec4(0, 1, 0, 1),
                                                   ct::toStr("FBO %u", backId).c_str(),
-                                                  ImVec4(0, 0, 0, 1), ImVec4(0, 0, 0, 0), ImVec2(0, 1), ImVec2(1, 0));
+                                                  ImVec4(0, 0, 0, 1),
+                                                  ImVec4(0, 0, 0, 0),
+                                                  ImVec2(0, 1),
+                                                  ImVec2(1, 0));
                         }
                         ImGui::EndGroup();
                         ImGui::PopItemWidth();

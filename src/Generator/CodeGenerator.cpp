@@ -1,10 +1,10 @@
-// NoodlesPlate Copyright (C) 2017-2023 Stephane Cuillerdier aka Aiekick
+// NoodlesPlate Copyright (C) 2017-2024 Stephane Cuillerdier aka Aiekick
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -19,90 +19,120 @@
 #include "CodeGenerator.h"
 #include <ctools/FileHelper.h>
 
-CodeGenerator::CodeGenerator()
-{
-	
+CodeGenerator::CodeGenerator() {
 }
 
-CodeGenerator::~CodeGenerator()
-{
-	
+CodeGenerator::~CodeGenerator() {
 }
 
-bool CodeGenerator::CreateFilePathName(const std::string& vFilePathName, const std::string& vType, const std::string&
-                                       /*vFilePath*/, bool useStandardPaths)
-{
-	if (!vFilePathName.empty())
-	{
-		const auto ps = FileHelper::Instance()->ParsePathFileName(vFilePathName);
-		if (ps.isOk)
-		{
-			FileHelper::Instance()->CreatePathIfNotExist(ps.path);
-		}
+bool CodeGenerator::CreateFilePathName(const std::string& vFilePathName,
+                                       const std::string& vType,
+                                       const std::string&
+                                       /*vFilePath*/,
+                                       bool useStandardPaths) {
+    if (!vFilePathName.empty()) {
+        const auto ps = FileHelper::Instance()->ParsePathFileName(vFilePathName);
+        if (ps.isOk) {
+            FileHelper::Instance()->CreatePathIfNotExist(ps.path);
+        }
 
-		ShaderInfos infos;
+        ShaderInfos infos;
 
-		// Noodlesplate Core
-		if (vType == "Shader_3dAxis")									infos = Get_Shader_3DAxis();
-		else if (vType == "Shader_3dGrid")								infos = Get_Shader_3DGrid();
-		else if (vType == "Shader_Mesh")								infos = Get_Shader_Mesh();
-		else if (vType == "Shader_Gizmoculling")						infos = Get_Shader_GizmoCulling();
-		else if (vType == "Helper_Culling")								infos = Get_Helper_Culling();
-		else if (vType == "Helper_Space3d")								infos = Get_Helper_Space3D();
+        // Noodlesplate Core
+        if (vType == "Shader_3dAxis")
+            infos = Get_Shader_3DAxis();
+        else if (vType == "Shader_3dGrid")
+            infos = Get_Shader_3DGrid();
+        else if (vType == "Shader_Mesh")
+            infos = Get_Shader_Mesh();
+        else if (vType == "Shader_Gizmoculling")
+            infos = Get_Shader_GizmoCulling();
+        else if (vType == "Helper_Culling")
+            infos = Get_Helper_Culling();
+        else if (vType == "Helper_Space3d")
+            infos = Get_Helper_Space3D();
 
-		// main types
-		else if (vType == "Shader_Quad")								infos = Get_Shader_Quad();
-		else if (vType == "Shader_Points_2D")							infos = Get_Shader_Points_2D();
-		else if (vType == "Shader_Points_3D_Lines")						infos = Get_Shader_Points_3D_Lines();
-		else if (vType == "Shader_Points_3D_Triangles")					infos = Get_Shader_Points_3D_Triangles();
-		else if (vType == "Shader_Mesh_Base")							infos = Get_Shader_Mesh_Base();
-		else if (vType == "Shader_Mesh_Tesselation")					infos = Get_Shader_Mesh_Tesselation();
-		else if (vType == "Shader_Mesh_Geometry")						infos = Get_Shader_Mesh_Geometry();
-		else if (vType == "Shader_Mesh_Capture")						infos = Get_Shader_Mesh_Capture();
-		
-		// web sites base formats
-		else if (vType == "Shader_ShaderToy_Image")						infos = Get_Shader_ShaderToy_Image();
-		else if (vType == "Shader_ShaderToy_Buffer")					infos = Get_Shader_ShaderToy_Buffer();
-		else if (vType == "Shader_GlslSandbox_Base")					infos = Get_Shader_GlslSandbox_Base();
-		else if (vType == "Shader_GlslSandbox_MultiPass")				infos = Get_Shader_GlslSandbox_MultiPass();
-		else if (vType == "Shader_GlslSandbox_SurfacePosition")			infos = Get_Shader_GlslSandbox_SurfacePosition();
-		else if (vType == "Shader_VertexShaderArt_Base")				infos = Get_Shader_VertexShaderArt_Base();
-		
-		// all uniforms types
-		else if (vType == "Shader_Uniforms_Help")						infos = Get_Shader_Uniforms_Help();
-		
-		// features shader
-		else if (vType == "Shader_Demo_Gizmo")							infos = Get_Shader_Demo_Gizmo();
-		else if (vType == "Shader_Demo_Space3D")						infos = Get_Shader_Demo_Space3D();
-		else if (vType == "Shader_Demo_Gizmo_Culling")					infos = Get_Shader_Demo_Gizmo_Culling();
-		else if (vType == "Shader_Demo_Buffer_Attachments")				infos = Get_Shader_Demo_Buffer_Attachments();
-		else if (vType == "Shader_Demo_Compute")						infos = Get_Shader_Demo_Compute();
-		else if (vType == "Shader_Demo_Instanced_Mesh")					infos = Get_Shader_Demo_Instanced();
-		else if (vType == "Shader_Demo_Scene")							infos = Get_Shader_Demo_Scene();
-		else if (vType == "Shader_Demo_Multipass_One_File_2_buffers")	infos = Get_Shader_Demo_Multipass_One_File_2_buffers();
-		else if (vType == "Shader_Demo_Multipass_One_File_3_buffers")	infos = Get_Shader_Demo_Multipass_One_File_3_buffers();
-		else if (vType == "Shader_Demo_Multipass_One_File_4_buffers")	infos = Get_Shader_Demo_Multipass_One_File_4_buffers();
-		
-		const auto file = infos.GetCode();
+        // main types
+        else if (vType == "Shader_Quad")
+            infos = Get_Shader_Quad();
+        else if (vType == "Shader_Font_Base")
+            infos = Get_Shader_Font_Base();
+        else if (vType == "Shader_Font_Glyph")
+            infos = Get_Shader_Font_Glyph();
+        else if (vType == "Shader_Points_2D")
+            infos = Get_Shader_Points_2D();
+        else if (vType == "Shader_Points_3D_Lines")
+            infos = Get_Shader_Points_3D_Lines();
+        else if (vType == "Shader_Points_3D_Triangles")
+            infos = Get_Shader_Points_3D_Triangles();
+        else if (vType == "Shader_Mesh_Base")
+            infos = Get_Shader_Mesh_Base();
+        else if (vType == "Shader_Mesh_Tesselation")
+            infos = Get_Shader_Mesh_Tesselation();
+        else if (vType == "Shader_Mesh_Geometry")
+            infos = Get_Shader_Mesh_Geometry();
+        else if (vType == "Shader_Mesh_Capture")
+            infos = Get_Shader_Mesh_Capture();
 
-		if (!file.empty())
-		{
-			const auto fpn = FileHelper::Instance()->CorrectSlashTypeForFilePathName(vFilePathName);
-			FileHelper::Instance()->SaveToFile(file, fpn, useStandardPaths ? (int)FILE_LOCATION_Enum::FILE_LOCATION_SCRIPT : (int)FILE_LOCATION_Enum::FILE_LOCATION_NONE);
+        // web sites base formats
+        else if (vType == "Shader_ShaderToy_Image")
+            infos = Get_Shader_ShaderToy_Image();
+        else if (vType == "Shader_ShaderToy_Buffer")
+            infos = Get_Shader_ShaderToy_Buffer();
+        else if (vType == "Shader_GlslSandbox_Base")
+            infos = Get_Shader_GlslSandbox_Base();
+        else if (vType == "Shader_GlslSandbox_MultiPass")
+            infos = Get_Shader_GlslSandbox_MultiPass();
+        else if (vType == "Shader_GlslSandbox_SurfacePosition")
+            infos = Get_Shader_GlslSandbox_SurfacePosition();
+        else if (vType == "Shader_VertexShaderArt_Base")
+            infos = Get_Shader_VertexShaderArt_Base();
 
-			return true;
-		}
-	}
+        // all uniforms types
+        else if (vType == "Shader_Uniforms_Help")
+            infos = Get_Shader_Uniforms_Help();
 
-	return false;
+        // features shader
+        else if (vType == "Shader_Demo_Gizmo")
+            infos = Get_Shader_Demo_Gizmo();
+        else if (vType == "Shader_Demo_Space3D")
+            infos = Get_Shader_Demo_Space3D();
+        else if (vType == "Shader_Demo_Gizmo_Culling")
+            infos = Get_Shader_Demo_Gizmo_Culling();
+        else if (vType == "Shader_Demo_Buffer_Attachments")
+            infos = Get_Shader_Demo_Buffer_Attachments();
+        else if (vType == "Shader_Demo_Compute")
+            infos = Get_Shader_Demo_Compute();
+        else if (vType == "Shader_Demo_Instanced_Mesh")
+            infos = Get_Shader_Demo_Instanced();
+        else if (vType == "Shader_Demo_Scene")
+            infos = Get_Shader_Demo_Scene();
+        else if (vType == "Shader_Demo_Multipass_One_File_2_buffers")
+            infos = Get_Shader_Demo_Multipass_One_File_2_buffers();
+        else if (vType == "Shader_Demo_Multipass_One_File_3_buffers")
+            infos = Get_Shader_Demo_Multipass_One_File_3_buffers();
+        else if (vType == "Shader_Demo_Multipass_One_File_4_buffers")
+            infos = Get_Shader_Demo_Multipass_One_File_4_buffers();
+
+        const auto file = infos.GetCode();
+
+        if (!file.empty()) {
+            const auto fpn = FileHelper::Instance()->CorrectSlashTypeForFilePathName(vFilePathName);
+            FileHelper::Instance()->SaveToFile(file, fpn, useStandardPaths ? (int)FILE_LOCATION_Enum::FILE_LOCATION_SCRIPT : (int)FILE_LOCATION_Enum::FILE_LOCATION_NONE);
+
+            return true;
+        }
+    }
+
+    return false;
 }
 
 // NoodlesPlate Core
 
-ShaderInfos CodeGenerator::Get_Shader_3DAxis()
-{
-	ShaderInfos infos;
-	infos.header += u8R"(
+ShaderInfos CodeGenerator::Get_Shader_3DAxis() {
+    ShaderInfos infos;
+    infos.header +=
+        u8R"(
 @UNIFORMS
 
 uniform float(maxpoints) uCountVertex;
@@ -151,13 +181,13 @@ void main(void)
 	fragColor.a = 1.0;
 }
 )";
-	return infos;
+    return infos;
 }
 
-ShaderInfos CodeGenerator::Get_Shader_3DGrid()
-{
-	ShaderInfos infos; 
-	infos.header += u8R"(
+ShaderInfos CodeGenerator::Get_Shader_3DGrid() {
+    ShaderInfos infos;
+    infos.header +=
+        u8R"(
 @UNIFORMS
 
 uniform float(maxpoints) uCountVertex;
@@ -219,13 +249,13 @@ void main(void)
 	fragColor.a = 1.0;
 }
 )";
-	return infos;
+    return infos;
 }
 
-ShaderInfos CodeGenerator::Get_Shader_Mesh()
-{
-	ShaderInfos infos;
-	infos.header += u8R"(
+ShaderInfos CodeGenerator::Get_Shader_Mesh() {
+    ShaderInfos infos;
+    infos.header +=
+        u8R"(
 @UNIFORMS
 
 uniform(hidden) mat4(camera:mvp) _cam;
@@ -636,13 +666,13 @@ void main()
 	fragColor = col;
 }
 )";
-	return infos;
+    return infos;
 }
 
-ShaderInfos CodeGenerator::Get_Shader_GizmoCulling()
-{
-	ShaderInfos infos;
-	infos.header += u8R"(
+ShaderInfos CodeGenerator::Get_Shader_GizmoCulling() {
+    ShaderInfos infos;
+    infos.header +=
+        u8R"(
 @UNIFORMS
 
 uniform float(maxpoints) uCountVertex;
@@ -780,13 +810,13 @@ void main(void)
 	fragColor = v_color;
 }
 )";
-	return infos;
+    return infos;
 }
 
-ShaderInfos CodeGenerator::Get_Helper_Culling()
-{
-	ShaderInfos infos;
-	infos.header += u8R"(
+ShaderInfos CodeGenerator::Get_Helper_Culling() {
+    ShaderInfos infos;
+    infos.header +=
+        u8R"(
 @UNIFORMS
 
 uniform float(useculling) _useGizmoCull; // hidden
@@ -798,7 +828,7 @@ uniform(_useGizmoCull==true) mat4(culling) _GizmoCull; // _GizmoCullingVolume
 // Volume Culling
 
 // based on http://iquilezles.org/www/articles/intersectors/intersectors.htm
-void getSpherePoint( in vec3 ro, in vec3 rd, in mat4 txx, out vec3 facePoint, out vec2 d, out vec3 nor)
+void GetSpherePoint( in vec3 ro, in vec3 rd, in mat4 txx, out vec3 facePoint, out vec2 d, out vec3 nor)
 {
 	mat4 txi = inverse(txx);
 	
@@ -874,7 +904,7 @@ bool getCullingPoint(in vec3 ro, in vec3 rd, out vec3 facePoint, out vec2 d, ino
 		}
 		else if (_cullingType == 1) // sphere
 		{
-			getSpherePoint(ro, rd, _GizmoCull, facePoint, d, nor);
+			GetSpherePoint(ro, rd, _GizmoCull, facePoint, d, nor);
 		}
 		
 		if (d.y > d.x)
@@ -892,13 +922,13 @@ bool getCullingPoint(in vec3 ro, in vec3 rd, out vec3 facePoint, out vec2 d, ino
 	return res;
 }
 )";
-	return infos;
+    return infos;
 }
 
-ShaderInfos CodeGenerator::Get_Helper_Space3D()
-{
-	ShaderInfos infos;
-	infos.header += u8R"(
+ShaderInfos CodeGenerator::Get_Helper_Space3D() {
+    ShaderInfos infos;
+    infos.header +=
+        u8R"(
 @UNIFORMS
 
 uniform vec2(buffer:target=0) size;
@@ -967,15 +997,15 @@ void CalcDepth(vec3 vRayDir, float vDist)
 	CalcDepth(_proj, _model, vRayDir, vDist);
 }
 )";
-	return infos;
+    return infos;
 }
 
 // Main types
 
-ShaderInfos CodeGenerator::Get_Shader_Quad()
-{
-	ShaderInfos infos;
-	infos.header += u8R"(
+ShaderInfos CodeGenerator::Get_Shader_Quad() {
+    ShaderInfos infos;
+    infos.header +=
+        u8R"(
 @FRAMEBUFFER 
 
 //FORMAT(float or byte)
@@ -1016,13 +1046,131 @@ void main(void)
 	fragColor.a = 1.0;
 }
 )";
-	return infos;
+    return infos;
 }
 
-ShaderInfos CodeGenerator::Get_Shader_Points_2D()
+ShaderInfos CodeGenerator::Get_Shader_Font_Base() {
+    ShaderInfos infos;
+    infos.header +=
+        u8R"(
+@FRAMEBUFFER 
+
+//FORMAT(float or byte)
+//COUNT(1 to 8)
+//WRAP(clamp or repeat or mirror)
+//FILTER(linear or nearest)
+//MIPMAP(false or true)
+//SIZE(800,600 or picture:file.jpeg)
+//RATIO(1.5 or picture:file.jpeg)
+
+@UNIFORMS
+
+uniform(texture) vec2(sdf)				uAtlasSize; // sdf texture size
+
+uniform(glyph) int(glyphcount) 			uCountGlyphs; // count glyphs
+uniform(glyph) vec4(glyphrects) 		uGlyphRects[glyphcount]; // glyph rects : left, bottom, right, top
+uniform(glyph) vec2(glyphcenter) 		uGlyphCenterOffsets[glyphcount]; // glyph center offset : x,y on range 0,0 to 1,1, default is center 0.5,0.5
+
+@FRAGMENT
+
+layout(location = 0) out vec4 fragColor;
+
+[[FONT_CODE]]
+
+void mainFontMap(vec2 fragCoord) {
+	vec2 uv = fragCoord / uAtlasSize;
+	for (int i = 0; i < uCountGlyphs; i++) {
+		vec4 rc = uGlyphRects[i];			
+		if (uv.x >= rc.x && uv.y >= rc.y && uv.x <= rc.z && uv.y <= rc.w) {
+			vec2 glyphSize = rc.zw - rc.xy;
+			vec2 glyphCoord = mod(uv - rc.xy, glyphSize) - glyphSize * 0.5;
+			glyphCoord -= glyphSize * 0.5 * (uGlyphCenterOffsets[i] * 2.0 - 1.0);			
+			fragColor = mainGlyph(i, glyphCoord, glyphSize, fragCoord, uAtlasSize);
+			// glyph found so we keep gpu cycles if we break here
+			break;
+		}
+	}
+}
+
+void main(void) {
+	mainFontMap(gl_FragCoord.xy);
+}
+)";
+    return infos;
+}
+
+ShaderInfos CodeGenerator::Get_Shader_Font_Glyph() {
+    ShaderInfos infos;
+    infos.header +=
+        u8R"(
+@UNIFORMS
+
+uniform(sdf) float(0.0:0.1:0.05) 		uSmoothing; // smooth edge
+uniform(sdf) float(-0.4:0.4:0.0) 		uOutlineWidth; // border line thickness
+
+uniform(common) int(frame) 				uFrame;	// frames
+uniform(common) float(time) 			uTime; // time
+
+uniform(texture) sampler2D(sdf)			uAtlas; // sdf texture
+uniform(texture) vec2(sdf)				uAtlasSize; // sdf texture size
+
+uniform(glyph) vec2(glyphpadding) 		uGlyphPadding; // global glyphs padding
+uniform(glyph) int(glyphcount) 			uCountGlyphs; // count glyphs
+uniform(glyph) float(glyphinversions) 	uGlyphInversions[glyphcount]; // glyph inversion ( true is > 0.5, false < 0.5)
+uniform(glyph) vec4(glyphrects) 		uGlyphRects[glyphcount]; // glyph rects : left, bottom, right, top
+uniform(glyph) vec2(glyphcenter) 		uGlyphCenterOffsets[glyphcount]; // glyph center offset : x,y on range 0,0 to 1,1, default is center 0.5,0.5
+
+uniform(color) vec3(color:0)			colorStart; // start filling color
+uniform(color) vec3(color:1)			colorEnd; // end filling color
+
+uniform(sdf) float(-1:1:0) dilat;
+
+@FONT
+
+// https://github.com/Chlumsky/msdfgen
+float median(vec3 rgb) 
 {
-	ShaderInfos infos;
-	infos.header += u8R"(
+    return max(min(rgb.r, rgb.g), min(max(rgb.r, rgb.g), rgb.b));
+}
+
+void mainGlyph(in int glyphIndex, in vec2 glyphCoord, in vec2 glyphSize, in vec2 texCoord, in vec2 texSize)
+{
+	vec2 uv = texCoord / texSize;
+	vec4 font = texture(uAtlas, uv);
+				
+	if (uGlyphInversions[glyphIndex] > 0.5) {
+		font = 1.0 - font; // inversion
+	}
+	
+	float glyphSdf = median(font.rgb);
+					
+	// put char between [[ and ]] for adapt your shader for a particular char
+	// example with the char c, we want to inverse here the sdf only for the char c
+	// if (glyphIndex == [[c]])	{ glyphSdf = 1. - glyphSdf; } 
+			 
+	glyphSdf -= dilat;
+
+	float smoothing = uSmoothing;
+	float outlineWidth = uOutlineWidth;
+	float outerEdgeCenter = 0.5 - outlineWidth;
+
+	float alpha = smoothstep(outerEdgeCenter - smoothing, outerEdgeCenter + smoothing, glyphSdf);
+	float border = smoothstep(0.5 - smoothing, 0.5 + smoothing, glyphSdf);
+
+	vec4 col = vec4(
+		mix(colorStart, colorEnd, border),
+		alpha);
+		
+	fragColor = col;
+}
+)";
+    return infos;
+}
+
+ShaderInfos CodeGenerator::Get_Shader_Points_2D() {
+    ShaderInfos infos;
+    infos.header +=
+        u8R"(
 @UNIFORMS
 
 uniform float(time) uTime;
@@ -1054,13 +1202,13 @@ void main(void)
 	fragColor.a = 1.0;
 }
 )";
-	return infos;
+    return infos;
 }
 
-ShaderInfos CodeGenerator::Get_Shader_Points_3D_Lines()
-{
-	ShaderInfos infos;
-	infos.header += u8R"(
+ShaderInfos CodeGenerator::Get_Shader_Points_3D_Lines() {
+    ShaderInfos infos;
+    infos.header +=
+        u8R"(
 @UNIFORMS
 
 uniform float(maxpoints) maxPoints; // count points (here 30000), not shown in uniforms pane
@@ -1142,13 +1290,13 @@ void main()
 	fragColor = v_color;
 }
 )";
-	return infos;
+    return infos;
 }
 
-ShaderInfos CodeGenerator::Get_Shader_Points_3D_Triangles()
-{
-	ShaderInfos infos;
-	infos.header += u8R"(
+ShaderInfos CodeGenerator::Get_Shader_Points_3D_Triangles() {
+    ShaderInfos infos;
+    infos.header +=
+        u8R"(
 @UNIFORMS
 
 uniform mat4(camera:mvp) cam;
@@ -1213,13 +1361,13 @@ void main()
 	fragColor = v_color;
 }
 )";
-	return infos;
+    return infos;
 }
 
-ShaderInfos CodeGenerator::Get_Shader_Mesh_Base()
-{
-	ShaderInfos infos;
-	infos.header += u8R"(
+ShaderInfos CodeGenerator::Get_Shader_Mesh_Base() {
+    ShaderInfos infos;
+    infos.header +=
+        u8R"(
 @UNIFORMS
 
 uniform(mesh) vec3(color:0.2,0.8,0.5) color; // shape color
@@ -1333,13 +1481,13 @@ void main()
 	fragColor = col;
 }
 )";
-	return infos;
+    return infos;
 }
 
-ShaderInfos CodeGenerator::Get_Shader_Mesh_Tesselation()
-{
-	ShaderInfos infos;
-	infos.header += u8R"(
+ShaderInfos CodeGenerator::Get_Shader_Mesh_Tesselation() {
+    ShaderInfos infos;
+    infos.header +=
+        u8R"(
 @UNIFORMS
 
 uniform(shape) float(time) iTime; // shape animation time
@@ -1561,13 +1709,13 @@ void main()
 	fragColor = col;
 }
 )";
-	return infos;
+    return infos;
 }
 
-ShaderInfos CodeGenerator::Get_Shader_Mesh_Geometry()
-{
-	ShaderInfos infos;
-	infos.header += u8R"(
+ShaderInfos CodeGenerator::Get_Shader_Mesh_Geometry() {
+    ShaderInfos infos;
+    infos.header +=
+        u8R"(
 @UNIFORMS
 
 uniform(hidden) float(usegeometry) useGeom;
@@ -1724,13 +1872,13 @@ void main()
 	fragColor = _color;
 }
 )";
-	return infos;
+    return infos;
 }
 
-ShaderInfos CodeGenerator::Get_Shader_Mesh_Capture()
-{
-	ShaderInfos infos;
-	infos.header += u8R"(
+ShaderInfos CodeGenerator::Get_Shader_Mesh_Capture() {
+    ShaderInfos infos;
+    infos.header +=
+        u8R"(
 @UNIFORMS
 
 uniform(shape) float(time) iTime; // shape animation time
@@ -1987,15 +2135,15 @@ void main()
 	fragColor = col;
 }
 )";
-	return infos;
+    return infos;
 }
 
 // web sites shaders
 
-ShaderInfos CodeGenerator::Get_Shader_ShaderToy_Image()
-{
-	ShaderInfos infos;
-	infos.header += u8R"(
+ShaderInfos CodeGenerator::Get_Shader_ShaderToy_Image() {
+    ShaderInfos infos;
+    infos.header +=
+        u8R"(
 @FRAMEBUFFER 
 
 WRAP(clamp) 
@@ -2040,14 +2188,14 @@ void main(void)
 {
 	mainImage(fragColor, gl_FragCoord.xy);
 }
-)"; 
-	return infos;
+)";
+    return infos;
 }
 
-ShaderInfos CodeGenerator::Get_Shader_ShaderToy_Buffer()
-{
-	ShaderInfos infos;
-	infos.header += u8R"(
+ShaderInfos CodeGenerator::Get_Shader_ShaderToy_Buffer() {
+    ShaderInfos infos;
+    infos.header +=
+        u8R"(
 @FRAMEBUFFER
 
 WRAP(clamp) 
@@ -2094,13 +2242,13 @@ void main(void)
 	fragColor.a = 1.0;
 }
 )";
-	return infos;
+    return infos;
 }
 
-ShaderInfos CodeGenerator::Get_Shader_GlslSandbox_Base()
-{
-	ShaderInfos infos;
-	infos.header += u8R"(
+ShaderInfos CodeGenerator::Get_Shader_GlslSandbox_Base() {
+    ShaderInfos infos;
+    infos.header +=
+        u8R"(
 @FRAMEBUFFER
 
 FORMAT(byte) 
@@ -2151,13 +2299,13 @@ void main(void)
 	fragColor = vec4(vec3(color, color * 0.5, sin(color + time / 3.0) * 0.75), 1.0);
 }
 )";
-	return infos;
+    return infos;
 }
 
-ShaderInfos CodeGenerator::Get_Shader_GlslSandbox_MultiPass()
-{
-	ShaderInfos infos;
-	infos.header += u8R"(
+ShaderInfos CodeGenerator::Get_Shader_GlslSandbox_MultiPass() {
+    ShaderInfos infos;
+    infos.header +=
+        u8R"(
 @FRAMEBUFFER
 
 FORMAT(byte) 
@@ -2214,13 +2362,13 @@ void main()
 	fragColor.a = 1.0;
 }
 )";
-	return infos;
+    return infos;
 }
 
-ShaderInfos CodeGenerator::Get_Shader_GlslSandbox_SurfacePosition()
-{
-	ShaderInfos infos;
-	infos.header += u8R"(
+ShaderInfos CodeGenerator::Get_Shader_GlslSandbox_SurfacePosition() {
+    ShaderInfos infos;
+    infos.header +=
+        u8R"(
 @FRAMEBUFFER
 
 FORMAT(byte) 
@@ -2275,13 +2423,13 @@ void main(void)
 	fragColor = vec4(vec3(color, color * 0.5, sin(color + time / 3.0) * 0.75), 1.0);
 }
 )";
-	return infos;
+    return infos;
 }
 
-ShaderInfos CodeGenerator::Get_Shader_VertexShaderArt_Base()
-{
-	ShaderInfos infos;
-	infos.header += u8R"(
+ShaderInfos CodeGenerator::Get_Shader_VertexShaderArt_Base() {
+    ShaderInfos infos;
+    infos.header +=
+        u8R"(
 @UNIFORMS
 
 uniform float(time) time;
@@ -2332,15 +2480,15 @@ void main(void)
 	fragColor.a = 1.0;
 }
 )";
-	return infos;
+    return infos;
 }
 
 // Help
 
-ShaderInfos CodeGenerator::Get_Shader_Uniforms_Help()
-{
-	ShaderInfos infos;
-	infos.header += u8R"(
+ShaderInfos CodeGenerator::Get_Shader_Uniforms_Help() {
+    ShaderInfos infos;
+    infos.header +=
+        u8R"(
 @FRAMEBUFFER 
 
 //FORMAT(float or byte)
@@ -2448,15 +2596,15 @@ void main(void)
 	fragColor.a = 1.0;
 }
 )";
-	return infos;
+    return infos;
 }
 
 // Feature samples
 
-ShaderInfos CodeGenerator::Get_Shader_Demo_Gizmo()
-{
-	ShaderInfos infos;
-	infos.header += u8R"(
+ShaderInfos CodeGenerator::Get_Shader_Demo_Gizmo() {
+    ShaderInfos infos;
+    infos.header +=
+        u8R"(
 @FRAMEBUFFER
 
 //FORMAT(float or byte)
@@ -2527,7 +2675,7 @@ vec2 maxObj(vec2 a, vec2 b)
 	return b;
 }
 
-vec2 getSDF(vec3 p)
+vec2 GetSDF(vec3 p)
 {
 	float dSphere = length(p - sphereOrigin[3].xyz) - sphereRadius;
 	vec2 resSDF = vec2(dSphere, 0);
@@ -2546,7 +2694,7 @@ float march(in vec3 ro, in vec3 rd)
 	for (int i = 0; i < countSteps; i++)
 	{
 		if (d*d / s > 1e5 || d > maxDistance) break;
-		s = getSDF(ro + rd * d).x;
+		s = GetSDF(ro + rd * d).x;
 		d += s * stepScale;
 	}
 	return d;
@@ -2556,20 +2704,20 @@ vec3 getNor(vec3 p, float k)
 {
 	vec3 eps = vec3(k, 0., 0.);
 	vec3 nor = vec3(
-		getSDF(p + eps.xyy).x - getSDF(p - eps.xyy).x,
-		getSDF(p + eps.yxy).x - getSDF(p - eps.yxy).x,
-		getSDF(p + eps.yyx).x - getSDF(p - eps.yyx).x);
+		GetSDF(p + eps.xyy).x - GetSDF(p - eps.xyy).x,
+		GetSDF(p + eps.yxy).x - GetSDF(p - eps.yxy).x,
+		GetSDF(p + eps.yyx).x - GetSDF(p - eps.yyx).x);
 	return normalize(nor);
 }
 
-float getSha(in vec3 ro, in vec3 rd, in float hn)
+float GetSha(in vec3 ro, in vec3 rd, in float hn)
 {
 	float res = 1.0;
 	float t = 0.0005;
 	float h = 1.0;
 	for (int i = 0; i < 40; i++)
 	{
-		h = getSDF(ro + rd * t).x;
+		h = GetSDF(ro + rd * t).x;
 		res = min(res, hn*h / t);
 		t += clamp(h, 0.02, 2.0);
 	}
@@ -2584,7 +2732,7 @@ float getAO(in vec3 p, in vec3 nor)
 	{
 		float hr = 0.01 + 0.12 * float(i) / 4.0;
 		vec3 aopos = nor * hr + p;
-		float dd = getSDF(aopos).x;
+		float dd = GetSDF(aopos).x;
 		occ += -(dd - hr)*sca;
 		sca *= 0.95;
 	}
@@ -2613,13 +2761,13 @@ vec3 material(in vec3 pos, in vec3 camdir)
 	float sha = 1.0;
 	float ao = 1.0;
 
-	float mat = getSDF(pos).y;
+	float mat = GetSDF(pos).y;
 	if (mat < 1.)
 		tex = matColor0;
 	else if (mat < 2.)
 		tex = matColor1;
 
-	sha = 0.5 + 0.5 * getSha(pos, norm, 2.0);
+	sha = 0.5 + 0.5 * GetSha(pos, norm, 2.0);
 	ao = getAO(pos, norm);
 
 	vec3 l1 = light(d1, light0Col, tex, norm, camdir);
@@ -2663,13 +2811,13 @@ void main(void)
 	fragColor.a = 1.0;
 }
 )";
-	return infos;
+    return infos;
 }
 
-ShaderInfos CodeGenerator::Get_Shader_Demo_Space3D()
-{
-	ShaderInfos infos;
-	infos.header += u8R"(
+ShaderInfos CodeGenerator::Get_Shader_Demo_Space3D() {
+    ShaderInfos infos;
+    infos.header +=
+        u8R"(
 @FRAMEBUFFER
 
 //FORMAT(float or byte)
@@ -2796,13 +2944,13 @@ void main(void)
 	fragColor = vec4(col,1);
 }
 )";
-	return infos;
+    return infos;
 }
 
-ShaderInfos CodeGenerator::Get_Shader_Demo_Gizmo_Culling()
-{
-	ShaderInfos infos;
-	infos.header += u8R"(
+ShaderInfos CodeGenerator::Get_Shader_Demo_Gizmo_Culling() {
+    ShaderInfos infos;
+    infos.header +=
+        u8R"(
 @FRAMEBUFFER 
 
 //FORMAT(float or byte)
@@ -2857,7 +3005,7 @@ layout(location = 0) out vec4 fragColor;
 vec2 minObj(vec2 a, vec2 b){if (a.x < b.x)return a;return b;}
 vec2 maxObj(vec2 a, vec2 b){if (a.x > b.x)return a;return b;}
 
-vec2 getSDF(vec3 p)
+vec2 GetSDF(vec3 p)
 {
 	vec2 sphere = vec2(length(p - sphereOrigin[3].xyz) - 0.5, 0.);
 	p = (p - cubeOrigin[3].xyz) * mat3(cubeOrigin);
@@ -2869,9 +3017,9 @@ vec3 getNor(vec3 p, float k)
 {
 	vec3 eps = vec3(k, 0., 0.);
 	vec3 nor = vec3(
-		getSDF(p + eps.xyy).x - getSDF(p - eps.xyy).x,
-		getSDF(p + eps.yxy).x - getSDF(p - eps.yxy).x,
-		getSDF(p + eps.yyx).x - getSDF(p - eps.yyx).x);
+		GetSDF(p + eps.xyy).x - GetSDF(p - eps.xyy).x,
+		GetSDF(p + eps.yxy).x - GetSDF(p - eps.yxy).x,
+		GetSDF(p + eps.yyx).x - GetSDF(p - eps.yyx).x);
 	return normalize(nor);
 }
 
@@ -2879,12 +3027,12 @@ bool march(vec3 ro, vec3 rd, float far, int iters, float prec, out vec2 md)
 {
 	float d = 0.;
 	vec3 p = ro;
-	vec2 s = getSDF(p);
+	vec2 s = GetSDF(p);
 	for (int i=0;i<iters;i++)
 	{
 		if (abs(s.x)<d*d*1e-6&&i>0) break;
 		if (d>far) return false;
-		s = getSDF(p);
+		s = GetSDF(p);
 		d += s.x * prec;
 		p = ro+rd*d;
 	}
@@ -2906,7 +3054,7 @@ void mainImage(inout vec4 fragColor, in vec2 fragCoord)
 	vec2 d = vec2(0);
 	if (getCullingPoint(eye, rd, ro, d, maxDistance, nor))
 	{
-		float s = getSDF(ro).x;
+		float s = GetSDF(ro).x;
 		if (s < 0.0)
 		{
 			CalcDepth(rd, d.x); 
@@ -2931,7 +3079,7 @@ void mainImage(inout vec4 fragColor, in vec2 fragCoord)
 				
 				vec3 p = ro + rd * md.x;
 				nor = getNor(p, normalPrec);
-				float my = getSDF(p).y;
+				float my = GetSDF(p).y;
 				vec3 matColor = vec3(0);
 				if (my < 1.) matColor = matColor0;
 				else if (my < 2.) matColor = matColor1;
@@ -2964,13 +3112,13 @@ void main(void)
 	fragColor = color;
 }
 )";
-	return infos;
+    return infos;
 }
 
-ShaderInfos CodeGenerator::Get_Shader_Demo_Buffer_Attachments()
-{
-	ShaderInfos infos;
-	infos.header += u8R"(
+ShaderInfos CodeGenerator::Get_Shader_Demo_Buffer_Attachments() {
+    ShaderInfos infos;
+    infos.header +=
+        u8R"(
 @FRAMEBUFFER 
 
 FORMAT(float)
@@ -3105,13 +3253,13 @@ void main(void)
 	fragColor.a = 1.0;
 }
 )";
-	return infos;
+    return infos;
 }
 
-ShaderInfos CodeGenerator::Get_Shader_Demo_Compute()
-{
-	ShaderInfos comp;
-	comp.header += u8R"(
+ShaderInfos CodeGenerator::Get_Shader_Demo_Compute() {
+    ShaderInfos comp;
+    comp.header +=
+        u8R"(
 @UNIFORMS
 
 uniform(hidden) int(frame) uFrame;
@@ -3335,8 +3483,9 @@ void main()
 }
 
 )";
-	ShaderInfos main;
-	main.header += u8R"(
+    ShaderInfos main;
+    main.header +=
+        u8R"(
 @FRAMEBUFFER 
 
 SIZE(1024)
@@ -3395,14 +3544,14 @@ void main(void)
 	fragColor.a = 1.0;
 }
 )";
-	main.childs.push_back(comp);
-	return main;
+    main.childs.push_back(comp);
+    return main;
 }
 
-ShaderInfos CodeGenerator::Get_Shader_Demo_Instanced()
-{
-	ShaderInfos infos;
-	infos.header += u8R"(
+ShaderInfos CodeGenerator::Get_Shader_Demo_Instanced() {
+    ShaderInfos infos;
+    infos.header +=
+        u8R"(
 @UNIFORMS
 
 uniform mat4(camera:mvp) cam;
@@ -3486,41 +3635,37 @@ void main(void)
 	fragColor = v_color;
 }
 )";
-	return infos;
+    return infos;
 }
 
-ShaderInfos CodeGenerator::Get_Shader_Demo_Scene()
-{
-	CTOOL_DEBUG_BREAK;
+ShaderInfos CodeGenerator::Get_Shader_Demo_Scene() {
+    CTOOL_DEBUG_BREAK;
 
-	ShaderInfos infos;
-	infos.header += u8R"()";
-	return infos;
+    ShaderInfos infos;
+    infos.header += u8R"()";
+    return infos;
 }
 
-ShaderInfos CodeGenerator::Get_Shader_Demo_Multipass_One_File_2_buffers()
-{
-	CTOOL_DEBUG_BREAK;
+ShaderInfos CodeGenerator::Get_Shader_Demo_Multipass_One_File_2_buffers() {
+    CTOOL_DEBUG_BREAK;
 
-	ShaderInfos infos;
-	infos.header += u8R"()";
-	return infos;
+    ShaderInfos infos;
+    infos.header += u8R"()";
+    return infos;
 }
 
-ShaderInfos CodeGenerator::Get_Shader_Demo_Multipass_One_File_3_buffers()
-{
-	CTOOL_DEBUG_BREAK;
+ShaderInfos CodeGenerator::Get_Shader_Demo_Multipass_One_File_3_buffers() {
+    CTOOL_DEBUG_BREAK;
 
-	ShaderInfos infos;
-	infos.header += u8R"()";
-	return infos;
+    ShaderInfos infos;
+    infos.header += u8R"()";
+    return infos;
 }
 
-ShaderInfos CodeGenerator::Get_Shader_Demo_Multipass_One_File_4_buffers()
-{
-	CTOOL_DEBUG_BREAK;
+ShaderInfos CodeGenerator::Get_Shader_Demo_Multipass_One_File_4_buffers() {
+    CTOOL_DEBUG_BREAK;
 
-	ShaderInfos infos;
-	infos.header += u8R"()";
-	return infos;
+    ShaderInfos infos;
+    infos.header += u8R"()";
+    return infos;
 }

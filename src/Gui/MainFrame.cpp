@@ -1,10 +1,10 @@
-// NoodlesPlate Copyright (C) 2017-2023 Stephane Cuillerdier aka Aiekick
+// NoodlesPlate Copyright (C) 2017-2024 Stephane Cuillerdier aka Aiekick
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -54,37 +54,40 @@
 
 // this project
 #include <Headers/NoodlesPlateBuild.h>
-#include <Config/SettingsDlg.h>
-#include <Config/StaticConfig.h>
+#include <Systems/PictureExportSystem.h>
+#include <Systems/UrlLibrarySystem.h>
+#include <Systems/TemplateSystem.h>
+#include <Systems/VersionSystem.h>
 #include <Metrics/MetricSystem.h>
 #include <Backends/MainBackend.h>
-#include <Systems/PictureExportSystem.h>
-#include <Systems/TemplateSystem.h>
-#include <ImGuiThemeHelper.h>
-#include <Systems/UrlLibrarySystem.h>
-#include <Systems/VersionSystem.h>
+#include <Config/StaticConfig.h>
 #include <Systems/PathSystem.h>
+#include <Config/SettingsDlg.h>
+#include <ImGuiThemeHelper.h>
 #include <Messaging.h>
 
 // Panes
 #include <Panes/CodePane.h>
-#include <Panes/ConfigPane.h>
+#include <Panes/FontPane.h>  // SdfFontDesigner
 #include <Panes/HelpPane.h>
 #include <Panes/InfosPane.h>
 #include <Panes/NodesPane.h>
-#include <Panes/TimeLinePane.h>
-#include <Panes/UniformsPane.h>
+#include <Panes/ConfigPane.h>
 #include <Panes/ConsolePane.h>
 #include <Panes/MessagePane.h>
+#include <Panes/TimeLinePane.h>
+#include <Panes/UniformsPane.h>
 #include <Panes/ProfilerPane.h>
 #include <Panes/InspectorPane.h>
-#include <Panes/ConfigSwitcherPane.h>
 #include <Panes/BufferPreview.h>
+#include <Panes/FontPreviewPane.h>  // SdfFontDesigner
+#include <Panes/ConfigSwitcherPane.h>
 
 #include <Res/CustomFont.h>
+#include <Res/CustomFont2.h>
 
 #if defined(__WIN32__) || defined(WIN32) || defined(_WIN32) || defined(__WIN64__) || defined(WIN64) || defined(_WIN64) || defined(_MSC_VER)
-#include <ShlObj.h> // for quick acces places
+#include <ShlObj.h>  // for quick acces places
 #else
 #endif
 
@@ -102,7 +105,7 @@ std::string MainFrame::puFileToLoad = std::string();
 ///////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////
 
-MainFrame::MainFrame() {  
+MainFrame::MainFrame() {
 }
 
 MainFrame::~MainFrame() {
@@ -166,13 +169,16 @@ bool MainFrame::Init() {
 #endif
         LayoutManager::Instance()->AddPane(BufferPreview::Instance(), ICON_NDP2_VIEW_GRID " Buffers Preview", "", "RIGHT", 0.3f, false, false);
 
+        // SdfFontDesigner actieved where there is a @FONT section in the current shader
+        LayoutManager::Instance()->AddPane(FontPane::Instance(), ICON_NDP2_ALPHA " Sdf Font Designer", "", "LEFT", 0.3f, false, false);
+        LayoutManager::Instance()->AddPane(FontPreviewPane::Instance(), ICON_NDP2_SPELLCHECK " Sdf Font Designer Preview", "", "BOTTOM", 0.3f, false, false);
+
 #ifdef USE_VR
         VRGui::Instance()->SetCodeTree(MainBackend::Instance()->puCodeTree);
 #endif
         LayoutManager::Instance()->InitPanes();
 
         Messaging::sMessagePaneId = ConsolePane::Instance()->GetFlag();
-    
 
         if (MainBackend::Instance()->Load(puFileToLoad)) {
             SaveConfigFile("config.xml");
@@ -264,7 +270,7 @@ void MainFrame::Display(ct::ivec2 vSize) {
         SettingsDlg::Instance()->DrawDialog();
         VersionSystem::Instance()->DrawNewVersionDialog();
         ShadertoyBackupFileImportDlg::Instance()->DrawDialog();
-        LayoutManager::Instance()->DrawDialogsAndPopups(0U, size);
+        LayoutManager::Instance()->DrawDialogsAndPopups(0U, ImRect(ImVec2(), size));
 
         DrawErrorDialog();
         DoAbout();
@@ -321,17 +327,17 @@ void MainFrame::m_CreateDialogPlaces() {
         //// SYSTEM QUICK ACCESS /////////////////////////
         //////////////////////////////////////////////////
 
-#define addKnownFolderAsPlace(knownFolder, folderLabel, folderIcon)      \
-    {                                                                    \
-        PWSTR path = NULL;                                               \
-        HRESULT hr = SHGetKnownFolderPath(knownFolder, 0, NULL, &path);  \
-        if (SUCCEEDED(hr)) {                                             \
-            IGFD::FileStyle style;                                       \
-            style.icon = folderIcon;                                     \
-            auto place_path = IGFD::Utils::UTF8Encode(path);             \
+#define addKnownFolderAsPlace(knownFolder, folderLabel, folderIcon)             \
+    {                                                                           \
+        PWSTR path = NULL;                                                      \
+        HRESULT hr = SHGetKnownFolderPath(knownFolder, 0, NULL, &path);         \
+        if (SUCCEEDED(hr)) {                                                    \
+            IGFD::FileStyle style;                                              \
+            style.icon = folderIcon;                                            \
+            auto place_path = IGFD::Utils::UTF8Encode(path);                    \
             system_places_ptr->AddPlace(folderLabel, place_path, false, style); \
-        }                                                                \
-        CoTaskMemFree(path);                                             \
+        }                                                                       \
+        CoTaskMemFree(path);                                                    \
     }
         addKnownFolderAsPlace(FOLDERID_Desktop, "Desktop", ICON_NDP2_DESKTOP_MAC);
         addKnownFolderAsPlace(FOLDERID_Startup, "Startup", ICON_NDP2_HOME);
@@ -493,7 +499,8 @@ bool MainFrame::DoAbout() {
         ImGui::Image((ImTextureID)(void*)(size_t)MainBackend::Instance()->m_AppIconGLTextureID, ImVec2(128, 128), ImVec2(0, 1), ImVec2(1, 0));
 
         // VERSION
-        ImGui::Text("Version : %s %s %s build %s", "Beta",
+        ImGui::Text("Version : %s %s %s build %s",
+                    "Beta",
 #ifdef _DEBUG
                     "Debug",
 #else
@@ -632,6 +639,7 @@ void MainFrame::DrawFileDialogs(const ct::ivec2& vScreenSize) {
         max = ImVec2((float)vScreenSize.x, (float)vScreenSize.y);
         min = max * 0.5f;
     }
+    min = ImVec2((float)vScreenSize.x, (float)vScreenSize.y) * 0.25f;
 
     if (ImGuiFileDialog::Instance()->Display("OpenFileDialog", ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking, min, max)) {
         if (ImGuiFileDialog::Instance()->IsOk()) {
@@ -697,11 +705,11 @@ void MainFrame::DrawFileDialogs(const ct::ivec2& vScreenSize) {
 
             if (!MainBackend::Instance()->puDisplay_RenderPack.expired()) {
                 if (MainBackend::Instance()->puShow3DSpace) {
-                    PictureExportSystem::Instance()->ExportFBOToPictureFile(MainBackend::Instance()->puMainPipeLine->puBackBuffer, filepathname,
-                                                                            MainBackend::Instance()->puPreviewBufferId);
+                    PictureExportSystem::Instance()->ExportFBOToPictureFile(
+                        MainBackend::Instance()->puMainPipeLine->puBackBuffer, filepathname, MainBackend::Instance()->puPreviewBufferId);
                 } else {
-                    PictureExportSystem::Instance()->ExportRenderPackToPictureFile(MainBackend::Instance()->puDisplay_RenderPack, filepathname,
-                                                                                   MainBackend::Instance()->puPreviewBufferId);
+                    PictureExportSystem::Instance()->ExportRenderPackToPictureFile(
+                        MainBackend::Instance()->puDisplay_RenderPack, filepathname, MainBackend::Instance()->puPreviewBufferId);
                 }
             }
 
@@ -729,6 +737,9 @@ void MainFrame::DrawMainMenuBar() {
             if (ImGui::BeginMenu("Quad")) {
                 if (ImGui::MenuItem("Base")) {
                     CreateNewShader("Shader_Quad", "Quad_Shader.glsl");
+                }
+                if (ImGui::MenuItem("Font")) {
+                    CreateNewShader("Shader_Font", "Font_Shader.glsl");
                 }
 
                 ImGui::EndMenu();
@@ -929,8 +940,7 @@ void MainFrame::DrawMainMenuBar() {
                     config.countSelectionMax = 1;
                     config.sidePane = std::bind(&PictureExportSystem::ExportPictureDialogOptions, PictureExportSystem::Instance(), _1, _2, _3);
                     config.flags = ImGuiFileDialogFlags_Modal;
-                    ImGuiFileDialog::Instance()->OpenDialog(
-                        "SavePictureDialog", "Save Current Buffer to Picture File", ".png,.tga,.bmp,.hdr", config);
+                    ImGuiFileDialog::Instance()->OpenDialog("SavePictureDialog", "Save Current Buffer to Picture File", ".png,.tga,.bmp,.hdr", config);
                 }
 
                 if (ImGui::BeginMenu("After Each Modif of Code")) {
@@ -1119,8 +1129,7 @@ void MainFrame::DrawMainMenuBar() {
         }
     }
 
-    if (ImGui::ToggleContrastedButton(ICON_NDP_PAUSE, ICON_NDP_PLAY, &MainBackend::Instance()->puPlayCounterTimers,
-                                      "Play/Pause  All (Counters / Timers / Players)")) {
+    if (ImGui::ToggleContrastedButton(ICON_NDP_PAUSE, ICON_NDP_PLAY, &MainBackend::Instance()->puPlayCounterTimers, "Play/Pause  All (Counters / Timers / Players)")) {
         MainBackend::Instance()->SetPlayPause(MainBackend::Instance()->puPlayCounterTimers);
     }
 

@@ -13,6 +13,7 @@ option(USE_NETWORK "Enable NETWORK (Shader Inport, Versions, Changelog)" ON)
 option(BUILD_X32 "Enable the 32 bit version of NoodlesPlate (default is X64)" OFF)
 option(USE_PACKAGE_TO_NSIS "Enable packaging to nsis isntaller or zip if false" ON)
 option(USE_STD_FILESYSTEM "Enable std::filesystem use for path and ImGuiFileDialog" ON)
+option(USE_SOURCETRAIL "Enable the Compilation DataBase building for sourceTrail" OFF)
 
 if (WIN32)
 	# MACOS : VR is not supported
@@ -45,6 +46,9 @@ if (USE_VR)
 		add_definitions(-DXR_USE_PLATFORM_WIN32)
 	endif()
 endif()
+
+# SourceTrail https://github.com/CoatiSoftware/Sourcetrail
+add_definitions(-DCMAKE_EXPORT_COMPILE_COMMANDS=${USE_SOURCETRAIL})
 
 set(FINAL_BIN_DIR ${CMAKE_BINARY_DIR}/../bin)
 set(CMAKE_INSTALL_PREFIX "${FINAL_BIN_DIR}")
@@ -142,12 +146,16 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/src PREFIX src FILES ${PROJECT_SRC
 
 if (USE_SDL)
 	file(GLOB IMGUI_IMPL_SRC 
+		${CMAKE_SOURCE_DIR}/3rdparty/SoGLSL/3rdparty/ImGuiPack/3rdparty/imgui_docking/misc/freetype/imgui_freetype.cpp
+		${CMAKE_SOURCE_DIR}/3rdparty/SoGLSL/3rdparty/ImGuiPack/3rdparty/imgui_docking/misc/freetype/imgui_freetype.h
 		${CMAKE_SOURCE_DIR}/3rdparty/SoGLSL/3rdparty/ImGuiPack/3rdparty/imgui_docking/backends/imgui_impl_opengl3.cpp
 		${CMAKE_SOURCE_DIR}/3rdparty/SoGLSL/3rdparty/ImGuiPack/3rdparty/imgui_docking/backends/imgui_impl_opengl3.h
 		${CMAKE_SOURCE_DIR}/3rdparty/SoGLSL/3rdparty/ImGuiPack/3rdparty/imgui_docking/backends/imgui_impl_sdl.cpp
 		${CMAKE_SOURCE_DIR}/3rdparty/SoGLSL/3rdparty/ImGuiPack/3rdparty/imgui_docking/backends/imgui_impl_sdl.h)
 else()
 	file(GLOB IMGUI_IMPL_SRC 
+		${CMAKE_SOURCE_DIR}/3rdparty/SoGLSL/3rdparty/ImGuiPack/3rdparty/imgui_docking/misc/freetype/imgui_freetype.cpp
+		${CMAKE_SOURCE_DIR}/3rdparty/SoGLSL/3rdparty/ImGuiPack/3rdparty/imgui_docking/misc/freetype/imgui_freetype.h
 		${CMAKE_SOURCE_DIR}/3rdparty/SoGLSL/3rdparty/ImGuiPack/3rdparty/imgui_docking/backends/imgui_impl_opengl3.cpp
 		${CMAKE_SOURCE_DIR}/3rdparty/SoGLSL/3rdparty/ImGuiPack/3rdparty/imgui_docking/backends/imgui_impl_opengl3.h
 		${CMAKE_SOURCE_DIR}/3rdparty/SoGLSL/3rdparty/ImGuiPack/3rdparty/imgui_docking/backends/imgui_impl_glfw.cpp
@@ -166,7 +174,6 @@ add_executable(${PROJECT}
 	${PROJECT_MAIN}
 	${CMAKE_RECURSE}
 	${IMGUI_IMPL_SRC}
-	${IMGUI_MISC_SRC}
 	${PROJECT_SRC_RECURSE}
 	${APP_ICON_RESOURCE_WINDOWS}
 )
@@ -286,11 +293,13 @@ include_directories(
 	3rdparty/SoGLSL/3rdparty/ImGuiPack/3rdparty/imgui_docking
 	${NVAPI_INCLUDE_DIR}
 	${SOGSL_INCLUDE_DIRS}
+	${MSDFGEN_INCLUDE_DIR}
 )
 
 target_link_libraries(${PROJECT} PRIVATE 
 	${NVAPI_LIBRARIES}
 	${SOGLSL_LIBRARIES}
+	${MSDFGEN_LIBRARIES}
 )
 
 #############################################################

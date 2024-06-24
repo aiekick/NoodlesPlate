@@ -1,10 +1,10 @@
-// NoodlesPlate Copyright (C) 2017-2023 Stephane Cuillerdier aka Aiekick
+// NoodlesPlate Copyright (C) 2017-2024 Stephane Cuillerdier aka Aiekick
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -17,14 +17,13 @@
 
 #include <ImGuiPack.h>
 
-class MainToolBar
-{
+class MainToolBar {
 public:
-	static ImFont* puFont;
+    static ImFont* puFont;
 
 public:
-	bool Init();
-	void Unit();
-	void DrawToolBar();
-	void DrawCoolBar();
+    bool Init();
+    void Unit();
+    void DrawToolBar();
+    void DrawCoolBar();
 };

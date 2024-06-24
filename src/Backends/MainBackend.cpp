@@ -1,10 +1,10 @@
-// NoodlesPlate Copyright (C) 2017-2023 Stephane Cuillerdier aka Aiekick
+// NoodlesPlate Copyright (C) 2017-2024 Stephane Cuillerdier aka Aiekick
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -15,7 +15,6 @@
 
 // This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
-
 
 #include <Backends/MainBackend.h>
 
@@ -30,7 +29,9 @@
 #include <ImGuiPack.h>
 
 // SoGLSL
+#include <SoGLSL/src/Res/CustomFont.h>
 #include <SoGLSL/src/Gui/GuiBackend.h>
+#include <SoGLSL/src/Res/CustomFont2.h>
 #include <SoGLSL/src/CodeTree/CodeTree.h>
 #include <SoGLSL/src/Buffer/FrameBuffer.h>
 #include <SoGLSL/src/CodeTree/ShaderKey.h>
@@ -54,21 +55,21 @@
 #include <SoGLSL/src/Mesh/Operations/MeshLoader.h>
 #include <SoGLSL/src/Buffer/FrameBuffersPipeLine.h>
 #include <SoGLSL/src/Systems/RenderDocController.h>
+#include <SoGLSL/src/Importer/ShadertoyBackupFileImportDlg.h>
 #include <SoGLSL/src/CodeTree/ShaderKeyConfigSwitcherUnified.h>
-#include <SoGLSL/src/Res/CustomFont.h>
-#include <SoGLSL/src/Res/CustomFont2.h>
 
 // This Project
-#include <Generator/CodeGenerator.h>
-#include <Systems/PictureExportSystem.h>
-#include <Headers/NoodlesPlateBuild.h>
 #include <Metrics/MetricSystem.h>
 #include <Systems/TemplateSystem.h>
+#include <Generator/CodeGenerator.h>
 #include <Systems/UrlLibrarySystem.h>
+#include <Headers/NoodlesPlateBuild.h>
+#include <Systems/PictureExportSystem.h>
+
+#include <FontDesigner/FontDesigner.h>
+#include <FontDesigner/Generation/GenerationThread.h>
+
 #include <filesystem>
-
-#include <SoGLSL/src/Importer/ShadertoyBackupFileImportDlg.h>
-
 #include <algorithm>
 
 #define MAIN_RENDERPACK_KEY "main"
@@ -118,25 +119,28 @@ void MainBackend::CreateWindows() {
     const std::string cpuVersion = (sizeof(size_t) > 4U) ? "x64" : "x86";
 
     static char buffer[1024 + 1];
-    snprintf(buffer, 1024, "NoodlesPlate Beta%s %s %s [F10/F11/F12 : Toggle UI/FullScreen/Decoration]",
+    snprintf(buffer,
+             1024,
+             "NoodlesPlate Beta%s %s %s [F10/F11/F12 : Toggle UI/FullScreen/Decoration]",
 #ifdef _DEBUG
              " Debug",
 #else
              "",
 #endif
-             cpuVersion.c_str(), NoodlesPlate_BuildId);
+             cpuVersion.c_str(),
+             NoodlesPlate_BuildId);
 
     prMainThreadWindowTitle = buffer;
 
-    MainBackend::sMainThread =
-        GuiBackend::Instance()->CreateGuiBackendWindow_Visible(sNormalWindowSize.x, sNormalWindowSize.y, prMainThreadWindowTitle.c_str());
+    MainBackend::sMainThread = GuiBackend::Instance()->CreateGuiBackendWindow_Visible(sNormalWindowSize.x, sNormalWindowSize.y, prMainThreadWindowTitle.c_str());
+
     if (MainBackend::sMainThread.win) {
         GuiBackend::MakeContextCurrent(MainBackend::sMainThread);
 
         GuiBackend::Instance()->SwapInterval(1);  // Enable vsync
-        GuiBackend::Instance()->SetWindowFocusCallback(MainBackend::sMainThread, window_focus_callback);
         GuiBackend::Instance()->SetWindowPosCallback(MainBackend::sMainThread, window_pos_callback);
         GuiBackend::Instance()->SetDropCallback(MainBackend::sMainThread, glfw_window_drop_callback);
+        GuiBackend::Instance()->SetWindowFocusCallback(MainBackend::sMainThread, window_focus_callback);
 
         GuiBackend::Instance()->SetEmbeddedIconApp(MainBackend::sMainThread, "IDI_ICON1");
     }
@@ -146,8 +150,8 @@ void MainBackend::UpdateWindowStatus() {
     std::string appMemoryUsage;
     if (MetricSystem::Instance()->GetAppMemoryString(1000, &appMemoryUsage)) {
 #ifdef _DEBUG
-        const auto title = ct::toStr("%s %s [%i x %i] [Uni %i]", prMainThreadWindowTitle.c_str(), appMemoryUsage.c_str(), puScreenSize.x,
-                                     puScreenSize.y, UniformVariant::counter);
+        const auto title =
+            ct::toStr("%s %s [%i x %i] [Uni %i]", prMainThreadWindowTitle.c_str(), appMemoryUsage.c_str(), puScreenSize.x, puScreenSize.y, UniformVariant::counter);
 #else
         const auto title = ct::toStr("%s %s [%i x %i]", prMainThreadWindowTitle.c_str(), appMemoryUsage.c_str(), puScreenSize.x, puScreenSize.y);
 #endif
@@ -201,9 +205,9 @@ void MainBackend::Unit() {
 #endif
 
     TextureSound::Release();
+    FontDesigner::Instance()->unit();
     MetricSystem::Instance()->Unit();
     GamePadSystem::Instance()->Unit();
-    ;
     SoundSystem::Instance()->Unit();
     MidiSystem::Instance()->Unit();
 
@@ -232,7 +236,7 @@ void MainBackend::Unit() {
 bool MainBackend::Init(const ct::ivec2& vScreenSize) {
     TracyGpuZone("MainBackend::Init");
 
-    puCodeTree = CodeTree::Create(); // need imgui
+    puCodeTree = CodeTree::Create();  // need imgui
 
 #ifdef USE_THUMBNAILS
     ImGuiFileDialog::Instance()->SetCreateThumbnailCallback([](IGFD_Thumbnail_Info* vThumbnail_Info) {
@@ -246,8 +250,15 @@ bool MainBackend::Init(const ct::ivec2& vScreenSize) {
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, (GLsizei)vThumbnail_Info->textureWidth, (GLsizei)vThumbnail_Info->textureHeight, 0, GL_RGBA,
-                         GL_UNSIGNED_BYTE, vThumbnail_Info->textureFileDatas);
+            glTexImage2D(GL_TEXTURE_2D,
+                         0,
+                         GL_RGBA,
+                         (GLsizei)vThumbnail_Info->textureWidth,
+                         (GLsizei)vThumbnail_Info->textureHeight,
+                         0,
+                         GL_RGBA,
+                         GL_UNSIGNED_BYTE,
+                         vThumbnail_Info->textureFileDatas);
             glBindTexture(GL_TEXTURE_2D, 0);
 
             delete[] vThumbnail_Info->textureFileDatas;
@@ -269,20 +280,21 @@ bool MainBackend::Init(const ct::ivec2& vScreenSize) {
 
     MetricSystem::Instance()->Init();
 
-    FileHelper::Instance()->RegisterPath((int)FILE_LOCATION_Enum::FILE_LOCATION_SCRIPT, "scripts");
-    FileHelper::Instance()->RegisterPath((int)FILE_LOCATION_Enum::FILE_LOCATION_ASSET_GENERAL, "assets");
-    FileHelper::Instance()->RegisterPath((int)FILE_LOCATION_Enum::FILE_LOCATION_ASSET_TEXTURE_2D, "assets");
-    FileHelper::Instance()->RegisterPath((int)FILE_LOCATION_Enum::FILE_LOCATION_ASSET_TEXTURE_3D, "assets");
-    FileHelper::Instance()->RegisterPath((int)FILE_LOCATION_Enum::FILE_LOCATION_ASSET_CUBEMAP, "assets");
-    FileHelper::Instance()->RegisterPath((int)FILE_LOCATION_Enum::FILE_LOCATION_ASSET_SOUND, "assets");
-    FileHelper::Instance()->RegisterPath((int)FILE_LOCATION_Enum::FILE_LOCATION_ASSET_MESH, "assets");
-    FileHelper::Instance()->RegisterPath((int)FILE_LOCATION_Enum::FILE_LOCATION_EXPORT, "exports");
+    FileHelper::Instance()->RegisterPath((int)FILE_LOCATION_Enum::FILE_LOCATION_APP, "");
     FileHelper::Instance()->RegisterPath((int)FILE_LOCATION_Enum::FILE_LOCATION_CONF, "conf");
+    FileHelper::Instance()->RegisterPath((int)FILE_LOCATION_Enum::FILE_LOCATION_FONTS, "fonts");
     FileHelper::Instance()->RegisterPath((int)FILE_LOCATION_Enum::FILE_LOCATION_DEBUG, "debug");
     FileHelper::Instance()->RegisterPath((int)FILE_LOCATION_Enum::FILE_LOCATION_SHAPES, "shapes");
     FileHelper::Instance()->RegisterPath((int)FILE_LOCATION_Enum::FILE_LOCATION_IMPORT, "imports");
+    FileHelper::Instance()->RegisterPath((int)FILE_LOCATION_Enum::FILE_LOCATION_SCRIPT, "scripts");
+    FileHelper::Instance()->RegisterPath((int)FILE_LOCATION_Enum::FILE_LOCATION_EXPORT, "exports");
+    FileHelper::Instance()->RegisterPath((int)FILE_LOCATION_Enum::FILE_LOCATION_ASSET_MESH, "assets");
+    FileHelper::Instance()->RegisterPath((int)FILE_LOCATION_Enum::FILE_LOCATION_ASSET_SOUND, "assets");
+    FileHelper::Instance()->RegisterPath((int)FILE_LOCATION_Enum::FILE_LOCATION_ASSET_CUBEMAP, "assets");
+    FileHelper::Instance()->RegisterPath((int)FILE_LOCATION_Enum::FILE_LOCATION_ASSET_GENERAL, "assets");
+    FileHelper::Instance()->RegisterPath((int)FILE_LOCATION_Enum::FILE_LOCATION_ASSET_TEXTURE_2D, "assets");
+    FileHelper::Instance()->RegisterPath((int)FILE_LOCATION_Enum::FILE_LOCATION_ASSET_TEXTURE_3D, "assets");
     FileHelper::Instance()->RegisterPath((int)FILE_LOCATION_Enum::FILE_LOCATION_SCRIPT_INCLUDE, "");
-    FileHelper::Instance()->RegisterPath((int)FILE_LOCATION_Enum::FILE_LOCATION_APP, "");
 
     FileHelper::Instance()->puSearchPaths.emplace_back("predefined");
     FileHelper::Instance()->puSearchPaths.emplace_back("predefined" + FileHelper::Instance()->puSlashType + "shaders");
@@ -307,6 +319,7 @@ bool MainBackend::Init(const ct::ivec2& vScreenSize) {
     SoundSystem::Instance()->Init(nullptr);
     MidiSystem::Instance()->Init(nullptr);
     TemplateSystem::Instance()->Init();
+    FontDesigner::Instance()->init(puCodeTree);
     CameraSystem::Instance()->NeedCamChange();
 
 #ifdef USE_NETWORK
@@ -329,16 +342,16 @@ bool MainBackend::Init(const ct::ivec2& vScreenSize) {
     puScreenSize = vScreenSize;
 
     ShaderKeyPtr mainKey = nullptr;  // puCodeTree->AddShaderKey("");
-    puMain_RenderPack = RenderPack::createBufferWithFileWithoutLoading(
-        MainBackend::sMainThread,    // thread
-        MAIN_RENDERPACK_KEY,         // tag
-        ct::ivec3(puScreenSize, 0),  // fbo size
-        mainKey,                     // script
-        true,                        // zbuffer // pour l'opprotunite de charger du points ou du mesh il seviera pas si c'est du quads
-        true,                        // fbo pour le multipass
-        false,                       // renderbuffer
-        false                        // floatbuffer
-    );
+    puMain_RenderPack =
+        RenderPack::createBufferWithFileWithoutLoading(MainBackend::sMainThread,    // thread
+                                                       MAIN_RENDERPACK_KEY,         // tag
+                                                       ct::ivec3(puScreenSize, 0),  // fbo size
+                                                       mainKey,                     // script
+                                                       true,   // zbuffer // pour l'opprotunite de charger du points ou du mesh il seviera pas si c'est du quads
+                                                       true,   // fbo pour le multipass
+                                                       false,  // renderbuffer
+                                                       false   // floatbuffer
+        );
 
     if (puMain_RenderPack) {
         puMain_RenderPack->puShowBlendingButton = true;
@@ -370,8 +383,8 @@ bool MainBackend::Init(const ct::ivec2& vScreenSize) {
     }
     puFileListingExceptions.emplace(path);
     puTriDAxisKey = puCodeTree->LoadFromFile(path, KEY_TYPE_Enum::KEY_TYPE_SHADER);
-    pu3dAxis_RenderPack = RenderPack::createBufferWithFileWithoutLoading(MainBackend::sMainThread, AXIS_RENDERPACK_KEY, ct::ivec3(puScreenSize, 0),
-                                                                         puTriDAxisKey, true, false);
+    pu3dAxis_RenderPack =
+        RenderPack::createBufferWithFileWithoutLoading(MainBackend::sMainThread, AXIS_RENDERPACK_KEY, ct::ivec3(puScreenSize, 0), puTriDAxisKey, true, false);
     if (pu3dAxis_RenderPack) {
         pu3dAxis_RenderPack->puShowZBufferButton = true;
     }
@@ -387,8 +400,8 @@ bool MainBackend::Init(const ct::ivec2& vScreenSize) {
     }
     puFileListingExceptions.emplace(path);
     puTriDGridKey = puCodeTree->LoadFromFile(path, KEY_TYPE_Enum::KEY_TYPE_SHADER);
-    pu3dGrid_RenderPack = RenderPack::createBufferWithFileWithoutLoading(MainBackend::sMainThread, GRID_RENDERPACK_KEY, ct::ivec3(puScreenSize, 0),
-                                                                         puTriDGridKey, true, false);
+    pu3dGrid_RenderPack =
+        RenderPack::createBufferWithFileWithoutLoading(MainBackend::sMainThread, GRID_RENDERPACK_KEY, ct::ivec3(puScreenSize, 0), puTriDGridKey, true, false);
     if (pu3dGrid_RenderPack) {
         pu3dGrid_RenderPack->puShowZBufferButton = true;
     }
@@ -404,8 +417,7 @@ bool MainBackend::Init(const ct::ivec2& vScreenSize) {
     }
     puFileListingExceptions.emplace(path);
     puMeshKey = puCodeTree->LoadFromFile(path, KEY_TYPE_Enum::KEY_TYPE_SHADER);
-    puMesh_RenderPack = RenderPack::createBufferWithFileWithoutLoading(MainBackend::sMainThread, MESH_RENDERPACK_KEY, ct::ivec3(puScreenSize, 0),
-                                                                       puMeshKey, true, false);
+    puMesh_RenderPack = RenderPack::createBufferWithFileWithoutLoading(MainBackend::sMainThread, MESH_RENDERPACK_KEY, ct::ivec3(puScreenSize, 0), puMeshKey, true, false);
     if (puMesh_RenderPack) {
         puMesh_RenderPack->puShowBlendingButton = true;
         puMesh_RenderPack->puShowCullingButton = true;
@@ -419,6 +431,7 @@ bool MainBackend::Init(const ct::ivec2& vScreenSize) {
     //////////////////////////////////////////////////////////////////////////////////////////////
 
     path = GizmoSystem::Instance()->InitRenderPack(MainBackend::sMainThread, puCodeTree);
+    puFileListingExceptions.emplace(path);
     path = SoundSystem::Instance()->InitRenderPack(MainBackend::sMainThread, puCodeTree);
     puFileListingExceptions.emplace(path);
 
@@ -745,11 +758,11 @@ void MainBackend::ApplyColorClearing() {
 void MainBackend::SetCustomWidgetsOfRenderPack(RenderPackWeak vRenderPack) {
     auto rpPtr = vRenderPack.lock();
     if (rpPtr) {
+        rpPtr->AddCustomWidgetNameAndPropagateToChilds(uType::uTypeEnum::U_VEC4, "bgcolor", 0);
         rpPtr->AddCustomWidgetNameAndPropagateToChilds(uType::uTypeEnum::U_FLOAT, "usemsaa", 0);
         rpPtr->AddCustomWidgetNameAndPropagateToChilds(uType::uTypeEnum::U_FLOAT, "show3dSpace", 0);
-        rpPtr->AddCustomWidgetNameAndPropagateToChilds(uType::uTypeEnum::U_INT, "currentattachment", 0);
         rpPtr->AddCustomWidgetNameAndPropagateToChilds(uType::uTypeEnum::U_SAMPLER2D, "desktop", 0);
-        rpPtr->AddCustomWidgetNameAndPropagateToChilds(uType::uTypeEnum::U_VEC4, "bgcolor", 0);
+        rpPtr->AddCustomWidgetNameAndPropagateToChilds(uType::uTypeEnum::U_INT, "currentattachment", 0);
     }
 }
 
@@ -850,7 +863,7 @@ bool MainBackend::DoShaderCodeUpdate(std::set<std::string> vFiles, bool vForceUp
             }
         }
 
-         // countUniforms = UniformVariant::counter;
+        // countUniforms = UniformVariant::counter;
         codeChange |= DoShaderCodeUpdateOfRenderPack(pu3dAxis_RenderPack, vForceUpdate, &glslFilesToUpdatePossibly);
         for (auto it : pu3dAxis_RenderPack->puBuffers) {
             codeChange |= DoShaderCodeUpdateOfRenderPack(it, vForceUpdate, &glslFilesToUpdatePossibly);
@@ -879,9 +892,9 @@ bool MainBackend::DoShaderCodeUpdate(std::set<std::string> vFiles, bool vForceUp
         // codeChange |= DoShaderCodeUpdateOfRenderPack(SoundSystem::Instance()->GetRenderPack(), vForceUpdate, &glslFilesToUpdatePossibly);
 
         if (codeChange) {
-            //countUniforms = UniformVariant::counter;
+            // countUniforms = UniformVariant::counter;
             puCodeTree->FillIncludeFileList();
-            //countUniforms = UniformVariant::counter;
+            // countUniforms = UniformVariant::counter;
 
             NeedRefresh(true);
             CameraSystem::Instance()->NeedCamChange();
@@ -977,8 +990,7 @@ void MainBackend::UpdateMouseDatas(bool vCanUseMouse) {
         puMouseInterface.buttonDown[mb] = imd && vCanUseMouse;
     }
 
-    puMouseInterface.canUpdateMouse =
-        puCanWeTuneMouse && (puMouseInterface.buttonDown[0] || puMouseInterface.buttonDown[1] || puMouseInterface.buttonDown[2]);
+    puMouseInterface.canUpdateMouse = puCanWeTuneMouse && (puMouseInterface.buttonDown[0] || puMouseInterface.buttonDown[1] || puMouseInterface.buttonDown[2]);
 
     if (vCanUseMouse) {
         // puMouseInterface pos is needed for camera and mouse
@@ -1225,8 +1237,7 @@ void MainBackend::DoRendering() {
                             glDrawBuffer(GL_COLOR_ATTACHMENT0);
                             LogGlError();
 
-                            glBlitFramebuffer(0, 0, size.x, size.y, p0.x, p0.y, p1.x, p1.y, GL_COLOR_BUFFER_BIT,
-                                              puMainPipeLine->puTexParams.magFilter);
+                            glBlitFramebuffer(0, 0, size.x, size.y, p0.x, p0.y, p1.x, p1.y, GL_COLOR_BUFFER_BIT, puMainPipeLine->puTexParams.magFilter);
                             LogGlError();
 
                             // seulement GL_NEAREST permet de merger le depth et les sdf
@@ -1241,19 +1252,33 @@ void MainBackend::DoRendering() {
 
                     if (pu3dAxis_RenderPack && puTriDAxisKey->puShaderGlobalSettings.showFlag) {
                         pu3dAxis_RenderPack->UpdateTimeWidgets(prDeltaTime);
-                        pu3dAxis_RenderPack->UpdateUniforms(
-                            std::bind(&MainBackend::UpdateUniforms, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
-                                      std::placeholders::_4, std::placeholders::_5),
-                            puDisplayQuality, &puMouseInterface, CameraSystem::Instance(), puScreenSize);
+                        pu3dAxis_RenderPack->UpdateUniforms(std::bind(&MainBackend::UpdateUniforms,
+                                                                      this,
+                                                                      std::placeholders::_1,
+                                                                      std::placeholders::_2,
+                                                                      std::placeholders::_3,
+                                                                      std::placeholders::_4,
+                                                                      std::placeholders::_5),
+                                                            puDisplayQuality,
+                                                            &puMouseInterface,
+                                                            CameraSystem::Instance(),
+                                                            puScreenSize);
                         pu3dAxis_RenderPack->RenderNode(nullptr, puMainPipeLine);
                     }
 
                     if (pu3dGrid_RenderPack && puTriDGridKey->puShaderGlobalSettings.showFlag) {
                         pu3dGrid_RenderPack->UpdateTimeWidgets(prDeltaTime);
-                        pu3dGrid_RenderPack->UpdateUniforms(
-                            std::bind(&MainBackend::UpdateUniforms, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
-                                      std::placeholders::_4, std::placeholders::_5),
-                            puDisplayQuality, &puMouseInterface, CameraSystem::Instance(), puScreenSize);
+                        pu3dGrid_RenderPack->UpdateUniforms(std::bind(&MainBackend::UpdateUniforms,
+                                                                      this,
+                                                                      std::placeholders::_1,
+                                                                      std::placeholders::_2,
+                                                                      std::placeholders::_3,
+                                                                      std::placeholders::_4,
+                                                                      std::placeholders::_5),
+                                                            puDisplayQuality,
+                                                            &puMouseInterface,
+                                                            CameraSystem::Instance(),
+                                                            puScreenSize);
                         pu3dGrid_RenderPack->RenderNode(nullptr, puMainPipeLine);
                     }
                 }
@@ -1263,9 +1288,17 @@ void MainBackend::DoRendering() {
 
                     if (puMesh_RenderPack && puMeshKey->puShaderGlobalSettings.showFlag) {
                         puMesh_RenderPack->UpdateTimeWidgets(prDeltaTime);
-                        puMesh_RenderPack->UpdateUniforms(std::bind(&MainBackend::UpdateUniforms, this, std::placeholders::_1, std::placeholders::_2,
-                                                                    std::placeholders::_3, std::placeholders::_4, std::placeholders::_5),
-                                                          puDisplayQuality, &puMouseInterface, CameraSystem::Instance(), puScreenSize);
+                        puMesh_RenderPack->UpdateUniforms(std::bind(&MainBackend::UpdateUniforms,
+                                                                    this,
+                                                                    std::placeholders::_1,
+                                                                    std::placeholders::_2,
+                                                                    std::placeholders::_3,
+                                                                    std::placeholders::_4,
+                                                                    std::placeholders::_5),
+                                                          puDisplayQuality,
+                                                          &puMouseInterface,
+                                                          CameraSystem::Instance(),
+                                                          puScreenSize);
                         puMesh_RenderPack->RenderNode(nullptr, puMainPipeLine);
                     }
                 }
@@ -1276,9 +1309,17 @@ void MainBackend::DoRendering() {
                     auto rp = GizmoSystem::Instance()->GetRenderPack().lock();
                     if (rp && rp->GetShaderKey() && rp->GetShaderKey()->puShaderGlobalSettings.showFlag) {
                         rp->UpdateTimeWidgets(prDeltaTime);
-                        rp->UpdateUniforms(std::bind(&MainBackend::UpdateUniforms, this, std::placeholders::_1, std::placeholders::_2,
-                                                     std::placeholders::_3, std::placeholders::_4, std::placeholders::_5),
-                                           puDisplayQuality, &puMouseInterface, CameraSystem::Instance(), puScreenSize);
+                        rp->UpdateUniforms(std::bind(&MainBackend::UpdateUniforms,
+                                                     this,
+                                                     std::placeholders::_1,
+                                                     std::placeholders::_2,
+                                                     std::placeholders::_3,
+                                                     std::placeholders::_4,
+                                                     std::placeholders::_5),
+                                           puDisplayQuality,
+                                           &puMouseInterface,
+                                           CameraSystem::Instance(),
+                                           puScreenSize);
                         rp->RenderNode(nullptr, puMainPipeLine);
                     }
                 }
@@ -1291,9 +1332,17 @@ void MainBackend::DoRendering() {
                         auto itPtr = puDisplay_RenderPack.lock();
                         if (itPtr) {
                             itPtr->UpdateTimeWidgets(prDeltaTime);
-                            itPtr->UpdateUniforms(std::bind(&MainBackend::UpdateUniforms, this, std::placeholders::_1, std::placeholders::_2,
-                                                            std::placeholders::_3, std::placeholders::_4, std::placeholders::_5),
-                                                  puDisplayQuality, &puMouseInterface, CameraSystem::Instance(), puScreenSize);
+                            itPtr->UpdateUniforms(std::bind(&MainBackend::UpdateUniforms,
+                                                            this,
+                                                            std::placeholders::_1,
+                                                            std::placeholders::_2,
+                                                            std::placeholders::_3,
+                                                            std::placeholders::_4,
+                                                            std::placeholders::_5),
+                                                  puDisplayQuality,
+                                                  &puMouseInterface,
+                                                  CameraSystem::Instance(),
+                                                  puScreenSize);
                             itPtr->RenderNode(nullptr, puMainPipeLine);
                         }
                     }
@@ -1329,9 +1378,17 @@ void MainBackend::DoRendering() {
                 if (itPtr && itPtr != renderPackToRender) {
                     const auto s = itPtr->puMeshRect.Size();
                     itPtr->UpdateTimeWidgets(prDeltaTime);
-                    itPtr->UpdateUniforms(std::bind(&MainBackend::UpdateUniforms, this, std::placeholders::_1, std::placeholders::_2,
-                                                    std::placeholders::_3, std::placeholders::_4, std::placeholders::_5),
-                                          puDisplayQuality, &puMouseInterface, CameraSystem::Instance(), ct::ivec2((int)s.x, (int)s.y));
+                    itPtr->UpdateUniforms(std::bind(&MainBackend::UpdateUniforms,
+                                                    this,
+                                                    std::placeholders::_1,
+                                                    std::placeholders::_2,
+                                                    std::placeholders::_3,
+                                                    std::placeholders::_4,
+                                                    std::placeholders::_5),
+                                          puDisplayQuality,
+                                          &puMouseInterface,
+                                          CameraSystem::Instance(),
+                                          ct::ivec2((int)s.x, (int)s.y));
                     itPtr->RenderNode();
                 }
             }
@@ -1370,28 +1427,50 @@ void MainBackend::DoRenderingVR() {
                 auto displayShaderPtr = puDisplay_RenderPack.lock();
                 if (displayShaderPtr) {
                     displayShaderPtr->UpdateTimeWidgets(prDeltaTime);
-                    displayShaderPtr->UpdateUniforms(std::bind(&MainBackend::UpdateUniforms, this, std::placeholders::_1, std::placeholders::_2,
-                                                               std::placeholders::_3, std::placeholders::_4, std::placeholders::_5),
-                                                     puDisplayQuality, &puMouseInterface, camPtr, fboSize);
+                    displayShaderPtr->UpdateUniforms(std::bind(&MainBackend::UpdateUniforms,
+                                                               this,
+                                                               std::placeholders::_1,
+                                                               std::placeholders::_2,
+                                                               std::placeholders::_3,
+                                                               std::placeholders::_4,
+                                                               std::placeholders::_5),
+                                                     puDisplayQuality,
+                                                     &puMouseInterface,
+                                                     camPtr,
+                                                     fboSize);
                     displayShaderPtr->RenderNode(nullptr, nullptr, nullptr, nullptr, true);
                 }
 
                 if (puShow3DSpace) {
                     if (pu3dAxis_RenderPack && puTriDAxisKey->puShaderGlobalSettings.showFlag) {
                         pu3dAxis_RenderPack->UpdateTimeWidgets(prDeltaTime);
-                        pu3dAxis_RenderPack->UpdateUniforms(
-                            std::bind(&MainBackend::UpdateUniforms, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
-                                      std::placeholders::_4, std::placeholders::_5),
-                            puDisplayQuality, &puMouseInterface, camPtr, fboSize);
+                        pu3dAxis_RenderPack->UpdateUniforms(std::bind(&MainBackend::UpdateUniforms,
+                                                                      this,
+                                                                      std::placeholders::_1,
+                                                                      std::placeholders::_2,
+                                                                      std::placeholders::_3,
+                                                                      std::placeholders::_4,
+                                                                      std::placeholders::_5),
+                                                            puDisplayQuality,
+                                                            &puMouseInterface,
+                                                            camPtr,
+                                                            fboSize);
                         pu3dAxis_RenderPack->RenderShader(nullptr, nullptr);
                     }
 
                     if (pu3dGrid_RenderPack && puTriDGridKey->puShaderGlobalSettings.showFlag) {
                         pu3dGrid_RenderPack->UpdateTimeWidgets(prDeltaTime);
-                        pu3dGrid_RenderPack->UpdateUniforms(
-                            std::bind(&MainBackend::UpdateUniforms, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
-                                      std::placeholders::_4, std::placeholders::_5),
-                            puDisplayQuality, &puMouseInterface, camPtr, fboSize);
+                        pu3dGrid_RenderPack->UpdateUniforms(std::bind(&MainBackend::UpdateUniforms,
+                                                                      this,
+                                                                      std::placeholders::_1,
+                                                                      std::placeholders::_2,
+                                                                      std::placeholders::_3,
+                                                                      std::placeholders::_4,
+                                                                      std::placeholders::_5),
+                                                            puDisplayQuality,
+                                                            &puMouseInterface,
+                                                            camPtr,
+                                                            fboSize);
                         pu3dGrid_RenderPack->RenderShader(nullptr, nullptr);
                     }
                 }
@@ -1400,9 +1479,17 @@ void MainBackend::DoRenderingVR() {
                     auto rp = gizmoPtr->GetRenderPack().lock();
                     if (rp && rp->GetShaderKey() && rp->GetShaderKey()->puShaderGlobalSettings.showFlag) {
                         rp->UpdateTimeWidgets(prDeltaTime);
-                        rp->UpdateUniforms(std::bind(&MainBackend::UpdateUniforms, this, std::placeholders::_1, std::placeholders::_2,
-                                                     std::placeholders::_3, std::placeholders::_4, std::placeholders::_5),
-                                           puDisplayQuality, &puMouseInterface, CameraSystem::Instance(), fboSize);
+                        rp->UpdateUniforms(std::bind(&MainBackend::UpdateUniforms,
+                                                     this,
+                                                     std::placeholders::_1,
+                                                     std::placeholders::_2,
+                                                     std::placeholders::_3,
+                                                     std::placeholders::_4,
+                                                     std::placeholders::_5),
+                                           puDisplayQuality,
+                                           &puMouseInterface,
+                                           CameraSystem::Instance(),
+                                           fboSize);
                         rp->RenderShader(nullptr, nullptr);
                     }
                 }
@@ -1431,9 +1518,17 @@ void MainBackend::DoRenderingOfSceneRenderPacks(bool vOnlyForSpace3DPipeLine) {
             if (itPtr) {
                 if (itPtr->puCanBeIntegratedInExternalPipeline) {
                     itPtr->UpdateTimeWidgets(prDeltaTime);
-                    itPtr->UpdateUniforms(std::bind(&MainBackend::UpdateUniforms, this, std::placeholders::_1, std::placeholders::_2,
-                                                    std::placeholders::_3, std::placeholders::_4, std::placeholders::_5),
-                                          puDisplayQuality, &puMouseInterface, CameraSystem::Instance(), puScreenSize);
+                    itPtr->UpdateUniforms(std::bind(&MainBackend::UpdateUniforms,
+                                                    this,
+                                                    std::placeholders::_1,
+                                                    std::placeholders::_2,
+                                                    std::placeholders::_3,
+                                                    std::placeholders::_4,
+                                                    std::placeholders::_5),
+                                          puDisplayQuality,
+                                          &puMouseInterface,
+                                          CameraSystem::Instance(),
+                                          puScreenSize);
                     itPtr->RenderNode(nullptr, nullptr);
                 }
             }
@@ -1480,9 +1575,13 @@ void MainBackend::DoRenderingOfRenderPacks() {
         }
 
         renderPackToRender->UpdateTimeWidgets(prDeltaTime);
-        renderPackToRender->UpdateUniforms(std::bind(&MainBackend::UpdateUniforms, this, std::placeholders::_1, std::placeholders::_2,
-                                                     std::placeholders::_3, std::placeholders::_4, std::placeholders::_5),
-                                           puDisplayQuality, &puMouseInterface, CameraSystem::Instance(), prPipeSize);
+        renderPackToRender->UpdateUniforms(
+            std::bind(
+                &MainBackend::UpdateUniforms, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5),
+            puDisplayQuality,
+            &puMouseInterface,
+            CameraSystem::Instance(),
+            prPipeSize);
         renderPackToRender->RenderNode();
     } else {
         prPipeSize = puScreenSize;
@@ -1608,7 +1707,10 @@ void MainBackend::BlitFrameBuffer(RenderPackWeak vRenderPack) {
 //// DEFAULT UNIFORMS /////////////////////////////////
 ///////////////////////////////////////////////////////
 
-void MainBackend::UpdateUniforms(RenderPackWeak vRenderPack, UniformVariantPtr vUniPtr, DisplayQualityType vDisplayQuality, MouseInterface* vMouse,
+void MainBackend::UpdateUniforms(RenderPackWeak vRenderPack,
+                                 UniformVariantPtr vUniPtr,
+                                 DisplayQualityType vDisplayQuality,
+                                 MouseInterface* vMouse,
                                  CameraInterface* vCamera) {
     UNUSED(vRenderPack);
     UNUSED(vDisplayQuality);
@@ -1688,8 +1790,7 @@ void MainBackend::DrawMenu_Edit() {
 
         const auto spacing_LURD = ct::fvec4(spacing_L, spacing_U, spacing_R, spacing_D);
 
-        for (auto it = puCodeTree->puFilesUsedFromLastShadersConstruction.begin(); it != puCodeTree->puFilesUsedFromLastShadersConstruction.end();
-             ++it) {
+        for (auto it = puCodeTree->puFilesUsedFromLastShadersConstruction.begin(); it != puCodeTree->puFilesUsedFromLastShadersConstruction.end(); ++it) {
             for (auto it2 = it->second.begin(); it2 != it->second.end(); ++it2) {
                 const auto key = it2->first;
 
@@ -1774,8 +1875,7 @@ std::string MainBackend::getXml(const std::string& vOffset, const std::string& v
     str += vOffset + "<MainBackend>\n";
     str += vOffset + "\t<useMSAA2X>" + ct::toStr(puUseFXAA ? "true" : "false") + "</useMSAA2X>\n";
     str += vOffset + "\t<quality>" + ct::toStr(puDisplayQuality) + "</quality>\n";
-    str += vOffset + "\t<appMaximized>" + ct::toStr(((bool)GuiBackend::Instance()->IsMaximized(MainBackend::sMainThread)) ? "true" : "false") +
-        "</appMaximized>\n";
+    str += vOffset + "\t<appMaximized>" + ct::toStr(((bool)GuiBackend::Instance()->IsMaximized(MainBackend::sMainThread)) ? "true" : "false") + "</appMaximized>\n";
     str += vOffset + "\t<appRect>" + puAppRectIfNotmaximized.string() + "</appRect>\n";
     str += vOffset + "\t<consolevisibility>" + ct::toStr(puConsoleVisiblity ? "true" : "false") + "</consolevisibility>\n";
     str += vOffset + "\t<colorbg value=\"" + ct::fvec4(puBackgroundColor.x, puBackgroundColor.y, puBackgroundColor.z, puBackgroundColor.w).string() + "\"/>\n";
@@ -1885,9 +1985,9 @@ void MainBackend::ExportFrame(FrameBuffersPipeLinePtr vPipe) {
 
     if (vPipe && ShaderKeyConfigSwitcherUnified::Instance()->IsRendering()) {
         if (ShaderKeyConfigSwitcherUnified::Instance()->GetRenderingMode() == RenderingModeEnum::RENDERING_MODE_PICTURES) {
-            PictureExportSystem::Instance()->ExportFBOToPictureFile(
-                vPipe->getBackBuffer(),                                                                                     //
-                ShaderKeyConfigSwitcherUnified::Instance()->GetRenderingFilePathNameForCurrentFrame(), puPreviewBufferId);  //
+            PictureExportSystem::Instance()->ExportFBOToPictureFile(vPipe->getBackBuffer(),  //
+                                                                    ShaderKeyConfigSwitcherUnified::Instance()->GetRenderingFilePathNameForCurrentFrame(),
+                                                                    puPreviewBufferId);  //
         }
     }
 }
@@ -1914,8 +2014,7 @@ std::string MainBackend::ForkToFile(const std::string& vFilePathName) {
         if (src_ps.isOk && tgt_ps.isOk) {
             using spss_t = std::pair<std::string, std::string>;
 
-            spss_t _main_buffer = spss_t(FileHelper::Instance()->GetPathRelativeToApp(src_ps.GetFPNE()),
-                                         FileHelper::Instance()->GetPathRelativeToApp(tgt_ps.GetFPNE()));
+            spss_t _main_buffer = spss_t(FileHelper::Instance()->GetPathRelativeToApp(src_ps.GetFPNE()), FileHelper::Instance()->GetPathRelativeToApp(tgt_ps.GetFPNE()));
             std::string _main_code = puMain_RenderPack->GetShaderKey()->puMainSection->code;
 
             std::map<spss_t, std::string> child_buffers_code;
@@ -1923,8 +2022,8 @@ std::string MainBackend::ForkToFile(const std::string& vFilePathName) {
                 auto rpPtr = child_buffer.lock();
                 if (rpPtr) {
                     if (rpPtr && rpPtr->GetShaderKey()) {
-                        child_buffers_code[spss_t(FileHelper::Instance()->GetPathRelativeToApp(rpPtr->GetShaderKey()->puMainSection->absoluteFile),
-                                                  "")] = rpPtr->GetShaderKey()->puMainSection->code;
+                        child_buffers_code[spss_t(FileHelper::Instance()->GetPathRelativeToApp(rpPtr->GetShaderKey()->puMainSection->absoluteFile), "")] =
+                            rpPtr->GetShaderKey()->puMainSection->code;
                     }
                 }
             }
@@ -1934,8 +2033,8 @@ std::string MainBackend::ForkToFile(const std::string& vFilePathName) {
                 auto rpPtr = scene_buffer.lock();
                 if (rpPtr) {
                     if (rpPtr && rpPtr->GetShaderKey()) {
-                        scene_buffers_code[spss_t(FileHelper::Instance()->GetPathRelativeToApp(rpPtr->GetShaderKey()->puMainSection->absoluteFile),
-                                                  "")] = rpPtr->GetShaderKey()->puMainSection->code;
+                        scene_buffers_code[spss_t(FileHelper::Instance()->GetPathRelativeToApp(rpPtr->GetShaderKey()->puMainSection->absoluteFile), "")] =
+                            rpPtr->GetShaderKey()->puMainSection->code;
                     }
                 }
             }
@@ -1945,8 +2044,7 @@ std::string MainBackend::ForkToFile(const std::string& vFilePathName) {
                 if (!include.second.empty()) {
                     auto incKey = puCodeTree->GetKey(include.second);
                     if (incKey) {
-                        scene_buffers_code[spss_t(FileHelper::Instance()->GetPathRelativeToApp(incKey->puMainSection->absoluteFile), "")] =
-                            incKey->puMainSection->code;
+                        scene_buffers_code[spss_t(FileHelper::Instance()->GetPathRelativeToApp(incKey->puMainSection->absoluteFile), "")] = incKey->puMainSection->code;
                     }
                 }
             }
@@ -2142,7 +2240,7 @@ void MainBackend::FinalizeUrlLoading_By_CreateOneFile() {
 std::string MainBackend::FinalizeShaderImport_By_CreateFiles(std::string vPath, std::list<ShaderInfos> vShaderInfos) {
     if (!vShaderInfos.empty()) {
         std::string mainBufferName;
-        //auto mainPlatform = ShaderPlaform::SPF_UNKNOW;  // on cree les fichier
+        // auto mainPlatform = ShaderPlaform::SPF_UNKNOW;  // on cree les fichier
         std::string file_string;
         for (auto& infos : vShaderInfos) {
             file_string.clear();
@@ -2191,7 +2289,7 @@ std::string MainBackend::FinalizeShaderImport_By_CreateFiles(std::string vPath, 
                 auto filename = name + ".glsl";
 
                 mainBufferName = filename;
-                //mainPlatform = infos.platform;
+                // mainPlatform = infos.platform;
 
                 if (vPath.empty()) {
                     FileHelper::Instance()->SaveToFile(file_string, filename, (int)FILE_LOCATION_Enum::FILE_LOCATION_SCRIPT);
@@ -2317,9 +2415,7 @@ void MainBackend::SetConsoleVisibility(bool vShow) {
 
 bool MainBackend::LoadFilePathName(const std::string& vFilePathName, const std::string& vType, bool vDontLoadRenderPack) {
     UNUSED(vType);
-
     auto res = false;
-
     if (puMain_RenderPack) {
         const auto filePathName = FileHelper::Instance()->CorrectSlashTypeForFilePathName(vFilePathName);
         auto relativeFilePathName = FileHelper::Instance()->GetPathRelativeToApp(filePathName);
@@ -2337,7 +2433,6 @@ bool MainBackend::LoadFilePathName(const std::string& vFilePathName, const std::
             } catch (const std::exception& ex) {
                 LogVarError("%s", ex.what());
             }
-
             const auto mp = puFileListingExceptions;
             puMain_RenderPack->Finish(false);
             puCodeTree->Clear(mp);
@@ -2345,8 +2440,8 @@ bool MainBackend::LoadFilePathName(const std::string& vFilePathName, const std::
             if (key) {
                 key = puCodeTree->GetShaderKey(relativeFilePathName);
                 if (key) {
+                    FontDesigner::Instance()->ComputeKey(key);
                     sCurrentFileLoaded = relativeFilePathName;
-
                     if (vDontLoadRenderPack) {
                         puMain_RenderPack->SetShaderKey(key, true);
                     } else {
@@ -2366,17 +2461,14 @@ bool MainBackend::LoadFilePathName(const std::string& vFilePathName, const std::
                             }
                         }
                     }
-
                     if (ShaderKeyConfigSwitcherUnified::Instance()->IsActivated()) {
                         // on provoque le refresh si le panel est deja ouvert
                         ShaderKeyConfigSwitcherUnified::Instance()->Activate(true, puCodeTree, puMain_RenderPack, true);
                     }
-
                     CameraSystem::Instance()->NeedCamChange();
                     NeedRefresh(true);
                 }
             }
-
             if (!key) {
                 puMain_RenderPack->SetShaderKey(nullptr);
             }
@@ -2384,13 +2476,11 @@ bool MainBackend::LoadFilePathName(const std::string& vFilePathName, const std::
             LogVarLightInfo("Path not found : %s", relativeFilePathName.c_str());
         }
     }
-
     return res;
 }
 
 void MainBackend::NewFilePathName(const std::string& vFilePathName, const std::string& vType, const std::string& vFilePath) {
     const auto filePathName = FileHelper::Instance()->CorrectSlashTypeForFilePathName(vFilePathName);
-
     if (CodeGenerator::Instance()->CreateFilePathName(filePathName, vType, vFilePath, false)) {
         LoadFilePathName(vFilePathName, ".glsl");
     }

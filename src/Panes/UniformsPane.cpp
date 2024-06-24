@@ -1,4 +1,4 @@
-// NoodlesPlate Copyright (C) 2017-2023 Stephane Cuillerdier aka Aiekick
+// NoodlesPlate Copyright (C) 2017-2024 Stephane Cuillerdier aka Aiekick
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -189,8 +189,10 @@ void UniformsPane::DrawImGuiRenderPackCategory(RenderPackWeak vRp, bool vCheckMo
 
 void UniformsPane::DrawImGuiUniformWidget(UniformsMultiLoc* vUniLoc) {
     if (vUniLoc != nullptr) {
-        MainBackend::Instance()->NeedRefresh(//
-            MainBackend::Instance()->puCodeTree->DrawImGuiUniformWidgetForPanes(//
-                vUniLoc->uniform, ImGui::GetContentRegionAvail().x, SHADER_UNIFORM_FIRST_COLUMN_WIDTH));
+        MainBackend::Instance()->NeedRefresh(                                     //
+            MainBackend::Instance()->puCodeTree->DrawImGuiUniformWidgetForPanes(  //
+                vUniLoc->uniform,
+                ImGui::GetContentRegionAvail().x,
+                SHADER_UNIFORM_FIRST_COLUMN_WIDTH));
     }
 }

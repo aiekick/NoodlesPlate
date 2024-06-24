@@ -1,10 +1,10 @@
-// NoodlesPlate Copyright (C) 2017-2023 Stephane Cuillerdier aka Aiekick
+// NoodlesPlate Copyright (C) 2017-2024 Stephane Cuillerdier aka Aiekick
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -19,45 +19,42 @@
 #include "StaticConfig.h"
 #include <ctools/cTools.h>
 
-StaticConfig::StaticConfig()
-{
-	puUseTransparancy = false;
+StaticConfig::StaticConfig() {
+    puUseTransparancy = false;
 }
 
-std::string StaticConfig::getXml(const std::string& vOffset, const std::string& vUserDatas)
-{
-	UNUSED(vUserDatas);
+std::string StaticConfig::getXml(const std::string& vOffset, const std::string& vUserDatas) {
+    UNUSED(vUserDatas);
 
-	std::string str;
+    std::string str;
 
-	str += vOffset + "<useTransparancy>" + ct::toStr(puUseTransparancy ? "true" : "false") + "</useTransparancy>\n";
-	str += vOffset + "<globalUIScale>" + ct::toStr(puGlobalUIScale) + "</globalUIScale>\n";
-	str += vOffset + "<enableDPISupport>" + ct::toStr(puEnableDPISupport ? "true" : "false") + "</enableDPISupport>\n";
+    str += vOffset + "<useTransparancy>" + ct::toStr(puUseTransparancy ? "true" : "false") + "</useTransparancy>\n";
+    str += vOffset + "<globalUIScale>" + ct::toStr(puGlobalUIScale) + "</globalUIScale>\n";
+    str += vOffset + "<enableDPISupport>" + ct::toStr(puEnableDPISupport ? "true" : "false") + "</enableDPISupport>\n";
 
-	return str;
+    return str;
 }
 
-bool StaticConfig::setFromXml(tinyxml2::XMLElement* vElem, tinyxml2::XMLElement* vParent, const std::string& vUserDatas)
-{
-	UNUSED(vUserDatas);
+bool StaticConfig::setFromXml(tinyxml2::XMLElement* vElem, tinyxml2::XMLElement* vParent, const std::string& vUserDatas) {
+    UNUSED(vUserDatas);
 
-	// The value of this child identifies the name of this element
-	std::string strName = "";
-	std::string strValue = "";
-	std::string strParentName = "";
+    // The value of this child identifies the name of this element
+    std::string strName = "";
+    std::string strValue = "";
+    std::string strParentName = "";
 
-	strName = vElem->Value();
-	if (vElem->GetText())
-		strValue = vElem->GetText();
-	if (vParent != nullptr)
-		strParentName = vParent->Value();
+    strName = vElem->Value();
+    if (vElem->GetText())
+        strValue = vElem->GetText();
+    if (vParent != nullptr)
+        strParentName = vParent->Value();
 
-	if (strName == "useTransparancy")
-		puUseTransparancy = ct::ivariant(strValue).GetB();
-	else if (strName == "globalUIScale")
-		puGlobalUIScale = ct::fvariant(strValue).GetF();
-	else if (strName == "enableDPISupport")
-		puEnableDPISupport = ct::ivariant(strValue).GetB();
+    if (strName == "useTransparancy")
+        puUseTransparancy = ct::ivariant(strValue).GetB();
+    else if (strName == "globalUIScale")
+        puGlobalUIScale = ct::fvariant(strValue).GetF();
+    else if (strName == "enableDPISupport")
+        puEnableDPISupport = ct::ivariant(strValue).GetB();
 
-	return true;
+    return true;
 }
