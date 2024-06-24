@@ -277,7 +277,7 @@ void FontDesigner::ComputeKey(ShaderKeyWeak vShaderkey) {
             // for the compilation suceeed
             auto* codeTreePtr = ptr->puParentCodeTree.get();
             if (codeTreePtr != nullptr) {
-                codeTreePtr->AddOrUpdateFromString("")
+                //codeTreePtr->AddOrUpdateFromString("")
             }
         }
         enable(exist);

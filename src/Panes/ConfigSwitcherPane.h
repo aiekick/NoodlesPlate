@@ -27,7 +27,7 @@ public:
     bool Init() override;
     void Unit() override;
     bool DrawPanes(const uint32_t& /*vCurrentFrame*/, bool* vOpened, ImGuiContext* /*vContextPtr*/ = nullptr, void* vUserDatas = nullptr) override;
-    bool DrawDialogsAndPopups(const uint32_t& /*vCurrentFrame*/, const ImVec2& vMaxSize, ImGuiContext* vContextPtr = nullptr, void* vUserDatas = nullptr) override;
+    bool DrawDialogsAndPopups(const uint32_t& /*vCurrentFrame*/, const ImRect& vMaxRect, ImGuiContext* vContextPtr = nullptr, void* vUserDatas = nullptr) override;
 
     // configuration
     std::string getXml(const std::string& vOffset, const std::string& vUserDatas = "") override;

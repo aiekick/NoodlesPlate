@@ -13,6 +13,7 @@ option(USE_NETWORK "Enable NETWORK (Shader Inport, Versions, Changelog)" ON)
 option(BUILD_X32 "Enable the 32 bit version of NoodlesPlate (default is X64)" OFF)
 option(USE_PACKAGE_TO_NSIS "Enable packaging to nsis isntaller or zip if false" ON)
 option(USE_STD_FILESYSTEM "Enable std::filesystem use for path and ImGuiFileDialog" ON)
+option(USE_SOURCETRAIL "Enable the Compilation DataBase building for sourceTrail" OFF)
 
 if (WIN32)
 	# MACOS : VR is not supported
@@ -45,6 +46,9 @@ if (USE_VR)
 		add_definitions(-DXR_USE_PLATFORM_WIN32)
 	endif()
 endif()
+
+# SourceTrail https://github.com/CoatiSoftware/Sourcetrail
+add_definitions(-DCMAKE_EXPORT_COMPILE_COMMANDS=${USE_SOURCETRAIL})
 
 set(FINAL_BIN_DIR ${CMAKE_BINARY_DIR}/../bin)
 set(CMAKE_INSTALL_PREFIX "${FINAL_BIN_DIR}")
