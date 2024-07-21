@@ -224,8 +224,7 @@ bool KGpuMon::GetDisplayDeviceMemoryInfo(const NvDisplayHandle nvDisplayHandle, 
         }
 
         return true;
-    }
-    
+    }    
 
     return false;
 }

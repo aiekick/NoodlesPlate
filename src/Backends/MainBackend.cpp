@@ -24,7 +24,7 @@
 #include <Headers/RenderPackHeaders.h>
 #include <glad/glad.h>
 #include <ImGuiPack.h>
-#include <InAppGpuProfiler/InAppGpuProfiler.h>
+#include <InAppGpuProfiler/iagp.h>
 #include <ctools/Logger.h>
 #include <ctools/GLVersionChecker.h>
 #include <ImGuiPack.h>
