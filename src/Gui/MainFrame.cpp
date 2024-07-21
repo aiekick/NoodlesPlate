@@ -264,7 +264,7 @@ void MainFrame::Display(ct::ivec2 vSize) {
         SettingsDlg::Instance()->DrawDialog();
         VersionSystem::Instance()->DrawNewVersionDialog();
         ShadertoyBackupFileImportDlg::Instance()->DrawDialog();
-        LayoutManager::Instance()->DrawDialogsAndPopups(0U, size);
+        LayoutManager::Instance()->DrawDialogsAndPopups(0U, ImRect(ImVec2(), size));
 
         DrawErrorDialog();
         DoAbout();

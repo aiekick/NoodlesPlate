@@ -4,7 +4,7 @@
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -54,12 +54,12 @@ static const float& font_scale_ratio = 1.0f / 3.5f;
 
 bool MainToolBar::Init() {
     static ImFontConfig icons_config3;
-    icons_config3.MergeMode              = false;
-    icons_config3.PixelSnapH             = true;
+    icons_config3.MergeMode = false;
+    icons_config3.PixelSnapH = true;
     static const ImWchar icons_ranges3[] = {ICON_MIN_NDPTB, ICON_MAX_NDPTB, 0};
-    const float& font_size               = 20.0f / font_scale_ratio;
-    MainToolBar::puFont                  = ImGui::GetIO().Fonts->AddFontFromMemoryCompressedBase85TTF(FONT_ICON_BUFFER_NAME_NDPTB, font_size, &icons_config3, icons_ranges3);
-    MainToolBar::puFont->Scale           = font_scale_ratio;
+    const float& font_size = 20.0f / font_scale_ratio;
+    MainToolBar::puFont = ImGui::GetIO().Fonts->AddFontFromMemoryCompressedBase85TTF(FONT_ICON_BUFFER_NAME_NDPTB, font_size, &icons_config3, icons_ranges3);
+    MainToolBar::puFont->Scale = font_scale_ratio;
     return (MainToolBar::puFont != nullptr);
 }
 
@@ -72,11 +72,11 @@ void MainToolBar::DrawCoolBar() {
     const float& toolbar_width = 35.0f;
 
     static ImGui::ImCoolBarConfig _config;
-    _config.normal_size  = 30.0f;
+    _config.normal_size = 30.0f;
     _config.hovered_size = 75.0f;
-    _config.anchor       = ImVec2(0.0f, 0.5f);
-    _config.anim_step    = 0.2f;
-    
+    _config.anchor = ImVec2(0.0f, 0.5f);
+    _config.anim_step = 0.2f;
+
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2());
     bool left_bar_opened = ImGui::BeginLeftToolBar(toolbar_width);
     ImGui::PopStyleVar();
@@ -85,27 +85,27 @@ void MainToolBar::DrawCoolBar() {
         ImGui::SetNextWindowViewport(ImGui::GetMainViewport()->ID);
         ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2());
-        bool _opened            = ImGui::BeginCoolBar("##coolbar", ImCoolBarFlags_Vertical, _config);
-        auto window  = ImGui::GetCurrentWindow();
+        bool _opened = ImGui::BeginCoolBar("##coolbar", ImCoolBarFlags_Vertical, _config);
+        auto window = ImGui::GetCurrentWindow();
         if (window) {
             // correct the rect of the window. maybe a bug on imgui..
-            // the workrect can cause issue when clikc a timeline 
+            // the workrect can cause issue when clikc a timeline
             // channel close button when close to the toolbar
             // this thing correct the issue
-            const auto& rc            = window->Rect();
-            window->WorkRect          = rc;
-            window->OuterRectClipped  = rc;
-            window->InnerRect         = rc;
-            window->InnerClipRect     = rc;
-            window->ParentWorkRect    = rc;
-            window->ClipRect          = rc;
+            const auto& rc = window->Rect();
+            window->WorkRect = rc;
+            window->OuterRectClipped = rc;
+            window->InnerRect = rc;
+            window->InnerClipRect = rc;
+            window->ParentWorkRect = rc;
+            window->ClipRect = rc;
             window->ContentRegionRect = rc;
         }
         ImGui::PopStyleVar(2);
 
         if (_opened) {
             if (ImGui::CoolBarItem()) {
-                const auto aw     = ImGui::GetCoolBarItemWidth();
+                const auto aw = ImGui::GetCoolBarItemWidth();
                 const auto colBtn = ImGui::ColorButton("##BackGround", MainBackend::Instance()->puBackgroundColor, 0, ImVec2(aw, aw));
                 if (colBtn) {
                     // Store current color and open a picker
@@ -118,10 +118,12 @@ void MainToolBar::DrawCoolBar() {
                 }
 
                 if (ImGui::BeginPopup("picker")) {
-                    const auto picker_flags_to_forward = ImGuiColorEditFlags_DataTypeMask_ | ImGuiColorEditFlags_PickerMask_ | ImGuiColorEditFlags_InputMask_ | ImGuiColorEditFlags_HDR | ImGuiColorEditFlags_NoAlpha | ImGuiColorEditFlags_AlphaBar;
-                    const auto picker_flags            = (0 & picker_flags_to_forward) | ImGuiColorEditFlags_DisplayMask_ | ImGuiColorEditFlags_NoLabel | ImGuiColorEditFlags_AlphaPreviewHalf;
-                    auto& g                            = *GImGui;
-                    NeedOneFrameUpdate                 = ImGui::ColorPicker4("##picker", &MainBackend::Instance()->puBackgroundColor.x, picker_flags, &g.ColorPickerRef.x);
+                    const auto picker_flags_to_forward = ImGuiColorEditFlags_DataTypeMask_ | ImGuiColorEditFlags_PickerMask_ | ImGuiColorEditFlags_InputMask_ |
+                        ImGuiColorEditFlags_HDR | ImGuiColorEditFlags_NoAlpha | ImGuiColorEditFlags_AlphaBar;
+                    const auto picker_flags =
+                        (0 & picker_flags_to_forward) | ImGuiColorEditFlags_DisplayMask_ | ImGuiColorEditFlags_NoLabel | ImGuiColorEditFlags_AlphaPreviewHalf;
+                    auto& g = *GImGui;
+                    NeedOneFrameUpdate = ImGui::ColorPicker4("##picker", &MainBackend::Instance()->puBackgroundColor.x, picker_flags, &g.ColorPickerRef.x);
                     ImGui::EndPopup();
                 }
             }
@@ -138,21 +140,21 @@ void MainToolBar::DrawCoolBar() {
             */
 
             if (ImGui::CoolBarItem()) {
-                const auto aw              = ImGui::GetCoolBarItemWidth();
+                const auto aw = ImGui::GetCoolBarItemWidth();
                 MainToolBar::puFont->Scale = font_scale_ratio * ImGui::GetCoolBarItemScale();
                 ImGui::RadioButtonLabeled_BitWize<LayoutPaneFlag>(ImVec2(aw, aw),
-                                                             ICON_NDPTB_VIEW_LIST "##Config",
-                                                             "Config",
-                                                             &LayoutManager::Instance()->pane_Shown,
-                                                             ConfigPane::Instance()->GetFlag(),
-                                                             false,
-                                                             true,
-                                                             0,
-                                                             false,
-                                                             MainToolBar::puFont);
+                                                                  ICON_NDPTB_VIEW_LIST "##Config",
+                                                                  "Config",
+                                                                  &LayoutManager::Instance()->pane_Shown,
+                                                                  ConfigPane::Instance()->GetFlag(),
+                                                                  false,
+                                                                  true,
+                                                                  0,
+                                                                  false,
+                                                                  MainToolBar::puFont);
             }
             if (ImGui::CoolBarItem()) {
-                const auto aw              = ImGui::GetCoolBarItemWidth();
+                const auto aw = ImGui::GetCoolBarItemWidth();
                 MainToolBar::puFont->Scale = font_scale_ratio * ImGui::GetCoolBarItemScale();
                 ImGui::RadioButtonLabeled_BitWize<LayoutPaneFlag>(ImVec2(aw, aw),
                                                                   ICON_NDPTB_TUNE "##Uniforms",
@@ -167,7 +169,7 @@ void MainToolBar::DrawCoolBar() {
             }
 
             if (ImGui::CoolBarItem()) {
-                const auto aw              = ImGui::GetCoolBarItemWidth();
+                const auto aw = ImGui::GetCoolBarItemWidth();
                 MainToolBar::puFont->Scale = font_scale_ratio * ImGui::GetCoolBarItemScale();
                 ImGui::RadioButtonLabeled_BitWize<LayoutPaneFlag>(ImVec2(aw, aw),
                                                                   ICON_NDPTB_VECTOR_CURVE "##TimeLine",
@@ -178,10 +180,10 @@ void MainToolBar::DrawCoolBar() {
                                                                   true,
                                                                   0,
                                                                   false,
-                                                            MainToolBar::puFont);
+                                                                  MainToolBar::puFont);
             }
             if (ImGui::CoolBarItem()) {
-                const auto aw              = ImGui::GetCoolBarItemWidth();
+                const auto aw = ImGui::GetCoolBarItemWidth();
                 MainToolBar::puFont->Scale = font_scale_ratio * ImGui::GetCoolBarItemScale();
                 ImGui::RadioButtonLabeled_BitWize<LayoutPaneFlag>(ImVec2(aw, aw),
                                                                   ICON_NDPTB_LAYERS_TRIPLE "##TuningSwitcher",
@@ -191,12 +193,13 @@ void MainToolBar::DrawCoolBar() {
                                                                   false,
                                                                   true,
                                                                   0,
-                                                            false, MainToolBar::puFont);
+                                                                  false,
+                                                                  MainToolBar::puFont);
             }
 
             // #ifdef _DEBUG
             if (ImGui::CoolBarItem()) {
-                const auto aw              = ImGui::GetCoolBarItemWidth();
+                const auto aw = ImGui::GetCoolBarItemWidth();
                 MainToolBar::puFont->Scale = font_scale_ratio * ImGui::GetCoolBarItemScale();
                 ImGui::RadioButtonLabeled_BitWize<LayoutPaneFlag>(ImVec2(aw, aw),
                                                                   ICON_NDPTB_FILE_DOCUMENT_EDIT "##Code",
@@ -212,10 +215,10 @@ void MainToolBar::DrawCoolBar() {
             // #endif
 
             if (ImGui::CoolBarItem()) {
-                const auto aw              = ImGui::GetCoolBarItemWidth();
+                const auto aw = ImGui::GetCoolBarItemWidth();
                 MainToolBar::puFont->Scale = font_scale_ratio * ImGui::GetCoolBarItemScale();
                 ImGui::RadioButtonLabeled_BitWize<LayoutPaneFlag>(ImVec2(aw, aw),
-                                                                  ICON_NDPTB_FILE_DOCUMENT_BOX "##Notes",
+                                                                  ICON_NDPTB_FILE_DOCUMENT "##Notes",
                                                                   "Notes",
                                                                   &LayoutManager::Instance()->pane_Shown,
                                                                   InfosPane::Instance()->GetFlag(),
@@ -228,7 +231,7 @@ void MainToolBar::DrawCoolBar() {
 
 #ifdef USE_HELP_IN_APP
             if (ImGui::CoolBarItem()) {
-                const auto aw              = ImGui::GetCoolBarItemWidth();
+                const auto aw = ImGui::GetCoolBarItemWidth();
                 MainToolBar::puFont->Scale = font_scale_ratio * ImGui::GetCoolBarItemScale();
                 ImGui::RadioButtonLabeled_BitWize<LayoutPaneFlag>(ImVec2(aw, aw),
                                                                   ICON_NDPTB_COMMENT_QUESTION "##Help",
@@ -244,7 +247,7 @@ void MainToolBar::DrawCoolBar() {
 #endif
 
             if (ImGui::CoolBarItem()) {
-                const auto aw              = ImGui::GetCoolBarItemWidth();
+                const auto aw = ImGui::GetCoolBarItemWidth();
                 MainToolBar::puFont->Scale = font_scale_ratio * ImGui::GetCoolBarItemScale();
                 ImGui::RadioButtonLabeled_BitWize<LayoutPaneFlag>(ImVec2(aw, aw),
                                                                   ICON_NDPTB_CLIPBOARD_PULSE "##Profiler",
@@ -255,7 +258,7 @@ void MainToolBar::DrawCoolBar() {
                                                                   true,
                                                                   0,
                                                                   false,
-                                                            MainToolBar::puFont);
+                                                                  MainToolBar::puFont);
             }
 
 #ifdef USE_GPU_METRIC
@@ -263,9 +266,9 @@ void MainToolBar::DrawCoolBar() {
                 ImVec2 lp, np;
                 static bool s_ShowMetricInToolBar = false;
                 if (ImGui::CoolBarItem()) {
-                    const auto aw              = ImGui::GetCoolBarItemWidth();
+                    const auto aw = ImGui::GetCoolBarItemWidth();
                     MainToolBar::puFont->Scale = font_scale_ratio * ImGui::GetCoolBarItemScale();
-                    lp                         = ImGui::GetCursorScreenPos();
+                    lp = ImGui::GetCursorScreenPos();
                     ImGui::RadioButtonLabeled(ImVec2(aw, aw), ICON_NDPTB_THERMOMETER "##Metrics", "Metrics (GPU 0)", &s_ShowMetricInToolBar, false, MainToolBar::puFont);
                     np = ImGui::GetCursorScreenPos();
                 }
@@ -279,10 +282,10 @@ void MainToolBar::DrawCoolBar() {
 
 #ifdef _DEBUG
             if (ImGui::CoolBarItem()) {
-                const auto aw              = ImGui::GetCoolBarItemWidth();
+                const auto aw = ImGui::GetCoolBarItemWidth();
                 MainToolBar::puFont->Scale = font_scale_ratio * ImGui::GetCoolBarItemScale();
                 ImGui::RadioButtonLabeled_BitWize<LayoutPaneFlag>(ImVec2(aw, aw),
-                                                                  ICON_NDPTB_ATOM_VARIANT "##Inspector",
+                                                                  ICON_NDPTB_ORBIT "##Inspector",
                                                                   "Inspector",
                                                                   &LayoutManager::Instance()->pane_Shown,
                                                                   InspectorPane::Instance()->GetFlag(),
@@ -290,11 +293,11 @@ void MainToolBar::DrawCoolBar() {
                                                                   true,
                                                                   0,
                                                                   false,
-                                                            MainToolBar::puFont);
+                                                                  MainToolBar::puFont);
             }
 #endif
             if (ImGui::CoolBarItem()) {
-                const auto aw              = ImGui::GetCoolBarItemWidth();
+                const auto aw = ImGui::GetCoolBarItemWidth();
                 MainToolBar::puFont->Scale = font_scale_ratio * ImGui::GetCoolBarItemScale();
                 ImGui::RadioButtonLabeled_BitWize<LayoutPaneFlag>(ImVec2(aw, aw),
                                                                   ICON_NDPTB_VIEW_GRID "##BufferPreview",
@@ -305,11 +308,11 @@ void MainToolBar::DrawCoolBar() {
                                                                   true,
                                                                   0,
                                                                   false,
-                                                            MainToolBar::puFont);
+                                                                  MainToolBar::puFont);
             }
 
             if (ImGui::CoolBarItem()) {
-                const auto aw              = ImGui::GetCoolBarItemWidth();
+                const auto aw = ImGui::GetCoolBarItemWidth();
                 MainToolBar::puFont->Scale = font_scale_ratio * ImGui::GetCoolBarItemScale();
                 ImGui::RadioButtonLabeled_BitWize<LayoutPaneFlag>(ImVec2(aw, aw),
                                                                   ICON_NDPTB_COMMENT_TEXT_MULTIPLE "##Console",
@@ -320,29 +323,28 @@ void MainToolBar::DrawCoolBar() {
                                                                   true,
                                                                   0,
                                                                   false,
-                                                            MainToolBar::puFont);
+                                                                  MainToolBar::puFont);
             }
 
             MessagePane::Instance()->DrawToolBarButtons(0.0f, MainToolBar::puFont);
 
             if (ImGui::CoolBarItem()) {
-                const auto aw              = ImGui::GetCoolBarItemWidth();
+                const auto aw = ImGui::GetCoolBarItemWidth();
                 MainToolBar::puFont->Scale = font_scale_ratio * ImGui::GetCoolBarItemScale();
-                NeedOneFrameUpdate |= ImGui::RadioButtonLabeled(ImVec2(aw, aw), ICON_NDPTB_GRID "##3DSpace", "3D Space",
-                                                            &MainBackend::Instance()->puShow3DSpace, false, MainToolBar::puFont);
+                NeedOneFrameUpdate |= ImGui::RadioButtonLabeled(
+                    ImVec2(aw, aw), ICON_NDPTB_GRID "##3DSpace", "3D Space", &MainBackend::Instance()->puShow3DSpace, false, MainToolBar::puFont);
             }
 
             if (ImGui::CoolBarItem()) {
-                const auto aw              = ImGui::GetCoolBarItemWidth();
+                const auto aw = ImGui::GetCoolBarItemWidth();
                 MainToolBar::puFont->Scale = font_scale_ratio * ImGui::GetCoolBarItemScale();
-                NeedOneFrameUpdate |=
-                    ImGui::RadioButtonLabeled(ImVec2(aw, aw), ICON_NDPTB_CUBE_OUTLINE "##3DMesh", "Mesh", &MainBackend::Instance()->puShowMesh,
-                                                false, MainToolBar::puFont);
+                NeedOneFrameUpdate |= ImGui::RadioButtonLabeled(
+                    ImVec2(aw, aw), ICON_NDPTB_CUBE_OUTLINE "##3DMesh", "Mesh", &MainBackend::Instance()->puShowMesh, false, MainToolBar::puFont);
             }
 
 #ifdef USE_VR
             if (ImGui::CoolBarItem()) {
-                const auto aw              = ImGui::GetCoolBarItemWidth();
+                const auto aw = ImGui::GetCoolBarItemWidth();
                 MainToolBar::puFont->Scale = font_scale_ratio * ImGui::GetCoolBarItemScale();
                 if (ImGui::RadioButtonLabeled(ImVec2(aw, aw), ICON_NDPTB_GOOGLE_CARDBOARD "##VR", "Vr", VRBackend::Instance()->IsLoaded(), false, MainToolBar::puFont)) {
                     MainBackend::Instance()->StartOrStopVR();
@@ -350,38 +352,41 @@ void MainToolBar::DrawCoolBar() {
             }
 #endif
             if (ImGui::CoolBarItem()) {
-                const auto aw              = ImGui::GetCoolBarItemWidth();
+                const auto aw = ImGui::GetCoolBarItemWidth();
                 MainToolBar::puFont->Scale = font_scale_ratio * ImGui::GetCoolBarItemScale();
-                NeedOneFrameUpdate |= ImGui::RadioButtonLabeled(ImVec2(aw, aw), ICON_NDPTB_CAMCORDER "##Camera", "Camera",
-                                                                &MainBackend::Instance()->puCanWeTuneCamera, false, MainToolBar::puFont);
+                NeedOneFrameUpdate |= ImGui::RadioButtonLabeled(
+                    ImVec2(aw, aw), ICON_NDPTB_CAMCORDER "##Camera", "Camera", &MainBackend::Instance()->puCanWeTuneCamera, false, MainToolBar::puFont);
             }
 
             if (ImGui::CoolBarItem()) {
-                const auto aw              = ImGui::GetCoolBarItemWidth();
+                const auto aw = ImGui::GetCoolBarItemWidth();
                 MainToolBar::puFont->Scale = font_scale_ratio * ImGui::GetCoolBarItemScale();
-                NeedOneFrameUpdate |= ImGui::RadioButtonLabeled(ImVec2(aw, aw), ICON_NDPTB_MOUSE "##Mouse", "Mouse",
-                                                                &MainBackend::Instance()->puCanWeTuneMouse, false, MainToolBar::puFont);
+                NeedOneFrameUpdate |= ImGui::RadioButtonLabeled(
+                    ImVec2(aw, aw), ICON_NDPTB_MOUSE "##Mouse", "Mouse", &MainBackend::Instance()->puCanWeTuneMouse, false, MainToolBar::puFont);
             }
 
             if (ImGui::CoolBarItem()) {
-                const auto aw              = ImGui::GetCoolBarItemWidth();
+                const auto aw = ImGui::GetCoolBarItemWidth();
                 MainToolBar::puFont->Scale = font_scale_ratio * ImGui::GetCoolBarItemScale();
-                if (ImGui::RadioButtonLabeled(ImVec2(aw, aw), ICON_NDPTB_AXIS_ARROW "##Gizmo", "Gizmo", &GizmoSystem::Instance()->puActivated, false, MainToolBar::puFont)) {
+                if (ImGui::RadioButtonLabeled(
+                        ImVec2(aw, aw), ICON_NDPTB_AXIS_ARROW "##Gizmo", "Gizmo", &GizmoSystem::Instance()->puActivated, false, MainToolBar::puFont)) {
                     GizmoSystem::Instance()->SetActivation(GizmoSystem::Instance()->puActivated);
                     NeedOneFrameUpdate = true;
                 }
             }
 
             if (ImGui::CoolBarItem()) {
-                const auto aw              = ImGui::GetCoolBarItemWidth();
+                const auto aw = ImGui::GetCoolBarItemWidth();
                 MainToolBar::puFont->Scale = font_scale_ratio * ImGui::GetCoolBarItemScale();
-                NeedOneFrameUpdate |= ImGui::RadioButtonLabeled(ImVec2(aw, aw), ICON_NDPTB_GOOGLE_CONTROLLER "##GamePad", "GamePad", &GamePadSystem::Instance()->puActivated, false, MainToolBar::puFont);
+                NeedOneFrameUpdate |= ImGui::RadioButtonLabeled(
+                    ImVec2(aw, aw), ICON_NDPTB_GOOGLE_CONTROLLER "##GamePad", "GamePad", &GamePadSystem::Instance()->puActivated, false, MainToolBar::puFont);
             }
 
             if (ImGui::CoolBarItem()) {
-                const auto aw              = ImGui::GetCoolBarItemWidth();
+                const auto aw = ImGui::GetCoolBarItemWidth();
                 MainToolBar::puFont->Scale = font_scale_ratio * ImGui::GetCoolBarItemScale();
-                NeedOneFrameUpdate |= ImGui::RadioButtonLabeled(ImVec2(aw, aw), ICON_NDPTB_MUSIC_NOTE "##Sound", "Sound", &SoundSystem::Instance()->puActivated, false, MainToolBar::puFont);
+                NeedOneFrameUpdate |= ImGui::RadioButtonLabeled(
+                    ImVec2(aw, aw), ICON_NDPTB_MUSIC_NOTE "##Sound", "Sound", &SoundSystem::Instance()->puActivated, false, MainToolBar::puFont);
             }
 
             MainBackend::Instance()->NeedRefresh(NeedOneFrameUpdate);
