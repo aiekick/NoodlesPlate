@@ -23,7 +23,7 @@
 #include <ctools/Logger.h>
 #include <Headers/RenderPackHeaders.h>
 #include <ImGuiPack.h>
-#include <InAppGpuProfiler/iagp.h>
+#include <iagp/iagp.h>
 #ifdef USE_SDL2
 #include <ImGuiPack/3rdparty/imgui_docking/backends/imgui_impl_sdl.h>
 #else

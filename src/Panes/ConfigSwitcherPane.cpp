@@ -94,7 +94,7 @@ bool ConfigSwitcherPane::DrawPanes(const uint32_t& /*vCurrentFrame*/, bool* vOpe
 	return false;
 }
 
-bool ConfigSwitcherPane::DrawDialogsAndPopups(const uint32_t& /*vCurrentFrame*/, const ImRect& vMaxRect /*vMaxSize*/, ImGuiContext* /*vContextPtr*/, void* /*vUserDatas*/) {
+bool ConfigSwitcherPane::DrawDialogsAndPopups(const uint32_t& /*vCurrentFrame*/, const ImRect& /*vMaxRect*/, ImGuiContext* /*vContextPtr*/, void* /*vUserDatas*/) {
     ShaderKeyConfigSwitcherUnified::Instance()->DrawDialog();
     return false;
 }

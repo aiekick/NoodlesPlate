@@ -31,6 +31,7 @@
 #include <SoGLSL/src/CodeTree/CodeTree.h>
 #include <SoGLSL/src/Systems/GizmoSystem.h>
 #include <SoGLSL/src/Systems/TimeLineSystem.h>
+#include <SoGLSL/src/Uniforms/UniformWidgets.h>
 
 #include <cinttypes>  // printf zu
 
@@ -189,8 +190,11 @@ void UniformsPane::DrawImGuiRenderPackCategory(RenderPackWeak vRp, bool vCheckMo
 
 void UniformsPane::DrawImGuiUniformWidget(UniformsMultiLoc* vUniLoc) {
     if (vUniLoc != nullptr) {
-        MainBackend::Instance()->NeedRefresh(//
-            MainBackend::Instance()->puCodeTree->DrawImGuiUniformWidgetForPanes(//
-                vUniLoc->uniform, ImGui::GetContentRegionAvail().x, SHADER_UNIFORM_FIRST_COLUMN_WIDTH));
+        MainBackend::Instance()->NeedRefresh(  //
+            UniformWidgets::drawImGuiUniformWidgetForPanes(    //
+                MainBackend::Instance()->puCodeTree,
+                vUniLoc->uniform,
+                ImGui::GetContentRegionAvail().x,
+                SHADER_UNIFORM_FIRST_COLUMN_WIDTH));
     }
 }

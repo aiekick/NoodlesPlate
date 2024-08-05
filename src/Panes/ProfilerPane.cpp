@@ -21,7 +21,7 @@
 #include <Gui/MainFrame.h>
 #include <Backends/MainBackend.h>
 #include <ImGuiPack.h>
-#include <InAppGpuProfiler/iagp.h>
+#include <iagp/iagp.h>
 #include <ctools/cTools.h>
 #include <ctools/Logger.h>
 #include <Helper/InterfacePanes.h>
