@@ -430,6 +430,8 @@ bool MainBackend::Init(const ct::ivec2& vScreenSize) {
         SoundSystem::Instance()->GetRenderPack().expired())    //
         res = false;
 
+    PreCalc_Menu_DisplayQuality();
+
     return res;
 }
 
@@ -489,6 +491,8 @@ bool MainBackend::Load(const std::string& vFileToLoad) {
 
     CameraSystem::Instance()->NeedCamChange();
     MainBackend::Instance()->NeedRefresh();
+
+    PreCalc_Menu_DisplayQuality();
 
     return res;
 }
@@ -651,6 +655,7 @@ void MainBackend::ResizeIfNeeded() {
         ReSize(prNewSize, prNewQuality, prResizeISForced);
         prResizeISNeeded = false;
         prResizeISForced = false;
+        PreCalc_Menu_DisplayQuality();
     }
     if (prClearingIsNeeded) {
         ApplyColorClearing();
@@ -1642,30 +1647,31 @@ void MainBackend::UpdateUniforms(RenderPackWeak vRenderPack, UniformVariantPtr v
 }
 //////////////// IMGUI ///////////////////////////////////////////////////
 
+void MainBackend::PreCalc_Menu_DisplayQuality() {
+    m_QualityDisplayMenu.clear();
+    auto dPtr = puDisplay_RenderPack.lock();
+    if (dPtr != nullptr && dPtr->GetPipe()!=nullptr) {
+        const auto& dpSize = puScreenSize;
+        for (const auto q : m_DisplayQualities) {
+            const auto newSize = ct::fvec2(dpSize) / q;
+            const auto s = ct::toStr("%f (%i x %i)", q, (int32_t)newSize.x, (int32_t)newSize.y);
+            m_QualityDisplayMenu[s] = q;
+        }
+    } else {
+        for (const auto q : m_DisplayQualities) {
+            const auto s = ct::toStr("%f", q);
+            m_QualityDisplayMenu[s] = q;
+        }    
+    }
+}
+
 void MainBackend::DrawMenu_DisplayQuality() {
     if (ImGui::BeginMenu("Quality")) {
-        if (ImGui::MenuItem("0.25", "", IS_FLOAT_EQUAL(puDisplayQuality, 0.25f)))
-            SetRenderQuality(0.25f);
-        if (ImGui::MenuItem("0.5", "", IS_FLOAT_EQUAL(puDisplayQuality, 0.5f)))
-            SetRenderQuality(0.5f);
-        if (ImGui::MenuItem("1.0", "", IS_FLOAT_EQUAL(puDisplayQuality, 1.0f)))
-            SetRenderQuality(1.0f);
-        if (ImGui::MenuItem("1.5", "", IS_FLOAT_EQUAL(puDisplayQuality, 1.5f)))
-            SetRenderQuality(1.5f);
-        if (ImGui::MenuItem("2.0", "", IS_FLOAT_EQUAL(puDisplayQuality, 2.0f)))
-            SetRenderQuality(2.0f);
-        if (ImGui::MenuItem("2.5", "", IS_FLOAT_EQUAL(puDisplayQuality, 2.5f)))
-            SetRenderQuality(2.5f);
-        if (ImGui::MenuItem("3.0", "", IS_FLOAT_EQUAL(puDisplayQuality, 3.0f)))
-            SetRenderQuality(3.0f);
-        if (ImGui::MenuItem("3.5", "", IS_FLOAT_EQUAL(puDisplayQuality, 3.5f)))
-            SetRenderQuality(3.5f);
-        if (ImGui::MenuItem("4.0", "", IS_FLOAT_EQUAL(puDisplayQuality, 4.0f)))
-            SetRenderQuality(4.0f);
-        if (ImGui::MenuItem("4.5", "", IS_FLOAT_EQUAL(puDisplayQuality, 4.5f)))
-            SetRenderQuality(4.5f);
-        if (ImGui::MenuItem("5.0", "", IS_FLOAT_EQUAL(puDisplayQuality, 5.0f)))
-            SetRenderQuality(5.0f);
+        for (const auto& p : m_QualityDisplayMenu) {
+            if (ImGui::MenuItem(p.first.c_str(), "", IS_FLOAT_EQUAL(puDisplayQuality, p.second))) {
+                SetRenderQuality(p.second);
+            }
+        }
 
         ImGui::EndMenu();
     }

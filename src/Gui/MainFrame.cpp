@@ -1021,6 +1021,7 @@ void MainFrame::DrawMainMenuBar() {
         if (ImGui::MenuItem(ICON_NDP_QUESTION " Help")) {
             FileHelper::Instance()->OpenUrl("https://github.com/aiekick/NoodlesPlate/wiki");
         }
+
 #ifdef USE_NETWORK
         if (ImGui::MenuItem(ICON_NDP_INFO " ChangeLog")) {
             VersionSystem::Instance()->ShowVersionChangeLog();

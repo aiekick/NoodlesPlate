@@ -2361,20 +2361,35 @@ uniform(frame) int(frame) uFrame;
 uniform(deltatime) float(deltatime) uDeltaTime; // last render time
 uniform(buffer) vec2(buffer:target=0) uBufferSize;
 
-uniform(Sliders Float) float(-2:2:0:0.1) uSliderF;
-uniform(Sliders Float) vec2(-2:2:0:0.1) uSliderV2;
-uniform(Sliders Float) vec3(-2:2:0:0.1) uSliderV3;
-uniform(Sliders Float) vec4(-2:2:0:0.1) uSliderV4;
+uniform(Sliders Float) float(-2:2:0.0:0.1) uSliderF;
+uniform(Sliders Float) vec2(-2:2:0.0,0.5:0.1) uSliderV2;
+uniform(Sliders Float) vec3(-2:2:0.0,0.5,1.0:0.1) uSliderV3;
+uniform(Sliders Float) vec4(-2:2:0.0,0.5,1.0,1.5:0.1) uSliderV4;
 
-uniform(Sliders Int:-1) int(-100:100:0) uSliderI;
-uniform(Sliders Int) ivec2(-100:100:0) uSliderIV2;
-uniform(Sliders Int) ivec3(-100:100:0) uSliderIV3;
-uniform(Sliders Int) ivec4(-100:100:0) uSliderIV4;
+uniform(Sliders Int:-1) int(-100:100:10) uSliderI;
+uniform(Sliders Int) ivec2(-100:100:20) uSliderIV2;
+uniform(Sliders Int) ivec3(-100:100:30) uSliderIV3;
+uniform(Sliders Int) ivec4(-100:100:40) uSliderIV4;
 
-uniform(Sliders UInt) uint(0:200:100) uSliderU;
-uniform(Sliders UInt) uvec2(0:200:100) uSliderUV2;
-uniform(Sliders UInt) uvec3(0:200:100) uSliderUV3;
-uniform(Sliders UInt) uvec4(0:200:100) uSliderUV4;
+uniform(Sliders UInt) uint(0:200:50) uSliderU;
+uniform(Sliders UInt) uvec2(0:200:60) uSliderUV2;
+uniform(Sliders UInt) uvec3(0:200:70) uSliderUV3;
+uniform(Sliders UInt) uvec4(0:200:80) uSliderUV4;
+
+uniform(Inputs Float) float(input:-2:2:0.0:0.1) uInputF;
+uniform(Inputs Float) vec2(input:-2:2:0.0,0.5:0.1) uInputV2;
+uniform(Inputs Float) vec3(input:-2:2:0.0,0.5,1.0:0.1) uInputV3;
+uniform(Inputs Float) vec4(input:-2:2:0.0,0.5,1.0,1.5:0.1) uInputV4;
+
+uniform(Inputs Int:-1) int(input:-100:100:10) uInputI;
+uniform(Inputs Int) ivec2(input:-100:100:20) uInputIV2;
+uniform(Inputs Int) ivec3(input:-100:100:30) uInputIV3;
+uniform(Inputs Int) ivec4(input:-100:100:40) uInputIV4;
+
+uniform(Inputs UInt) uint(input:0:200:50) uInputU;
+uniform(Inputs UInt) uvec2(input:0:200:60) uInputUV2;
+uniform(Inputs UInt) uvec3(input:0:200:70) uInputUV3;
+uniform(Inputs UInt) uvec4(input:0:200:80) uInputUV4;
 
 uniform(checkbox float:0) float(checkbox:true) uCheckF;
 uniform(checkbox float:1) vec2(checkbox:false,true) uCheckV2;

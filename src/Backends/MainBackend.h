@@ -119,6 +119,9 @@ private:
 	int64_t prLastTimeMeasure = 0;
 	float prDeltaTime = 0.0f;
 
+    std::map<std::string, float> m_QualityDisplayMenu;
+    std::vector<float> m_DisplayQualities{0.125, 0.25, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0};
+
 public:
 	static MainBackend* Instance()
 	{
@@ -216,8 +219,10 @@ public:
 	
 	void LoadToClipBoard(std::string vString);
 	void SetConsoleVisibility(bool vShow);
-	
+
+    void PreCalc_Menu_DisplayQuality();
 	void DrawMenu_DisplayQuality();
+
 	void DrawMenu_FXAA();
 	void DrawMenu_Edit();
 	void ShowEditFileMenuKey(ShaderKeyPtr vKey, ct::fvec4 vLURD);
@@ -248,6 +253,7 @@ private:
 	void ApplyColorClearing();
 
 	bool DoShaderCodeUpdateOfRenderPack(RenderPackWeak vRenderPack, bool vForceUpdate, std::set<std::string>* vUpdatedFiles);
+
 
 public:
 	std::string getXml(const std::string& vOffset, const std::string& vUserDatas) override;
