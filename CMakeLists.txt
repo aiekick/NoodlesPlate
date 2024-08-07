@@ -286,11 +286,13 @@ include_directories(
 	3rdparty/SoGLSL/3rdparty/ImGuiPack/3rdparty/imgui_docking
 	${NVAPI_INCLUDE_DIR}
 	${SOGSL_INCLUDE_DIRS}
+	${TINYEXPR_INCLUDE_DIR}
 )
 
 target_link_libraries(${PROJECT} PRIVATE 
 	${NVAPI_LIBRARIES}
 	${SOGLSL_LIBRARIES}
+	${TINYEXPR_LIBRARIES}
 )
 
 #############################################################

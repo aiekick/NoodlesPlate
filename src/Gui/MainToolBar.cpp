@@ -47,6 +47,7 @@
 #include <Panes/InspectorPane.h>
 #include <Panes/ConfigSwitcherPane.h>
 #include <Panes/BufferPreview.h>
+#include <Panes/ChartPane.h>
 
 ImFont* MainToolBar::puFont = nullptr;
 
@@ -190,6 +191,20 @@ void MainToolBar::DrawCoolBar() {
                                                                   "Tuning Switcher",
                                                                   &LayoutManager::Instance()->pane_Shown,
                                                                   ConfigSwitcherPane::Instance()->GetFlag(),
+                                                                  false,
+                                                                  true,
+                                                                  0,
+                                                                  false,
+                                                                  MainToolBar::puFont);
+            }
+            if (ImGui::CoolBarItem()) {
+                const auto aw = ImGui::GetCoolBarItemWidth();
+                MainToolBar::puFont->Scale = font_scale_ratio * ImGui::GetCoolBarItemScale();
+                ImGui::RadioButtonLabeled_BitWize<LayoutPaneFlag>(ImVec2(aw, aw),
+                                                                  ICON_NDPTB_CHART_BELL_CURVE "##Chart",
+                                                                  "Chart",
+                                                                  &LayoutManager::Instance()->pane_Shown,
+                                                                  ChartPane::Instance()->GetFlag(),
                                                                   false,
                                                                   true,
                                                                   0,

@@ -80,6 +80,7 @@
 #include <Panes/InspectorPane.h>
 #include <Panes/ConfigSwitcherPane.h>
 #include <Panes/BufferPreview.h>
+#include <Panes/ChartPane.h>
 
 #include <Res/CustomFont.h>
 
@@ -165,6 +166,7 @@ bool MainFrame::Init() {
         LayoutManager::Instance()->AddPane(InspectorPane::Instance(), ICON_NDP2_ORBIT " Inspector", "", "BOTTOM", 0.3f, false, false);
 #endif
         LayoutManager::Instance()->AddPane(BufferPreview::Instance(), ICON_NDP2_VIEW_GRID " Buffers Preview", "", "RIGHT", 0.3f, false, false);
+        LayoutManager::Instance()->AddPane(ChartPane::Instance(), ICON_NDP2_CHART_BELL_CURVE " Chart", "", "RIGHT", 0.5f, false, false);
 
 #ifdef USE_VR
         VRGui::Instance()->SetCodeTree(MainBackend::Instance()->puCodeTree);
