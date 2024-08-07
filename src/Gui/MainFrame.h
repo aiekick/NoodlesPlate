@@ -122,7 +122,8 @@ public:
 #ifdef USE_HELP_IN_APP
 	bool puShowScriptHelp = false; // montre le panneau d'aide
 #endif
-	bool puShowImGui = false; // montre le panneau du nodegraph
+	bool puShowImGui = false;
+    bool puShowImPlot = false;
 	bool puShowMetric = false;
 
 private:

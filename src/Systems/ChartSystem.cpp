@@ -3,7 +3,12 @@
 #include <Res/CustomFont.h>
 
 void ChartSystem::draw() {
-    m_DrawWidgets();
+    m_DrawChart(m_ChartWidth);
+    const auto avail = ImGui::GetContentRegionAvail();
+    ImGui::SameLine();
+    ImGui::Splitter(true, 3.0f, &m_ChartWidth, &m_WidgetsWidth, avail.x * 0.2f, avail.x * 0.2f, avail.y);
+    ImGui::SameLine();
+    m_DrawWidgets(m_WidgetsWidth);
 }
 
 void ChartSystem::m_AddVar(const std::string& vName, const double& vValue) {
@@ -97,7 +102,7 @@ bool ChartSystem::m_DrawVars() {
     return change;
 }
 
-void ChartSystem::m_DrawWidgets() {
+void ChartSystem::m_DrawWidgets(const float vWidth) {
     if (ImGui::CollapsingHeader("Parametric Curve Diff")) {
         bool change = false;
 
@@ -135,8 +140,20 @@ void ChartSystem::m_DrawWidgets() {
     }
 }
 
-void ChartSystem::m_DrawChart() {
-
+void ChartSystem::m_DrawChart(const float vWidth) {
+    static float constraints[4] = {-10, 10, 1, 20};
+    static ImPlotAxisFlags flags;
+    ImGui::DragFloat2("Limits Constraints", &constraints[0], 0.01f);
+    ImGui::DragFloat2("Zoom Constraints", &constraints[2], 0.01f);
+    if (ImPlot::BeginPlot("##AxisConstraints", ImVec2(vWidth, -1.0f))) {
+        ImPlot::SetupAxes("X", "Y", flags, flags);
+        ImPlot::SetupAxesLimits(-1, 1, -1, 1);
+        ImPlot::SetupAxisLimitsConstraints(ImAxis_X1, constraints[0], constraints[1]);
+        ImPlot::SetupAxisZoomConstraints(ImAxis_X1, constraints[2], constraints[3]);
+        ImPlot::SetupAxisLimitsConstraints(ImAxis_Y1, constraints[0], constraints[1]);
+        ImPlot::SetupAxisZoomConstraints(ImAxis_Y1, constraints[2], constraints[3]);
+        ImPlot::EndPlot();
+    }
 }
 
 void ChartSystem::m_Compute() {

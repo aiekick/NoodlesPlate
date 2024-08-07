@@ -25,6 +25,8 @@ private:
     char m_VarToAddBuffer[s_EXPR_MAX_LEN + 1] = "";
     bool m_CloseCurve = false;
     ct::dvec3 m_CenterPoint;
+    float m_ChartWidth = 0.0f;
+    float m_WidgetsWidth = 0.0f;
 
 public:
     ChartSystem() = default;
@@ -42,8 +44,8 @@ private:
                          const int& vError,         //
                          const char* vDdefaultValue);
     bool m_DrawVars();
-    void m_DrawWidgets();
-    void m_DrawChart();
+    void m_DrawWidgets(const float vWidth);
+    void m_DrawChart(const float vWidth);
     void m_Compute();
 
 public:

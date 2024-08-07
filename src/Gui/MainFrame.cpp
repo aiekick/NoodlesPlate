@@ -166,7 +166,7 @@ bool MainFrame::Init() {
         LayoutManager::Instance()->AddPane(InspectorPane::Instance(), ICON_NDP2_ORBIT " Inspector", "", "BOTTOM", 0.3f, false, false);
 #endif
         LayoutManager::Instance()->AddPane(BufferPreview::Instance(), ICON_NDP2_VIEW_GRID " Buffers Preview", "", "RIGHT", 0.3f, false, false);
-        LayoutManager::Instance()->AddPane(ChartPane::Instance(), ICON_NDP2_CHART_BELL_CURVE " Chart", "", "RIGHT", 0.5f, false, false);
+        LayoutManager::Instance()->AddPane(ChartPane::Instance(), ICON_NDP2_CHART_BELL_CURVE " Chart", "", "CENTRAL", 0.0f, false, false);
 
 #ifdef USE_VR
         VRGui::Instance()->SetCodeTree(MainBackend::Instance()->puCodeTree);
@@ -277,10 +277,15 @@ void MainFrame::Display(ct::ivec2 vSize) {
             }
         }
 
-        if (puShowImGui)
+        if (puShowImGui) {
             ImGui::ShowDemoWindow();
-        if (puShowMetric)
+        }
+        if (puShowImPlot) {
+            ImPlot::ShowDemoWindow();
+        }
+        if (puShowMetric) {
             ImGui::ShowMetricsWindow(&puShowMetric);
+        }
 
         // on update la mouse apres l'affichage complet
         CanMouseAffectRendering();
@@ -866,8 +871,7 @@ void MainFrame::DrawMainMenuBar() {
         }
 
         if (MainBackend::Instance()->IsLoaded()) {
-            /*
-            if (ImGui::MenuItem(ICON_NDP_CODE_FORK " Fork"))
+            /* if (ImGui::MenuItem(ICON_NDP_CODE_FORK " Fork"))
             {
                 ImGuiFileDialog::Instance()->OpenModal("ForkFileDialog", "Fork to File", ".glsl",
                     puForkFileDialog.filePath, puForkFileDialog.filePathName, 1, nullptr,
@@ -1067,7 +1071,8 @@ void MainFrame::DrawMainMenuBar() {
             ImGui::Separator();
 
             ImGui::MenuItem("Show ImGUi", "", &puShowImGui);
-            ImGui::MenuItem("Show ImGui Metric/Debug", "", &puShowMetric);
+            ImGui::MenuItem("Show ImPlot", "", &puShowImPlot);
+            ImGui::MenuItem("Show Metric/Debug", "", &puShowMetric);
         }
 
         ImGui::EndMenu();

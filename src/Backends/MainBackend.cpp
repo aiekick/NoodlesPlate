@@ -203,7 +203,6 @@ void MainBackend::Unit() {
     TextureSound::Release();
     MetricSystem::Instance()->Unit();
     GamePadSystem::Instance()->Unit();
-    ;
     SoundSystem::Instance()->Unit();
     MidiSystem::Instance()->Unit();
 
