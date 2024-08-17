@@ -2,3 +2,6 @@
 	path = 3rdparty/SoGLSL
 	url = https://github.com/aiekick/SoGLSL.git
 	branch = master
+[submodule "3rdparty/EzExpr"]
+	path = 3rdparty/EzExpr
+	url = https://github.com/aiekick/EzExpr.git
