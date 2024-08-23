@@ -1,4 +1,4 @@
-// NoodlesPlate Copyright (C) 2017-2023 Stephane Cuillerdier aka Aiekick
+// NoodlesPlate Copyright (C) 2017-2024 Stephane Cuillerdier aka Aiekick
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -31,6 +31,8 @@
 
 // SoGLSL
 #include <SoGLSL/src/Gui/GuiBackend.h>
+#include <SoGLSL/src/Res/CustomFont.h>
+#include <SoGLSL/src/Res/CustomFont2.h>
 #include <SoGLSL/src/CodeTree/CodeTree.h>
 #include <SoGLSL/src/Buffer/FrameBuffer.h>
 #include <SoGLSL/src/CodeTree/ShaderKey.h>
@@ -54,21 +56,18 @@
 #include <SoGLSL/src/Mesh/Operations/MeshLoader.h>
 #include <SoGLSL/src/Buffer/FrameBuffersPipeLine.h>
 #include <SoGLSL/src/Systems/RenderDocController.h>
+#include <SoGLSL/src/Importer/ShadertoyBackupFileImportDlg.h>
 #include <SoGLSL/src/CodeTree/ShaderKeyConfigSwitcherUnified.h>
-#include <SoGLSL/src/Res/CustomFont.h>
-#include <SoGLSL/src/Res/CustomFont2.h>
 
 // This Project
-#include <Generator/CodeGenerator.h>
-#include <Systems/PictureExportSystem.h>
-#include <Headers/NoodlesPlateBuild.h>
 #include <Metrics/MetricSystem.h>
 #include <Systems/TemplateSystem.h>
+#include <Generator/CodeGenerator.h>
 #include <Systems/UrlLibrarySystem.h>
+#include <Headers/NoodlesPlateBuild.h>
+#include <Systems/PictureExportSystem.h>
+
 #include <filesystem>
-
-#include <SoGLSL/src/Importer/ShadertoyBackupFileImportDlg.h>
-
 #include <algorithm>
 
 #define MAIN_RENDERPACK_KEY "main"

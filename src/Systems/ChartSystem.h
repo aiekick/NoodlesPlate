@@ -1,52 +1,75 @@
 #pragma once
 
+// NoodlesPlate Copyright (C) 2017-2024 Stephane Cuillerdier aka Aiekick
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 #include <ImGuiPack/ImGuiPack.h>
-#include <ctools/cTools.h>
+#include <EzExpr/EzExpr.hpp>
+#include <unordered_map>
 
-#include <tinyexpr/tinyexpr.h>
+class OneExpr;
+typedef std::shared_ptr<OneExpr> OneExprPtr;
+typedef std::weak_ptr<OneExpr> OneExprWeak;
 
-#include <map>
-#include <vector>
-#include <string>
-#include <cstdint>
+enum class WidgetType { WIDGET_INPUT = 0, WIDGET_SLIDER, Count };
 
-class ChartSystem {
+class ChartSystem;
+class OneExpr {
+public:
+    static constexpr int32_t s_COUNT_POINTS = 1000U;
+    typedef std::array<double, s_COUNT_POINTS> Points;
+    static OneExprPtr create(const std::string& vLabel, const int32_t& vIdx);
+
 private:
-    static constexpr size_t s_EXPR_MAX_LEN = 1024;
-    int m_Err_x = 0, m_Err_y = 0, m_Err_z = 0;
-    char m_ExprX[s_EXPR_MAX_LEN + 1] = "10.0*(y-x)";
-    char m_ExprY[s_EXPR_MAX_LEN + 1] = "28.0*x-y-x*z";
-    char m_ExprZ[s_EXPR_MAX_LEN + 1] = "x*y-2.66667*z";
-    ct::dvec3 m_StartLocation = 0.001;
-    uint32_t m_StepCount = 10000U;
-    double m_StepSize = 0.01;
-    std::map<std::string, double> m_VarNameValues;
-    std::vector<te_variable> m_Vars;
-    char m_VarToAddBuffer[s_EXPR_MAX_LEN + 1] = "";
-    bool m_CloseCurve = false;
-    ct::dvec3 m_CenterPoint;
-    float m_ChartWidth = 0.0f;
-    float m_WidgetsWidth = 0.0f;
+    OneExprWeak m_This;
+    Points m_axisX{};
+    Points m_axisY{};
+    ez::Expr m_Expr;
+    ez::ErrorCode m_ErrorCode = ez::ErrorCode::NONE;
+    std::string m_ErrorMsg;
+    std::string m_Label;
+    int32_t m_Idx;
+    ImWidgets::InputText m_ExprInput;
+    std::unordered_map<ez::String, WidgetType> m_WidgetTypes;
+    ImPlotRect m_ChartLimits;
 
 public:
-    ChartSystem() = default;
-    ~ChartSystem() = default;
-
-    void draw();
+    bool init(const std::string& vLabel, const int32_t& vIdx);
+    void drawCurve();
+    void drawWidgets();
+    void reComputeIfNeeded(const ImPlotRect& vRect);
+    Points& getAxisXRef();
+    Points& getAxisYRef();
 
 private:
-    void m_AddVar(const std::string& vName, const double& vValue);
-    void m_DelVar(const std::string& vName);
-    bool m_DrawInputExpr(const char* vLabel,        //
-                         const char* vBufferLabel,  //
-                         char* vBuffer,             //
-                         size_t vBufferSize,        //
-                         const int& vError,         //
-                         const char* vDdefaultValue);
-    bool m_DrawVars();
-    void m_DrawWidgets(const float vWidth);
-    void m_DrawChart(const float vWidth);
-    void m_Compute();
+    bool m_computeExpr();
+};
+
+class ChartSystem {
+public:
+    typedef ImPlotRect CharLimits;
+
+private:
+    std::vector<OneExprPtr> m_Exprs;
+    ImPlotRect m_ChartLimits;
+
+public:
+    bool init();
+    void unit();
+    void drawChart();
+    void drawExpr();
 
 public:
     static ChartSystem* Instance() {

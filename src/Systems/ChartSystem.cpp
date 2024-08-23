@@ -1,247 +1,210 @@
 #include "ChartSystem.h"
 
-#include <Res/CustomFont.h>
+// NoodlesPlate Copyright (C) 2017-2024 Stephane Cuillerdier aka Aiekick
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-void ChartSystem::draw() {
-    m_DrawChart(m_ChartWidth);
-    const auto avail = ImGui::GetContentRegionAvail();
-    ImGui::SameLine();
-    ImGui::Splitter(true, 3.0f, &m_ChartWidth, &m_WidgetsWidth, avail.x * 0.2f, avail.x * 0.2f, avail.y);
-    ImGui::SameLine();
-    m_DrawWidgets(m_WidgetsWidth);
-}
+#define DEFAULT_EXPR "x"
 
-void ChartSystem::m_AddVar(const std::string& vName, const double& vValue) {
-    if (!vName.empty()) {
-        if (m_VarNameValues.find(vName) == m_VarNameValues.end()) {
-            m_VarNameValues.emplace(vName, vValue);
-            const auto& it = m_VarNameValues.find(vName);
-            te_variable v;
-            v.name = it->first.c_str();  // ref so m_VarNames name must already exist
-            v.address = &it->second;
-            v.context = 0;
-            v.type = 0;
-            m_Vars.push_back(v);
-        }
+std::shared_ptr<OneExpr> OneExpr::create(const std::string& vLabel, const int32_t& vIdx) {
+    auto ret = std::make_shared<OneExpr>();
+    ret->m_This = ret;
+    if (!ret->init(vLabel, vIdx)) {
+        ret.reset();
     }
+    return ret;
 }
 
-void ChartSystem::m_DelVar(const std::string& vName) {
-    auto it = m_VarNameValues.find(vName);
-    if (it != m_VarNameValues.end()) {
-        for (auto var_it = m_Vars.begin(); var_it != m_Vars.end(); ++var_it) {
-            if (strcmp(var_it->name, it->first.c_str()) == 0) {  // is equal
-                m_Vars.erase(var_it);
-                m_VarNameValues.erase(vName);
-                break;
+bool OneExpr::init(const std::string& vLabel, const int32_t& vIdx) {
+    m_Label = vLabel;
+    m_Idx = vIdx;
+    m_ExprInput.SetText(DEFAULT_EXPR);
+    return true;
+}
+
+void OneExpr::drawCurve() {
+    ImPlot::PlotLine(m_Label.c_str(), m_axisX.data(), m_axisY.data(), OneExpr::s_COUNT_POINTS);
+}
+
+void OneExpr::drawWidgets() {
+    const auto avail_width = ImGui::GetContentRegionAvail().x;
+    if (m_ErrorCode != ez::ErrorCode::NONE) {
+        ImGui::TextColored(ImVec4(0.8f, 0.2f, 0.2f, 1.0f), "%s", m_ErrorMsg.c_str());
+    }
+    if (m_ExprInput.DisplayInputText(avail_width, m_Label, DEFAULT_EXPR, false, 70.0f)) {
+        m_computeExpr();
+    }
+    if (!m_Expr.getParsedVars().empty() && m_Expr.isParsedVariableExist("x") && m_Expr.getParsedVars().size() > 1) {
+        if (m_WidgetTypes.size() != (m_Expr.getParsedVars().size() - 1U)) {
+            ImGui::Text("%s", "Add a Input ?");
+            for (const auto& var : m_Expr.getParsedVars()) {
+                if (var.first == "x") {
+                    continue;
+                }
+                ImGui::SameLine();
+                if (m_WidgetTypes.find(var.first) == m_WidgetTypes.end()) {  // not found
+                    if (ImGui::ContrastedButton(var.first.c_str())) {
+                        m_Expr.set(var.first, 0.0, true);
+                        m_WidgetTypes[var.first] = WidgetType::WIDGET_INPUT;
+                    }
+                }
+            }
+            ImGui::Text("%s", "Add a Slider ?");
+            for (const auto& var : m_Expr.getParsedVars()) {
+                if (var.first == "x") {
+                    continue;
+                }
+                ImGui::SameLine();
+                if (m_WidgetTypes.find(var.first) == m_WidgetTypes.end()) {  // not found
+                    if (ImGui::ContrastedButton(var.first.c_str())) {
+                        m_Expr.set(var.first, 0.0, true);
+                        m_WidgetTypes[var.first] = WidgetType::WIDGET_SLIDER;
+                    }
+                }
             }
         }
     }
-}
-
-bool ChartSystem::m_DrawInputExpr(const char* vLabel, const char* vBufferLabel, char* vBuffer, size_t vBufferSize, const int& vError, const char* vDdefaultValue) {
-    bool change = false;
-
-    ImGui::Text(vLabel);
-    ImGui::SameLine();
-    if (vError)
-        ImGui::PushStyleColor(ImGuiCol_FrameBg, ImGui::CustomStyle::BadColor);
-    if (ImGui::ContrastedButton(ICON_NDP_RESET)) {
-        ct::ResetBuffer(vBuffer);
-        ct::AppendToBuffer(vBuffer, vBufferSize, vDdefaultValue);
-    }
-    ImGui::SameLine();
-    change |= ImGui::InputText(vBufferLabel, vBuffer, vBufferSize);
-    if (vError) {
-        ImGui::PopStyleColor();
-        ImGui::Text("Err at pos : %i", vError);
-    }
-
-    return change;
-}
-
-bool ChartSystem::m_DrawVars() {
-    static std::string var_to_erase;
-
-    bool change = false;
-
-    ImGui::Separator();
-
-    if (ImGui::ContrastedButton("Add Var")) {
-        m_AddVar(m_VarToAddBuffer, 0.0);
-        change = true;
-    }
-
-    ImGui::SameLine();
-
-    ImGui::InputText("##VarToAdd", m_VarToAddBuffer, s_EXPR_MAX_LEN);
-
-    ImGui::Separator();
-
-    for (auto& var : m_VarNameValues) {
-        if (var.first == "x" || var.first == "y" || var.first == "z")
+    for (auto& var : m_Expr.getDefinedVarsRef()) {
+        if (var.first == "x") {
             continue;
-
-        if (ImGui::ContrastedButton(ICON_NDP_RESET)) {
-            var_to_erase = var.first;
         }
-        ImGui::SameLine();
-        ImGui::Text("%s", var.first.c_str());
-        ImGui::SameLine();
-        ImGui::PushID(&var.second);
-        change |= ImGui::InputDouble("##value", &var.second);
-        ImGui::PopID();
+        assert(m_WidgetTypes.find(var.first) != m_WidgetTypes.end());
+        switch (m_WidgetTypes.at(var.first)) {
+            case WidgetType::WIDGET_INPUT: {
+                if (ImGui::InputDoubleDefaultStepper(  //
+                        avail_width,
+                        70.0f,
+                        var.first.c_str(),
+                        &var.second,
+                        0.0,
+                        0.1,
+                        0.5,
+                        "%.6f",
+                        "%.6f")) {
+                    m_Expr.set(var.first, var.second);
+                    m_computeExpr();
+                }
+            } break;
+            case WidgetType::WIDGET_SLIDER: {
+                ImGui::Text("%s", var.first.c_str());
+                ImGui::SameLine(70.0f);
+                ImGui::PushID(var.first.c_str());
+                if (ImGui::SliderDoubleDefault(avail_width - 70.0f - ImGui::GetStyle().ItemSpacing.x, "##WIDGET_SLIDER", &var.second, -10.0, 10.0, 0.0)) {
+                    m_Expr.set(var.first, var.second);
+                    m_computeExpr();
+                }
+                ImGui::PopID();
+            } break;
+            case WidgetType::Count:
+            default: break;
+        }
     }
-
-    if (!var_to_erase.empty()) {
-        m_DelVar(var_to_erase);
-        var_to_erase.clear();
-        change = true;
-    }
-
-    return change;
+    ImGui::Separator();
 }
 
-void ChartSystem::m_DrawWidgets(const float vWidth) {
-    if (ImGui::CollapsingHeader("Parametric Curve Diff")) {
-        bool change = false;
-
-        change |= ImGui::InputDoubleDefault(0.0f, "Start Location x", &m_StartLocation.x, 0.001, "%f");
-        change |= ImGui::InputDoubleDefault(0.0f, "Start Location Y", &m_StartLocation.y, 0.001, "%f");
-        change |= ImGui::InputDoubleDefault(0.0f, "Start Location z", &m_StartLocation.z, 0.001, "%f");
-        change |= ImGui::InputUIntDefault(0.0f, "Step Count", &m_StepCount, 10000U, 1, 10);
-        change |= ImGui::InputDoubleDefault(0.0f, "Step Size", &m_StepSize, 0.01, "%f");
-
-        ImGui::Separator();
-
-        change |= m_DrawInputExpr("dx(x,y,z)", "##expr_x", m_ExprX, ChartSystem::s_EXPR_MAX_LEN, m_Err_x, "10.0*(y-x)");
-        change |= m_DrawInputExpr("dy(x,y,z)", "##expr_y", m_ExprY, ChartSystem::s_EXPR_MAX_LEN, m_Err_y, "28.0*x-y-x*z");
-        change |= m_DrawInputExpr("dz(x,y,z)", "##expr_z", m_ExprZ, ChartSystem::s_EXPR_MAX_LEN, m_Err_z, "x*y-2.66667*z");
-
-        ImGui::Separator();
-
-        change |= ImGui::CheckBoxBoolDefault("Close Curve", &m_CloseCurve, false);
-
-        ImGui::Separator();
-
-        change |= ImGui::ContrastedButton("Eval");
-
-        ImGui::SameLine();
-
-        if (ImGui::ContrastedButton("Center Model")) {
-            // CommonSystem::Instance()->SetTargetXYZ(-(ct::fvec3)m_CenterPoint, true);
-        }
-
-        change |= m_DrawVars();
-
-        if (change) {
-            m_Compute();
-        }
+void OneExpr::reComputeIfNeeded(const ImPlotRect& vRect) {
+    if (vRect.Min().x != m_ChartLimits.Min().x ||  //
+        vRect.Min().y != m_ChartLimits.Min().y ||  //
+        vRect.Max().x != m_ChartLimits.Max().x ||  //
+        vRect.Max().y != m_ChartLimits.Max().y) {
+        m_ChartLimits = vRect;
+        m_computeExpr();
     }
 }
 
-void ChartSystem::m_DrawChart(const float vWidth) {
-    static float constraints[4] = {-10, 10, 1, 20};
+bool OneExpr::m_computeExpr() {
+    bool ret = false;
+    m_ErrorCode = ez::ErrorCode::NONE;
+    m_ErrorMsg.clear();
+    try {
+        m_Expr.parse(m_ExprInput.GetText());
+    } catch (const ez::ExprException& ex) {
+        m_ErrorCode = ex.getCode();
+        m_ErrorMsg = ex.what();
+        return false;
+    }
+    double rangeX = m_ChartLimits.Size().x;
+    double stepX = rangeX / s_COUNT_POINTS;
+    double px = m_ChartLimits.Min().x;
+    bool have_div_by_zero = false;
+    bool have_inf = false;
+    bool have_nan = false;
+    for (size_t idx = 0U; idx < s_COUNT_POINTS; ++idx) {
+        m_axisX[idx] = px;
+        try {
+            m_axisY[idx] = m_Expr.set("x", px).eval().getResult();
+        } catch (const ez::ExprException& ex) {
+            m_ErrorCode = ex.getCode();
+            if (m_ErrorCode == ez::ErrorCode::DIVISION_BY_ZERO) {
+                have_div_by_zero = true;
+            } else if (m_ErrorCode == ez::ErrorCode::EVALUATION_INF) {
+                have_inf = true;
+            } else if (m_ErrorCode == ez::ErrorCode::EVALUATION_NAN) {
+                have_nan = true;
+            }
+            m_axisY[idx] = 0.0;
+        }
+        px += stepX;
+    }
+    if (have_div_by_zero) {
+        m_ErrorMsg += "\nSome portions have div by zero";
+    } else if (have_inf) {
+        m_ErrorMsg += "\nSome portions have inf value";
+    } else if (have_nan) {
+        m_ErrorMsg += "\nSome portions have nan value";
+    }
+    return ret;
+}
+
+OneExpr::Points& OneExpr::getAxisXRef() {
+    return m_axisX;
+}
+
+OneExpr::Points& OneExpr::getAxisYRef() {
+    return m_axisY;
+}
+
+bool ChartSystem::init() {
+    m_ChartLimits = ImPlotRect(-2, 2, -2, 2);
+    m_Exprs.push_back(OneExpr::create("f0(y)", 0));
+    return true;
+}
+
+void ChartSystem::unit() {
+    m_Exprs.clear();
+}
+
+void ChartSystem::drawChart() {
     static ImPlotAxisFlags flags;
-    ImGui::DragFloat2("Limits Constraints", &constraints[0], 0.01f);
-    ImGui::DragFloat2("Zoom Constraints", &constraints[2], 0.01f);
-    if (ImPlot::BeginPlot("##AxisConstraints", ImVec2(vWidth, -1.0f))) {
+    if (ImPlot::BeginPlot("##MathExpr", ImVec2(-1, -1))) {
         ImPlot::SetupAxes("X", "Y", flags, flags);
-        ImPlot::SetupAxesLimits(-1, 1, -1, 1);
-        ImPlot::SetupAxisLimitsConstraints(ImAxis_X1, constraints[0], constraints[1]);
-        ImPlot::SetupAxisZoomConstraints(ImAxis_X1, constraints[2], constraints[3]);
-        ImPlot::SetupAxisLimitsConstraints(ImAxis_Y1, constraints[0], constraints[1]);
-        ImPlot::SetupAxisZoomConstraints(ImAxis_Y1, constraints[2], constraints[3]);
+        ImPlot::SetupAxisLinks(ImAxis_X1, &m_ChartLimits.X.Min, &m_ChartLimits.X.Max);
+        ImPlot::SetupAxisLinks(ImAxis_Y1, &m_ChartLimits.Y.Min, &m_ChartLimits.Y.Max);
+        for (auto& exprPtr : m_Exprs) {
+            if (exprPtr != nullptr) {
+                exprPtr->reComputeIfNeeded(m_ChartLimits);
+                exprPtr->drawCurve();
+            }
+        }
         ImPlot::EndPlot();
     }
 }
 
-void ChartSystem::m_Compute() {
-    /*VerticeArray vertices;
-    IndiceArray indices;
-
-    const int verts_len = m_StepCount;
-    if (verts_len < 2) {
-        LogVarError("Vertex count < 2, no mesh will be generated");
-        return;
-    }
-
-    vertices.resize(verts_len);
-    indices.resize(m_CloseCurve ? verts_len + 1 : verts_len);
-
-    te_expr* expr_x_ptr = te_compile(m_ExprX, m_Vars.data(), (int)m_Vars.size(), &m_Err_x);
-    te_expr* expr_y_ptr = te_compile(m_ExprY, m_Vars.data(), (int)m_Vars.size(), &m_Err_y);
-    te_expr* expr_z_ptr = te_compile(m_ExprZ, m_Vars.data(), (int)m_Vars.size(), &m_Err_z);
-
-    if (expr_x_ptr && expr_y_ptr && expr_z_ptr) {
-        const double step_d = m_StepSize;  // double conv
-
-        auto& x_value = m_VarNameValues.at("x");
-        x_value = m_StartLocation.x;
-
-        auto& y_value = m_VarNameValues.at("y");
-        y_value = m_StartLocation.y;
-
-        auto& z_value = m_VarNameValues.at("z");
-        z_value = m_StartLocation.z;
-
-        m_CenterPoint = 0.0;
-
-        double ratio = 0.0;
-        double px, py, pz;
-        int verts_index;
-        for (verts_index = 0; verts_index < verts_len; ++verts_index) {
-            ratio = (double)verts_index / (double)verts_len;
-
-            px = te_eval(expr_x_ptr);
-            py = te_eval(expr_y_ptr);
-            pz = te_eval(expr_z_ptr);
-
-            x_value += px * step_d;
-            y_value += py * step_d;
-            z_value += pz * step_d;
-
-            if (!isfinite(abs(x_value)))
-                x_value = 0.0;
-            if (!isfinite(abs(y_value)))
-                y_value = 0.0;
-            if (!isfinite(abs(z_value)))
-                z_value = 0.0;
-
-            auto& v = vertices.at(verts_index);
-            v.p.x = (float)x_value;
-            v.p.y = (float)y_value;
-            v.p.z = (float)z_value;
-            v.c = (float)ratio;
-            m_CenterPoint += v.p;
-            indices[verts_index] = verts_index;
-        }
-
-        m_CenterPoint /= (double)verts_len;
-
-        if (m_CloseCurve) {
-            indices[verts_len] = 0;
-        }
-
-        auto sceneMeshPtr = SceneMesh<VertexStruct::P3_N3_TA3_BTA3_T2_C4>::Create(m_VulkanCore, vertices, indices);
-        sceneMeshPtr->SetPrimitiveType(SceneModelPrimitiveType::SCENE_MODEL_PRIMITIVE_TYPE_CURVES);
-        m_SceneModelPtr->clear();
-        m_SceneModelPtr->Add(sceneMeshPtr);
-
-        auto parentNodePtr = GetParentNode().lock();
-        if (parentNodePtr) {
-            parentNodePtr->SendFrontNotification(ModelUpdateDone);
+void ChartSystem::drawExpr() {
+    for (auto& exprPtr : m_Exprs) {
+        if (exprPtr != nullptr) {
+            exprPtr->drawWidgets();
         }
     }
-
-    if (!expr_x_ptr)
-        LogVarError("Parse error for params x at %d", m_Err_x);
-    if (!expr_y_ptr)
-        LogVarError("Parse error for params y at %d", m_Err_y);
-    if (!expr_z_ptr)
-        LogVarError("Parse error for params z at %d", m_Err_z);
-
-    te_free(expr_x_ptr);
-    te_free(expr_y_ptr);
-    te_free(expr_z_ptr);*/
 }
