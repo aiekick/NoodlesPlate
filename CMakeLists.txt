@@ -11,7 +11,7 @@ option(USE_PROFILER_TRACY "Enale Tracy Profiler" OFF)
 option(USE_SDL "Enale SDL instead of GLFW (Not fully tested btw)" OFF)
 option(USE_NETWORK "Enable NETWORK (Shader Inport, Versions, Changelog)" ON)
 option(BUILD_X32 "Enable the 32 bit version of NoodlesPlate (default is X64)" OFF)
-option(USE_PACKAGE_TO_NSIS "Enable packaging to nsis isntaller or zip if false" ON)
+option(USE_PACKAGE_TO_NSIS "Enable packaging to nsis isntaller or zip if false" OFF)
 option(USE_STD_FILESYSTEM "Enable std::filesystem use for path and ImGuiFileDialog" ON)
 
 if (WIN32)
