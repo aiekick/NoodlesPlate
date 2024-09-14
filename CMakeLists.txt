@@ -7,11 +7,13 @@ enable_language(C CXX)
 
 project(${PROJECT} CXX)
 
-option(USE_PROFILER_TRACY "Enale Tracy Profiler" OFF)
+option(USE_CONSOLE_APP "Enable Console" OFF)
+option(USE_TRACY_PROFILER "Enable Tracy Profiler" OFF)
+option(USE_DEBUG_SANITIZER "Enable Address Sanitizer" OFF)
 option(USE_SDL "Enale SDL instead of GLFW (Not fully tested btw)" OFF)
+option(USE_PACKAGE_TO_NSIS_OR_ZIP "Package to NISIS Installer or ZIP" OFF)
 option(USE_NETWORK "Enable NETWORK (Shader Inport, Versions, Changelog)" ON)
 option(BUILD_X32 "Enable the 32 bit version of NoodlesPlate (default is X64)" OFF)
-option(USE_PACKAGE_TO_NSIS "Enable packaging to nsis isntaller or zip if false" OFF)
 option(USE_STD_FILESYSTEM "Enable std::filesystem use for path and ImGuiFileDialog" ON)
 
 if (WIN32)
@@ -46,31 +48,40 @@ if (USE_VR)
 	endif()
 endif()
 
-set(FINAL_BIN_DIR ${CMAKE_BINARY_DIR}/../bin)
-set(CMAKE_INSTALL_PREFIX "${FINAL_BIN_DIR}")
-set(CMAKE_PDB_OUTPUT_DIRECTORY "${FINAL_BIN_DIR}/debug")
-
-## some defines for debug mode (before 3rdparty.cmake)
-if(MSVC)
-	set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>") ## MT in release or MTd in debug
-	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /W4 -D_DEBUG /Zi")
-else()
-	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_DEBUG -g")
+if (USE_STD_FILESYSTEM)
+	add_definitions(-DUSE_STD_FILESYSTEM)
 endif()
 
 ## for group smake targets in the dir cmakeTargets
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set_property(GLOBAL PROPERTY PREDEFINED_TARGETS_FOLDER "cmakeTargets")
+## set_property(GLOBAL PROPERTY GLOBAL_DEPENDS_DEBUG_MODE 1)
 
-if (USE_STD_FILESYSTEM)
-	add_definitions(-DUSE_STD_FILESYSTEM)
-	set(CMAKE_CXX_STANDARD 17)
-else()
-	set(CMAKE_CXX_STANDARD 14)
-endif()
-
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+
+## some defines for debug mode (before 3rdparty.cmake)
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_DEBUG")
+
+## some defines for debug mode (before 3rdparty.cmake)
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_DEBUG")
+
+set(FINAL_BIN_DIR ${CMAKE_SOURCE_DIR}/bin)
+set(CMAKE_PDB_OUTPUT_DIRECTORY "${FINAL_BIN_DIR}/debug")
+
+set(CMAKE_INSTALL_PREFIX .)
+set(CMAKE_INSTALL_BINDIR .)
+
+## some defines for debug mode (before 3rdparty.cmake)
+if(MSVC)
+	set(CMAKE_GENERATOR_PLATFROM=x64)
+	set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>") ## MT in release or MTd in debug
+	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /W4 -D_DEBUG /Zi")
+else ()
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m64")
+	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_DEBUG -g")
+endif ()
 
 add_definitions(-DGLM)
 add_definitions(-DGLAD)
@@ -92,48 +103,48 @@ set(LLVM_USE_CRT_RELEASE MT CACHE STRING "" FORCE)
 set(LLVM_USE_CRT_RELWITHDEBINFO MT CACHE STRING "" FORCE)
 set(USE_MSVC_RUNTIME_LIBRARY_DLL OFF CACHE BOOL "" FORCE)
 
+###########################################################
+###########################################################
+###########################################################
+
 include(cmake/3rdparty.cmake)
 
+###########################################################
+###########################################################
+###########################################################
+
+set_target_properties(uninstall PROPERTIES FOLDER "cmakeTargets")
+
 if(UNIX)
-    if(APPLE)
-        add_definitions(-DAPPLE)
-    else()
-        add_definitions(-DLINUX)
-    endif()
     add_definitions(-DUNIX)
-	add_definitions(-DMINGW32)	
 elseif(WIN32)
-	add_definitions(-DWIN32)
-	if(MINGW)
-		add_definitions(-DMINGW32)
-	endif()
-    set(DIRENT_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/3rdparty/dirent/include)
-    include_directories(${DIRENT_INCLUDE_DIR})
+    add_definitions(-DWIN32)
 endif()
 
 if(MSVC)
-	# Ignore 4055 for glad
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4 /IGNORE:4055")
-	add_definitions(-D_USE_MATH_DEFINES)
-	add_definitions(-DMSVC)
-	add_definitions(-DNOMINMAX) ## for avoid issue regarding std::max and std::min	
-	if (BUILD_X32)
-		set(CMAKE_GENERATOR_PLATFROM=x86)
-	else()
-		set(CMAKE_GENERATOR_PLATFROM=x64)
-	endif()
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4 /FR /std:c++17")
+	set(CMAKE_GENERATOR_PLATFROM=x64)
+    add_definitions(-D_USE_MATH_DEFINES)
+    add_definitions(-DMSVC)
+    add_definitions(-DGLFW_EXPOSE_NATIVE_WIN32)
+	add_definitions(-DNOMINMAX) ## for avoid issue regarding std::max and std::min
 else ()
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic -Wdeprecated-declarations -Wno-unknown-pragmas -Wno-unused-variable -Wno-unused-parameter")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic -std=c++17 -Wunused-parameter -Wno-unknown-pragmas")
 	if (BUILD_X32)
-    	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m32")
+		#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 	else()
-    	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m64")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m64")
 	endif()
+endif ()
+
+
+if(NOT CMAKE_DEBUG_POSTFIX)
+  set(CMAKE_DEBUG_POSTFIX _debug)
 endif()
 
-if (TARGET uninstall)
-	set_target_properties(uninstall PROPERTIES FOLDER "cmakeTargets")
-endif()
+###########################################################
+###########################################################
+###########################################################
 
 file(GLOB PROJECT_MAIN ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp ${CMAKE_CURRENT_SOURCE_DIR}/.clang-format)
 source_group(main FILES ${PROJECT_MAIN})
@@ -162,6 +173,10 @@ if (MSVC)
 	set(APP_ICON_RESOURCE_WINDOWS "${CMAKE_SOURCE_DIR}/res/appicon.rc")
 endif()
 
+###########################################################
+###########################################################
+###########################################################
+
 add_executable(${PROJECT}
 	${PROJECT_MAIN}
 	${CMAKE_RECURSE}
@@ -170,6 +185,23 @@ add_executable(${PROJECT}
 	${PROJECT_SRC_RECURSE}
 	${APP_ICON_RESOURCE_WINDOWS}
 )
+
+###########################################################
+###########################################################
+###########################################################
+
+if(USE_CONSOLE_APP)
+	if (MSVC)
+		target_link_options(${PROJECT} PRIVATE "/SUBSYSTEM:WINDOWS")
+		target_link_options(${PROJECT} PRIVATE "/ENTRY:mainCRTStartup")
+	endif()
+endif()
+
+if(USE_DEBUG_SANITIZER)
+	target_compile_options(${PROJECT} PRIVATE $<$<CONFIG:Debug>:-fsanitize=address -static-libasan>)
+	target_link_options(${PROJECT} PRIVATE $<$<CONFIG:Debug>:-fsanitize=address -static-libasan>)
+	message(STATUS "Address Sanitizer enabled for projet ${PROJECT}")
+endif()
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 	target_compile_options(${PROJECT} PRIVATE -Wno-unused-function)
@@ -206,10 +238,11 @@ if (USE_IN_APP_GPU_PROFILER)
 	target_compile_definitions(${PROJECT} PUBLIC USE_IN_APP_GPU_PROFILER)
 endif()
 
-set_target_properties(${PROJECT} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${FINAL_BIN_DIR}")
-set_target_properties(${PROJECT} PROPERTIES RUNTIME_OUTPUT_DIRECTORY_DEBUG "${FINAL_BIN_DIR}")
-set_target_properties(${PROJECT} PROPERTIES RUNTIME_OUTPUT_DIRECTORY_RELEASE "${FINAL_BIN_DIR}")
-set_target_properties(${PROJECT} PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${FINAL_BIN_DIR}")
+set(${PROJECT}_OUTPUT_NAME "${PROJECT}_${CMAKE_SYSTEM_NAME}_$<$<CONFIG:Debug>:Debug>$<$<CONFIG:Release>:Release>$<$<CONFIG:MinSizeRel>:MinSizeRel>$<$<CONFIG:RelWithDebInfo>:RelWithDebInfo>_${ARCH}")
+set_target_properties(${PROJECT} PROPERTIES	OUTPUT_NAME "${${PROJECT}_OUTPUT_NAME}")
+set_target_properties(${PROJECT} PROPERTIES	RUNTIME_OUTPUT_DIRECTORY "${FINAL_BIN_DIR}")
+set_target_properties(${PROJECT} PROPERTIES	RUNTIME_OUTPUT_DIRECTORY_DEBUG "${FINAL_BIN_DIR}")
+set_target_properties(${PROJECT} PROPERTIES	RUNTIME_OUTPUT_DIRECTORY_RELEASE "${FINAL_BIN_DIR}")
 
 if(MSVC)
 	if ("${CMAKE_EXE_LINKER_FLAGS}" STREQUAL "/machine:x64")
@@ -240,7 +273,6 @@ endif()
 if (APPLE)
 	set(${PROJECT}_Output_Name "${PROJECT}_Osx_${ARCH}")
 	set_target_properties(${PROJECT} PROPERTIES
-		OUTPUT_NAME "${PROJECT}_Osx_${ARCH}"
 		MACOSX_BUNDLE_EXECUTABLE_NAME "${PROJECT}_Osx_${ARCH}"
 		MACOSX_BUNDLE_BUNDLE_NAME "${PROJECT}_Osx_${ARCH}"
 		FOLDER "${PROJECT}_Osx_${ARCH}"
@@ -249,18 +281,6 @@ if (APPLE)
 		##MACOSX_BUNDLE_LONG_VERSION_STRING "Beta 0.5"
 		##MACOSX_BUNDLE_ICON_FILE res/icon.icns
 		MACOSX_BUNDLE_INFO_PLIST "${CMAKE_SOURCE_DIR}/res/MacOSXBundleInfo.plist.in")
-elseif(WIN32)
-	if (MINGW)
-		set(${PROJECT}_Output_Name "${PROJECT}_Mingw32_${ARCH}")
-	elseif (CYGWIN)
-		set(${PROJECT}_Output_Name "${PROJECT}_Cygwin_${ARCH}")
-	elseif(MSVC)
-		set(${PROJECT}_Output_Name "${PROJECT}_Msvc_${ARCH}")
-	endif()
-	set_target_properties(${PROJECT} PROPERTIES	OUTPUT_NAME "${${PROJECT}_Output_Name}")
-elseif(UNIX)
-	set(${PROJECT}_Output_Name "${PROJECT}_Linux_${ARCH}")
-	set_target_properties(${PROJECT} PROPERTIES	OUTPUT_NAME "${${PROJECT}_Output_Name}")
 endif()
 
 include_directories(
