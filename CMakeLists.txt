@@ -64,9 +64,6 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 ## some defines for debug mode (before 3rdparty.cmake)
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_DEBUG")
 
-## some defines for debug mode (before 3rdparty.cmake)
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_DEBUG")
-
 set(FINAL_BIN_DIR ${CMAKE_SOURCE_DIR}/bin)
 set(CMAKE_PDB_OUTPUT_DIRECTORY "${FINAL_BIN_DIR}/debug")
 
@@ -318,6 +315,7 @@ if (EXISTS ${CMAKE_BINARY_DIR}/current_build_type)
 	string(STRIP ${CURRENT_BUILD_TYPE} CURRENT_BUILD_TYPE) ### removing end line wrote by echo command
 	set(PROJECT_BUILD_CONFIG_NAME ${CURRENT_BUILD_TYPE} CACHE STRING "" FORCE)
 	message(STATUS "CURRENT BUILD CONFIG is : ${PROJECT_BUILD_CONFIG_NAME}")
+	set(${PROJECT}_OUTPUT_NAME "${PROJECT}_${CMAKE_SYSTEM_NAME}_${PROJECT_BUILD_CONFIG_NAME}_${ARCH}")
 endif()
 
 #############################################################
