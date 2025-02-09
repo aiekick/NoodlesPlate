@@ -3518,7 +3518,64 @@ ShaderInfos CodeGenerator::Get_Shader_Demo_Multipass_One_File_2_buffers()
 	CTOOL_DEBUG_BREAK;
 
 	ShaderInfos infos;
-	infos.header += u8R"()";
+	infos.header += u8R"(
+@NOTE
+
+@FRAMEBUFFER
+
+//FORMAT(float or byte)
+//COUNT(1 to 8)
+//WRAP(clamp or repeat or mirror)
+//FILTER(linear or nearest)
+//MIPMAP(false or true)
+//SIZE(800,600 or picture:file.jpeg)
+//RATIO(1.5 or picture:file.jpeg)
+
+@UNIFORMS
+
+uniform vec2(buffer) uSize;
+uniform sampler2D(buffer:buffer=BUFFER_A) uBufferA;
+uniform sampler2D(buffer:buffer=BUFFER_B) uBufferB;
+
+@COMMON
+
+@FRAGMENT BUFFER(MAIN)
+
+layout(location = 0) out vec4 fragColor;
+void main() {
+	vec2 uv = gl_FragCoord.xy / uSize;
+	vec4 bufferA = texture(uBufferA, uv);
+	vec4 bufferB = texture(uBufferB, uv);
+	fragColor.r = clamp(dot(bufferA, bufferA), 0.0, 1.0);
+	fragColor.g = clamp(dot(bufferB, bufferB), 0.0, 1.0);
+	fragColor.b = 0.0;
+	fragColor.a = 1.0;
+}
+
+@FRAGMENT BUFFER(BUFFER_A)
+
+layout(location = 0) out vec4 fragColor;
+void main() {
+	vec2 uv = gl_FragCoord.xy / uSize;
+    fragColor = vec4(uv.x);
+}
+
+@FRAGMENT BUFFER(BUFFER_B)
+
+layout(location = 0) out vec4 fragColor;
+void main() {
+	vec2 uv = gl_FragCoord.xy / uSize;
+    fragColor = vec4(uv.y);
+}
+
+@VERTEX
+
+layout(location = 0) in vec2 a_position;
+void main()
+{
+	gl_Position = vec4(a_position, 0.0, 1.0);
+}
+)";
 	return infos;
 }
 
@@ -3527,7 +3584,74 @@ ShaderInfos CodeGenerator::Get_Shader_Demo_Multipass_One_File_3_buffers()
 	CTOOL_DEBUG_BREAK;
 
 	ShaderInfos infos;
-	infos.header += u8R"()";
+	infos.header += u8R"(
+@NOTE
+
+@FRAMEBUFFER
+
+//FORMAT(float or byte)
+//COUNT(1 to 8)
+//WRAP(clamp or repeat or mirror)
+//FILTER(linear or nearest)
+//MIPMAP(false or true)
+//SIZE(800,600 or picture:file.jpeg)
+//RATIO(1.5 or picture:file.jpeg)
+
+@UNIFORMS
+
+uniform vec2(buffer) uSize;
+uniform sampler2D(buffer:buffer=BUFFER_A) uBufferA;
+uniform sampler2D(buffer:buffer=BUFFER_B) uBufferB;
+uniform sampler2D(buffer:buffer=BUFFER_C) uBufferC;
+
+@COMMON
+
+@FRAGMENT BUFFER(MAIN)
+
+layout(location = 0) out vec4 fragColor;
+void main() {
+	vec2 uv = gl_FragCoord.xy / uSize;
+	vec4 bufferA = texture(uBufferA, uv);
+	vec4 bufferB = texture(uBufferB, uv);
+	vec4 bufferC = texture(uBufferC, uv);
+	fragColor.r = clamp(dot(bufferA, bufferA), 0.0, 1.0);
+	fragColor.g = clamp(dot(bufferB, bufferB), 0.0, 1.0);
+	fragColor.b = clamp(dot(bufferC, bufferC), 0.0, 1.0);
+	fragColor.a = 1.0;
+}
+
+@FRAGMENT BUFFER(BUFFER_A)
+
+layout(location = 0) out vec4 fragColor;
+void main() {
+	vec2 uv = gl_FragCoord.xy / uSize;
+    fragColor = vec4(uv.x);
+}
+
+@FRAGMENT BUFFER(BUFFER_B)
+
+layout(location = 0) out vec4 fragColor;
+void main() {
+	vec2 uv = gl_FragCoord.xy / uSize;
+    fragColor = vec4(uv.y);
+}
+
+@FRAGMENT BUFFER(BUFFER_C)
+
+layout(location = 0) out vec4 fragColor;
+void main() {
+	vec2 uv = gl_FragCoord.xy / uSize;
+    fragColor = vec4(cos(uv.x) * sin(uv.y));
+}
+
+@VERTEX
+
+layout(location = 0) in vec2 a_position;
+void main()
+{
+	gl_Position = vec4(a_position, 0.0, 1.0);
+}
+)";
 	return infos;
 }
 
@@ -3536,6 +3660,83 @@ ShaderInfos CodeGenerator::Get_Shader_Demo_Multipass_One_File_4_buffers()
 	CTOOL_DEBUG_BREAK;
 
 	ShaderInfos infos;
-	infos.header += u8R"()";
+	infos.header += u8R"(
+@NOTE
+
+@FRAMEBUFFER
+
+//FORMAT(float or byte)
+//COUNT(1 to 8)
+//WRAP(clamp or repeat or mirror)
+//FILTER(linear or nearest)
+//MIPMAP(false or true)
+//SIZE(800,600 or picture:file.jpeg)
+//RATIO(1.5 or picture:file.jpeg)
+
+@UNIFORMS
+
+uniform vec2(buffer) uSize;
+uniform sampler2D(buffer:buffer=BUFFER_A) uBufferA;
+uniform sampler2D(buffer:buffer=BUFFER_B) uBufferB;
+uniform sampler2D(buffer:buffer=BUFFER_C) uBufferC;
+uniform sampler2D(buffer:buffer=BUFFER_D) uBufferD;
+
+@COMMON
+
+@FRAGMENT BUFFER(MAIN)
+
+layout(location = 0) out vec4 fragColor;
+void main() {
+	vec2 uv = gl_FragCoord.xy / uSize;
+	vec4 bufferA = texture(uBufferA, uv);
+	vec4 bufferB = texture(uBufferB, uv);
+	vec4 bufferC = texture(uBufferC, uv);
+	vec4 bufferD = texture(uBufferD, uv);
+	fragColor.r = clamp(dot(bufferA, bufferA), 0.0, 1.0);
+	fragColor.g = clamp(dot(bufferB, bufferB), 0.0, 1.0);
+	fragColor.b = clamp(dot(bufferC, bufferC), 0.0, 1.0);
+	fragColor.a = clamp(dot(bufferD, bufferD), 0.0, 1.0);
+}
+
+@FRAGMENT BUFFER(BUFFER_A)
+
+layout(location = 0) out vec4 fragColor;
+void main() {
+	vec2 uv = gl_FragCoord.xy / uSize;
+    fragColor = vec4(uv.x);
+}
+
+@FRAGMENT BUFFER(BUFFER_B)
+
+layout(location = 0) out vec4 fragColor;
+void main() {
+	vec2 uv = gl_FragCoord.xy / uSize;
+    fragColor = vec4(uv.y);
+}
+
+@FRAGMENT BUFFER(BUFFER_C)
+
+layout(location = 0) out vec4 fragColor;
+void main() {
+	vec2 uv = gl_FragCoord.xy / uSize;
+    fragColor = vec4(cos(uv.x) * sin(uv.y));
+}
+
+@FRAGMENT BUFFER(BUFFER_D)
+
+layout(location = 0) out vec4 fragColor;
+void main() {
+	vec2 uv = gl_FragCoord.xy / uSize;
+    fragColor = vec4(uv.x - uv.y);
+}
+
+@VERTEX
+
+layout(location = 0) in vec2 a_position;
+void main()
+{
+	gl_Position = vec4(a_position, 0.0, 1.0);
+}
+)";
 	return infos;
 }
