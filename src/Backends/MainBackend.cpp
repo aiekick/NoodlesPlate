@@ -55,6 +55,7 @@
 #include <SoGLSL/src/Buffer/FrameBuffersPipeLine.h>
 #include <SoGLSL/src/Systems/RenderDocController.h>
 #include <SoGLSL/src/CodeTree/ShaderKeyConfigSwitcherUnified.h>
+#include <SoGLSL/src/Importer/ShadertoyBackupFileImportDlg.h>
 #include <SoGLSL/src/Res/CustomFont.h>
 #include <SoGLSL/src/Res/CustomFont2.h>
 
@@ -65,10 +66,9 @@
 #include <Metrics/MetricSystem.h>
 #include <Systems/TemplateSystem.h>
 #include <Systems/UrlLibrarySystem.h>
+#include <Project/ProjectFile.h>
+
 #include <filesystem>
-
-#include <SoGLSL/src/Importer/ShadertoyBackupFileImportDlg.h>
-
 #include <algorithm>
 
 #define MAIN_RENDERPACK_KEY "main"
@@ -1694,8 +1694,7 @@ void MainBackend::DrawMenu_Edit() {
 
         const auto spacing_LURD = ct::fvec4(spacing_L, spacing_U, spacing_R, spacing_D);
 
-        for (auto it = puCodeTree->puFilesUsedFromLastShadersConstruction.begin(); it != puCodeTree->puFilesUsedFromLastShadersConstruction.end();
-             ++it) {
+        for (auto it = puCodeTree->puFilesUsedFromLastShadersConstruction.begin(); it != puCodeTree->puFilesUsedFromLastShadersConstruction.end(); ++it) {
             for (auto it2 = it->second.begin(); it2 != it->second.end(); ++it2) {
                 const auto key = it2->first;
 
@@ -1739,6 +1738,15 @@ void MainBackend::DrawMenu_Edit() {
         }*/
 
         ImGui::EndMenu();
+    }
+    auto ptr = puDisplay_RenderPack.lock();
+    if (ptr->puLastShaderNote.dico.find("url") != ptr->puLastShaderNote.dico.end()) {
+        const auto& url = *(ptr->puLastShaderNote.dico.at("url").begin());
+        if (!url.empty()) {
+            if (ImGui::ContrastedButton(ICON_NDP2_QRCODE, "generate a QrCode of the shader url")) {
+                PictureExportSystem::Instance()->ExportQrCode(ptr->GetShaderKey()->puKey, url);
+            }
+        }
     }
 }
 

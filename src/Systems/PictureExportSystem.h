@@ -51,7 +51,7 @@ protected:
 public:
 	void ExportRenderPackToPictureFile(RenderPackWeak vRP, const std::string& vFilePathName, int vBufferId);
 	void ExportFBOToPictureFile(FrameBufferPtr vFBO, const std::string& vFilePathName, int vBufferId);
-
+    void ExportQrCode(const std::string& vFilePathName, const std::string& vContent);
 	void ExportPictureDialogOptions(std::string vFilter, IGFDUserDatas vUserDatas, bool *vCantContinue);
 	std::string ModifyFilePathNameWithTimeStamp(const std::string& vFilePathName, std::string vExt);
 	void TakeScreenShotForEachModif(bool vForceShot);

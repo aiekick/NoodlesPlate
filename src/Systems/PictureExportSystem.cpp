@@ -31,6 +31,8 @@
 #include <SoGLSL/src/Systems/ScreenGrabber.h>
 #include <Panes/MessagePane.h>
 
+#include <ezlibs/derived/ezQrCode.hpp>
+#include <stb_image_write.h>
 
 // This project
 #include <Backends/MainBackend.h>
@@ -93,39 +95,50 @@ void PictureExportSystem::ExportRenderPackToPictureFile(
 	}
 }
 
-void PictureExportSystem::ExportFBOToPictureFile(
-	FrameBufferPtr vFBO, const std::string& vFilePathName, int vBufferId)
-{
-	if (vFBO)
-	{
-		auto fboSize = vFBO->getSize().xy();
-		if (!fboSize.emptyAND())
-		{
-			if (!vFilePathName.empty() && vBufferId >= 0)
-			{
-				if (vFilePathName.find(".png") != std::string::npos)
-				{
-					vFBO->SaveToPng(vFilePathName, puExport_Texture_FlipY, puExport_Texture_Sample_Count, fboSize, vBufferId);
-				}
-				else if (vFilePathName.find(".bmp") != std::string::npos)
-				{
-					vFBO->SaveToBmp(vFilePathName, puExport_Texture_FlipY, puExport_Texture_Sample_Count, fboSize, vBufferId);
-				}
-				else if (vFilePathName.find(".tga") != std::string::npos)
-				{
-					vFBO->SaveToTga(vFilePathName, puExport_Texture_FlipY, puExport_Texture_Sample_Count, fboSize, vBufferId);
-				}
-				else if (vFilePathName.find(".hdr") != std::string::npos)
-				{
-					vFBO->SaveToHdr(vFilePathName, puExport_Texture_FlipY, puExport_Texture_Sample_Count, fboSize, vBufferId);
-				}
-				else if (vFilePathName.find(".jpg") != std::string::npos)
-				{
-					vFBO->SaveToJpg(vFilePathName, puExport_Texture_FlipY, puExport_Texture_Sample_Count, 100, fboSize, vBufferId);
+void PictureExportSystem::ExportFBOToPictureFile(FrameBufferPtr vFBO, const std::string& vFilePathName, int vBufferId) {
+    if (vFBO) {
+        auto fboSize = vFBO->getSize().xy();
+        if (!fboSize.emptyAND()) {
+            if (!vFilePathName.empty() && vBufferId >= 0) {
+                auto ps = FileHelper::Instance()->ParsePathFileName(vFilePathName);
+                if (ps.isOk) {
+                    if (ps.ext == ".png") {
+                        vFBO->SaveToPng(vFilePathName, puExport_Texture_FlipY, puExport_Texture_Sample_Count, fboSize, vBufferId);
+                    } else if (ps.ext == ".bmp") {
+                        vFBO->SaveToBmp(vFilePathName, puExport_Texture_FlipY, puExport_Texture_Sample_Count, fboSize, vBufferId);
+                    } else if (ps.ext == ".tga") {
+                        vFBO->SaveToTga(vFilePathName, puExport_Texture_FlipY, puExport_Texture_Sample_Count, fboSize, vBufferId);
+                    } else if (ps.ext == ".hdr") {
+                        vFBO->SaveToHdr(vFilePathName, puExport_Texture_FlipY, puExport_Texture_Sample_Count, fboSize, vBufferId);
+                    } else if (ps.ext == ".jpg") {
+                        vFBO->SaveToJpg(vFilePathName, puExport_Texture_FlipY, puExport_Texture_Sample_Count, 100, fboSize, vBufferId);
+                    }
+                }
+            }
+        }
+    }
+}
+
+void PictureExportSystem::ExportQrCode(const std::string& vFilePathName, const std::string& vContent) {
+    if (!vFilePathName.empty() && !vContent.empty()) {
+        auto ps = FileHelper::Instance()->ParsePathFileName(vFilePathName);
+        if (ps.isOk) {
+            const auto file_path_name = ps.GetFPNE_WithNameExt(ps.name + "_qrcode", "png");
+            auto qr = ez::QrCode<5>();
+            if (qr.encode(vContent, ez::Ecc::H)) {
+                int32_t size = 0;
+                const auto buffer = qr.getImageBuffer(1, size);
+                if (!buffer.empty()) {
+                    int ret = stbi_write_png(file_path_name.c_str(), size, size, 1, buffer.data(), size);
+                    if (ret == 0) {
+                        LogVarError("Err : Fail to save QrCode to %s", file_path_name.c_str());
+					} else {
+                        LogVarInfo("QrCode save to %s", file_path_name.c_str());
+					}
 				}
 			}
 		}
-	}
+    }
 }
 
 void PictureExportSystem::ExportPictureDialogOptions(std::string /*vFilter*/, IGFDUserDatas /*vUserDatas*/, bool *
