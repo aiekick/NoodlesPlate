@@ -19,6 +19,8 @@
 
 #include <Backends/MainBackend.h>
 
+#include <Gui/MainFrame.h>
+
 // 3rdparty
 #include <ctools/FileHelper.h>
 #include <Headers/RenderPackHeaders.h>
@@ -1739,12 +1741,26 @@ void MainBackend::DrawMenu_Edit() {
 
         ImGui::EndMenu();
     }
-    auto ptr = puDisplay_RenderPack.lock();
-    if (ptr->puLastShaderNote.dico.find("url") != ptr->puLastShaderNote.dico.end()) {
-        const auto& url = *(ptr->puLastShaderNote.dico.at("url").begin());
-        if (!url.empty()) {
-            if (ImGui::ContrastedButton(ICON_NDP2_QRCODE, "generate a QrCode of the shader url")) {
-                PictureExportSystem::Instance()->ExportQrCode(ptr->GetShaderKey()->puKey, url);
+    if (MainFrame::Instance()->puShowDebug) {
+        auto ptr = puDisplay_RenderPack.lock();
+        if (ptr->puLastShaderNote.dico.find("url") != ptr->puLastShaderNote.dico.end()) {
+            const auto& url = *(ptr->puLastShaderNote.dico.at("url").begin());
+            if (!url.empty()) {
+                if (ImGui::ContrastedButton(ICON_NDP2_QRCODE, "generate a QrCode of the shader url")) {
+                    PictureExportSystem::Instance()->ExportQrCode(  //
+                        ptr->GetShaderKey()->puKey,
+                        url);
+                }
+            }
+            if (ImGui::ContrastedButton(ICON_NDP_PICTURE_O, "generate a Picture of the FBO")) {
+                auto ps = FileHelper::Instance()->ParsePathFileName(ptr->GetShaderKey()->puKey);
+                if (ps.isOk) {
+                    const auto file_path_name = ps.GetFPNE_WithNameExt(ps.name, "png");
+                    PictureExportSystem::Instance()->ExportRenderPackToPictureFile(  //
+                        puDisplay_RenderPack,
+                        file_path_name,
+                        puPreviewBufferId);
+                }
             }
         }
     }
